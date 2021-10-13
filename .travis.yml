@@ -11,8 +11,8 @@ install:
     
 # script to run tests.
 script: 
-  - python -m unittest test/test.py
-  - coverage run test/test.py
+  - python manage.py test
+  - coverage run manage.py test
 
 after_script:
   - bash <(curl -s https://codecov.io/bash)
