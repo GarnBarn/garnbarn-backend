@@ -6,4 +6,3 @@ cover_pylib = False
 # omit uninteresting files
 omit =
     test/test.py
-    
