@@ -1,0 +1,14 @@
+# Using python 3.*
+FROM python:3
+
+# Set Work Directory
+WORKDIR /usr/src/app
+
+# Copy Project Source code into the contaioner
+COPY . ./
+
+# Install Dependency
+RUN pip install -r requirements.txt
+
+# Start Django
+CMD ["python", "manage.py", "runserver"]

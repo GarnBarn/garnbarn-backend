@@ -1,0 +1,14 @@
+# Ignore CI Config File
+.travis.yml
+.coveragerc
+config.cfg
+
+# Docker Config File
+DockerFile
+
+# Repository Files
+LICENSE
+README.md
+
+
+
