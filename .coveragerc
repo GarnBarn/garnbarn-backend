@@ -5,4 +5,4 @@ branch = True
 cover_pylib = False
 # omit uninteresting files
 omit =
-    test/test.py
+    manage.py
