@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'garnbarn_api.apps.GarnbarnApiConfig'
 ]
 
 MIDDLEWARE = [
@@ -75,8 +76,9 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
+# Available database options.
+DATABASES_AVAILABLE = {
+    'sqlite': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     },
@@ -88,6 +90,11 @@ DATABASES = {
     }
 }
 
+selected_database = config("DJANGO_DATABASE", default="sqlite")
+# Real Database configuration.
+DATABASES = {
+    'default': DATABASES_AVAILABLE[selected_database]
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
