@@ -19,5 +19,5 @@ from django.urls.conf import include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('config.urls')),
+    path('api/', include('garnbarn_api.urls')),
 ]
