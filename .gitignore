@@ -130,3 +130,6 @@ dmypy.json
 
 # MySQL Credential
 mysql_credential.cnf
+# IDE cache
+.idea
+*.DS_Store
