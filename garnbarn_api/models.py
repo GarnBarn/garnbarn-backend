@@ -14,7 +14,7 @@ class Tag(models.Model):
 
     def delete_tag(self):
         """Delete the tag."""
-        pass
+        return self.delete()
 
     def __str__(self):
         """Return name of the tag."""
