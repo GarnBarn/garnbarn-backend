@@ -13,9 +13,3 @@ class Assignment(models.Model):
 
     def __str__(self) -> str:
         return self.assignment_name
-
-    def get_assignment(self):
-        pass
-
-    def remove_assignment(self, pk):
-        pass
