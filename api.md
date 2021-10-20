@@ -221,6 +221,81 @@ Example error response:
 
 ---
 
+### Update Assignment
+
+This API will update the specifed assignment with the new detail.
+
+#### Permission
+
+- User must be the **owner** of the requested Assignment.
+- (OR) User must be the **subscriber** of the Tag the requested Assignment has been assigned.
+
+#### HTTP Request
+
+`PATCH /api/v1/assignments/{assignmentId}`
+
+**Request headers**
+
+|                             | Parameters        | Value               |
+| :-------------------------: | :---------------- | ------------------- |
+| ![Required][required_badge] | **Content-Type**  | application/json    |
+| ![Required][required_badge] | **Authorization** | Bearer `{ID Token}` |
+
+**Path parameters**
+
+|                             | Parameters       |  Type  | Description                              |
+| :-------------------------: | :--------------- | :----: | :--------------------------------------- |
+| ![Required][required_badge] | **assignmentId** | String | The ID of assignment you want to remove. |
+
+**Request body**
+
+|                             | Parameters  |  Type  | Description                                                   |
+| :-------------------------: | :---------- | :----: | :------------------------------------------------------------ |
+| ![Optional][optional_badge] | **name**    | String | The name of the new assignment.                               |
+| ![Optional][optional_badge] | **dueDate** | Number | The due date of the new assignment specifed as **Timestamp**. |
+| ![Optional][optional_badge] | **tagId**   | String | The tag id that this assignment will be assgiened to.         |
+
+Example request:
+
+```bash
+curl -v -X PATCH {PREFIX}/api/v1/assignments/{assignmentId} \
+-H 'Content-Type: application/json' \
+-H 'Authorization: Bearer {ID Token}' \
+-d '{
+    "name": "Renamed Assignment"
+}'
+```
+
+#### Response
+
+Return status code `200` and the [Assignment Object](#assignment-object) of the assignment after the update.
+
+Example response:
+
+```JSON
+{
+    "assignmentId": "1",
+    "name": "Renamed Assignment",
+    "description": "This is example",
+    "dueDate": 1634745493,
+    "tagId": "1234",
+}
+```
+
+#### Error
+
+Returns a `40x` HTTP status code and an error response. For more information, see [Error responses in Common specifications](#error-responses-in-common-specifications).
+
+Example error response:
+
+```JSON
+{
+    "message": "Assignment not found"
+}
+```
+
+---
+
 ## Object Structure
 
 ### Assignment Object
