@@ -245,7 +245,7 @@ This API will update the specifed assignment with the new detail.
 
 |                             | Parameters       |  Type  | Description                              |
 | :-------------------------: | :--------------- | :----: | :--------------------------------------- |
-| ![Required][required_badge] | **assignmentId** | String | The ID of assignment you want to remove. |
+| ![Required][required_badge] | **assignmentId** | String | The ID of assignment you want to update. |
 
 **Request body**
 
