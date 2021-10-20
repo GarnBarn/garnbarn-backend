@@ -14,7 +14,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Assignment',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.BigAutoField(auto_created=True,
+                 primary_key=True, serialize=False, verbose_name='ID')),
                 ('assignment_name', models.CharField(max_length=50)),
                 ('due_date', models.DateTimeField(verbose_name='due date')),
                 ('timestamp', models.DateTimeField(auto_now_add=True)),
