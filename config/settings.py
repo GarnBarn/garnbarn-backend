@@ -27,7 +27,8 @@ SECRET_KEY = config("SECRET_KEY", default="no_secret_key")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", default=False)
 
-ALLOWED_HOSTS = config("ALLOW_HOST", default=["127.0.0.1", "localhost"])
+# ALLOWED_HOSTS = config("ALLOW_HOSTS", default=["127.0.0.1", "localhost"])
+ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 
 
 # Application definition
@@ -39,7 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'garnbarn_api.apps.GarnbarnApiConfig'
+    'garnbarn_api.apps.GarnbarnApiConfig',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
@@ -113,6 +115,11 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
+}
 
 
 # Internationalization
