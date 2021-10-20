@@ -93,6 +93,8 @@ Example error response:
 }
 ```
 
+---
+
 ### Create Assignment API
 
 This API will create the assignment in the Database.
