@@ -40,6 +40,10 @@ _Note: https://garnbarn.example is an example PREFIX. Please don't send any requ
 
 This API return the specific Assignment Object related to the Assignment ID passed in the request body.
 
+#### Permission
+
+- User must have permission to view the requested Assignment </br> (By being the **owner of the assignment** or the **subscriber of the Tag** that the Assignment has been assigned).
+
 #### HTTP Request
 
 `GET /api/v1/assignments/{assignmentId}`
@@ -98,6 +102,10 @@ Example error response:
 ### Create Assignment
 
 This API will create the assignment in the Database.
+
+#### Permission
+
+- Anyone that have the user in GarnBarn system.
 
 #### HTTP Request
 
@@ -158,6 +166,11 @@ Example error response:
 ### Delete Assignment
 
 This API will delete the specifed assignment from the Database.
+
+#### Permission
+
+- User must be the **owner** of the requested Assignment.
+- (OR) User must be the **subscriber** of the Tag the requested Assignment has been assigned.
 
 #### HTTP Request
 
