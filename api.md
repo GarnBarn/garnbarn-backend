@@ -105,7 +105,7 @@ This API will create the assignment in the Database.
 
 #### Permission
 
-- Anyone that have the user in GarnBarn system.
+- Anyone that have the account in GarnBarn system.
 
 #### HTTP Request
 
