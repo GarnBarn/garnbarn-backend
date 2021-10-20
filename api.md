@@ -36,7 +36,7 @@ _Note: https://garnbarn.example is an example PREFIX. Please don't send any requ
 
 ## Assignment API
 
-### Get Assignment API
+### Get Assignment
 
 This API return the specific Assignment Object related to the Assignment ID passed in the request body.
 
@@ -95,7 +95,7 @@ Example error response:
 
 ---
 
-### Create Assignment API
+### Create Assignment
 
 This API will create the assignment in the Database.
 
@@ -154,6 +154,59 @@ Example error response:
     "message": "Assignment not found"
 }
 ```
+
+### Delete Assignment
+
+This API will delete the specifed assignment from the Database.
+
+#### HTTP Request
+
+`DELETE /api/v1/assignments/{assignmentId}`
+
+**Request headers**
+
+|                             | Parameters        | Value               |
+| :-------------------------: | :---------------- | ------------------- |
+| ![Required][required_badge] | **Content-Type**  | application/json    |
+| ![Required][required_badge] | **Authorization** | Bearer `{ID Token}` |
+
+**Path parameters**
+
+|                             | Parameters       |  Type  | Description                              |
+| :-------------------------: | :--------------- | :----: | :--------------------------------------- |
+| ![Required][required_badge] | **assignmentId** | String | The ID of assignment you want to remove. |
+
+Example request:
+
+```bash
+curl -v -X DELETE {PREFIX}/api/v1/assignments/{assignmentId} \
+-H 'Content-Type: application/json' \
+-H 'Authorization: Bearer {ID Token}' \
+```
+
+#### Response
+
+Return status code `200` and empty json.
+
+Example response:
+
+```JSON
+{}
+```
+
+#### Error
+
+Returns a `40x` HTTP status code and an error response. For more information, see [Error responses in Common specifications](#error-responses-in-common-specifications).
+
+Example error response:
+
+```JSON
+{
+    "message": "Assignment not found"
+}
+```
+
+---
 
 ## Object Structure
 
