@@ -1,2 +1,2 @@
-* [Home](/)
-* [API Documentation](api.md)
+- [Home](/)
+- [API Documentation](api.md)
