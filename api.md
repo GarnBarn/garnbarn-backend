@@ -20,7 +20,7 @@ Example of the fully assembled API endpoint:
 https://garnbarn.example/api/v1/assignments
 ```
 
-_Note: In this document. We won't write the PREFIX in the URL Endpoint._
+_Note: https://garnbarn.example is an example PREFIX. Please don't send any request to this prefix_
 
 ### Available API Version List
 
@@ -60,7 +60,7 @@ This API return the specific Assignment Object related to the Assignment ID pass
 Example request:
 
 ```bash
-curl -v -X GET https://garnbarn.example/api/v1/assignments/1/ \
+curl -v -X GET {PREFIX}/api/v1/assignments/{assignmentId}/ \
 -H 'Content-Type: application/json' \
 -H 'Authorization: Bearer {ID Token}' \
 ```
@@ -73,7 +73,7 @@ Example response:
 
 ```JSON
 {
-    "id": "1",
+    "assignmentId": "1",
     "name": "Example Assignment",
     "description": "This is example",
     "dueDate": 1634745493,
@@ -93,17 +93,77 @@ Example error response:
 }
 ```
 
+### Create Assignment API
+
+This API will create the assignment in the Database.
+
+#### HTTP Request
+
+`POST /api/v1/assignments/`
+
+**Request headers**
+
+|                             | Parameters        | Value               |
+| :-------------------------: | :---------------- | ------------------- |
+| ![Required][required_badge] | **Content-Type**  | application/json    |
+| ![Required][required_badge] | **Authorization** | Bearer `{ID Token}` |
+
+**Request body**
+
+|                             | Parameters  |  Type  | Description                                                   |
+| :-------------------------: | :---------- | :----: | :------------------------------------------------------------ |
+| ![Required][required_badge] | **name**    | String | The name of the new assignment.                               |
+| ![Optional][optional_badge] | **dueDate** | Number | The due date of the new assignment specifed as **Timestamp**. |
+| ![Optional][optional_badge] | **tagId**   | String | The tag id that this assignment will be assgiened to.         |
+
+Example request:
+
+```bash
+curl -v -X POST {PREFIX}/api/v1/assignments/ \
+-H 'Content-Type: application/json' \
+-H 'Authorization: Bearer {ID Token}' \
+-d '{
+    "name": "Example",
+    "dueDate": 1634745493,
+    "tagId": "1234"
+}'
+```
+
+#### Response
+
+Return status code `200` and the new assignment id
+
+Example response:
+
+```JSON
+{
+    "assignmentId": "1",
+}
+```
+
+#### Error
+
+Returns a `40x` HTTP status code and an error response. For more information, see [Error responses in Common specifications](#error-responses-in-common-specifications).
+
+Example error response:
+
+```JSON
+{
+    "message": "Assignment not found"
+}
+```
+
 ## Object Structure
 
 ### Assignment Object
 
-|                             | Parameters      |  Type  | Value                                                              |
-| :-------------------------: | :-------------- | :----: | :----------------------------------------------------------------- |
-| ![Required][required_badge] | **id**          | String | The ID of assignment.                                              |
-| ![Required][required_badge] | **name**        | String | The name of assignment.                                            |
-| ![Optional][optional_badge] | **description** | String | Assignment description.                                            |
-| ![Optional][optional_badge] | **dueDate**     | Number | The due date of the current assignment presented as **Timestamp**. |
-| ![Optional][optional_badge] | **tagId**       | String | The tag id that this assignment has been assgiened to.             |
+|                             | Parameters       |  Type  | Value                                                              |
+| :-------------------------: | :--------------- | :----: | :----------------------------------------------------------------- |
+| ![Required][required_badge] | **assignmentId** | String | The ID of assignment.                                              |
+| ![Required][required_badge] | **name**         | String | The name of assignment.                                            |
+| ![Optional][optional_badge] | **description**  | String | Assignment description.                                            |
+| ![Optional][optional_badge] | **dueDate**      | Number | The due date of the current assignment presented as **Timestamp**. |
+| ![Optional][optional_badge] | **tagId**        | String | The tag id that this assignment has been assgiened to.             |
 
 ## Error responses in Common specifications
 
