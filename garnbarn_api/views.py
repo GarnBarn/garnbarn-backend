@@ -7,8 +7,6 @@ from .serializer import AssignmentSerializer, TagSerializer
 from .models import Assignment, Tag
 
 
-@api_view()
-@permission_classes([AllowAny])
 class AssignmentViewset(viewsets.ModelViewSet):
     serializer_class = AssignmentSerializer
 
