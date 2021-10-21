@@ -11,3 +11,9 @@ class AssignmentSerializer(serializers.ModelSerializer):
                   'timestamp',
                   'detail'
                   ]
+
+
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = ['tag_name', 'tag_id']
