@@ -14,11 +14,10 @@ class AssignmentViewset(viewsets.ModelViewSet):
         assignment = Assignment.objects.get_queryset().order_by('id')
         return assignment
 
-    def create(self, request, *args, **kwargs):
+    def create(self, request):
         """Override create action."""
 
         assignment_data = request.data
-        print(assignment_data)
         new_assignment = Assignment.objects.create(assignment_name=assignment_data["assignment_name"],
                                                    due_date=assignment_data["due_date"],
                                                    detail=assignment_data["detail"])
