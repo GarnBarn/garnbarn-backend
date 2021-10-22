@@ -17,8 +17,7 @@ class Assignment(models.Model):
 class Tag(models.Model):
     """Class that contain tags or subject of the users."""
 
-    tag_name = models.CharField(max_length=200)
-    tag_id = models.CharField(max_length=200)
+    tag_name = models.CharField(max_length=20)
 
     def __str__(self):
         return self.tag_name
