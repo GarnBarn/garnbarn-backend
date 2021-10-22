@@ -9,12 +9,9 @@ from .models import Assignment, Tag
 
 class AssignmentViewset(viewsets.ModelViewSet):
     serializer_class = AssignmentSerializer
+    queryset = Assignment.objects.get_queryset().order_by('id')
 
-    def get_queryset(self):
-        assignment = Assignment.objects.get_queryset().order_by('id')
-        return assignment
-
-    def create(self, request):
+    def create(self, request, *args, **kwargs):
         """Override create action."""
 
         assignment_data = request.data
@@ -24,6 +21,13 @@ class AssignmentViewset(viewsets.ModelViewSet):
         new_assignment.save()
         serializer = AssignmentSerializer(new_assignment)
         return Response(serializer.data)
+
+    def destroy(self, request, *args, **kwargs):
+        logedin_user = request.user
+        assignment = self.get_object()
+        assignment.delete()
+
+        return Response({"message": "Item has been deleted"})
 
 
 class TagViewset(viewsets.ModelViewSet):
