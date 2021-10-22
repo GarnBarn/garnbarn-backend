@@ -1,19 +1,15 @@
 from rest_framework import serializers
-from .models import Assignment, Tag
+from .models import Assignment
 
 
 class AssignmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Assignment
         fields = ['id',
+                  'tag',
                   'assignment_name',
                   'due_date',
                   'timestamp',
                   'detail'
                   ]
-
-
-class TagSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Tag
-        fields = ['tag_name', 'tag_id']
+        depth = 1
