@@ -27,7 +27,7 @@ class AssignmentViewset(viewsets.ModelViewSet):
         assignment_name = assignment.assignment_name
         assignment.delete()
 
-        return Response({"message": assignment_name + " has been deleted"})
+        return Response({"message": "Assignment:" + assignment_name + " has been deleted"})
 
     def update(self, request, *args, **kwargs):
         assignment_object = self.get_object()
