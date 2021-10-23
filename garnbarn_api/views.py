@@ -12,6 +12,13 @@ class AssignmentViewset(viewsets.ModelViewSet):
     queryset = Assignment.objects.get_queryset().order_by('id')
 
     def create(self, request, *args, **kwargs):
+        """ Create Assignment object.
+
+        Returns:
+            Bad request status, if the given data does not 
+            contain all required data.
+            Else, Assignment's object will be return in json form.
+        """
         serializer = self.serializer_class(data=request.data)
 
         if serializer.is_valid():
@@ -26,6 +33,11 @@ class AssignmentViewset(viewsets.ModelViewSet):
         }, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, *args, **kwargs):
+        """ Remove assignment with specified id.
+
+        Returns:
+            Response message telling which assignment has been deleted.
+        """
         assignment = self.get_object()
         assignment_name = assignment.assignment_name
         assignment.delete()
@@ -33,6 +45,11 @@ class AssignmentViewset(viewsets.ModelViewSet):
         return Response({"message": "Assignment:" + assignment_name + " has been deleted"})
 
     def partial_update(self, request, *args, **kwargs):
+        """ Update data of a specified assignment
+
+        Returns:
+            Assignment's object in json.
+        """
         assignment_object = self.get_object()
         data = request.data
 

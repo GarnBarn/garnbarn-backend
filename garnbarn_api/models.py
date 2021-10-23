@@ -4,7 +4,7 @@ from django.utils import timezone
 
 
 class Tag(models.Model):
-    """Class that contain tags or subject of the users."""
+    """Tag or subject"""
 
     tag_name = models.CharField(max_length=20)
 
@@ -13,10 +13,11 @@ class Tag(models.Model):
 
 
 class Assignment(models.Model):
-    """Contain data and detail about assignment"""
+    """Data and detail about assignment"""
 
     # The assignment shouldn't get deleted when tag is deleted.
     tag = models.ForeignKey(Tag, on_delete=models.SET_NULL, null=True)
+
     assignment_name = models.CharField(max_length=50)
     due_date = models.DateTimeField('due date')
     timestamp = models.DateTimeField(auto_now_add=True)
