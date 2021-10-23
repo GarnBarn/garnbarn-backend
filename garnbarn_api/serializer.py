@@ -1,30 +1,34 @@
 import datetime
+from django.db.models import fields
 from rest_framework import serializers
-from .models import Assignment
+from .models import Assignment, Tag
 
 
 class AssignmentSerializer(serializers.ModelSerializer):
-    """Seriralizer for assignment's object
+    """Seriralizer for Assignment's object
 
-    Assignment:
+    template:
             {
             "id": 1,
             "tag": {
                 "id": 1,
                 "tag_name": "example_tag_name"
             },
-            "assignment_name": "example_assignment_name",
-            "due_date": 1635336554,
+            "name": "example_assignment_name",
+            "dueDate": 1635336554,
             "timestamp": 1634904558,
             "detail": "example_detail"
             }
     """
+    name = serializers.CharField(source='assignment_name')
+    dueDate = serializers.DateTimeField(source='due_date')
+
     class Meta:
         model = Assignment
         fields = ['id',
                   'tag',
-                  'assignment_name',
-                  'due_date',
+                  'name',
+                  'dueDate',
                   'timestamp',
                   'detail'
                   ]

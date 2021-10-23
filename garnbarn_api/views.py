@@ -31,6 +31,7 @@ class AssignmentViewset(viewsets.ModelViewSet):
 
         if not serializer.is_published():
             message = 'Invalid due date'
+
         return Response({
             'status': 'Bad Request',
             'message': message
@@ -64,9 +65,9 @@ class AssignmentViewset(viewsets.ModelViewSet):
             pass
 
         assignment_object.assignment_name = data.get(
-            "assignment_name", assignment_object.assignment_name)
+            "name", assignment_object.assignment_name)
         assignment_object.due_date = data.get(
-            "due_date", assignment_object.due_date)
+            "dueDate", assignment_object.due_date)
         assignment_object.detial = data.get(
             "detial", assignment_object.detail)
 
