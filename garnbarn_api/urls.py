@@ -6,7 +6,6 @@ from .views import AssignmentViewset
 
 router = DefaultRouter()
 router.register('assignment', AssignmentViewset, basename='assignment')
-# router.register('tag', TagViewset, basename='tag')
 
 urlpatterns = [
     url('', include(router.urls))
