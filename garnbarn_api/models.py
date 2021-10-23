@@ -1,3 +1,4 @@
+from typing import Optional
 from django.db import models
 import datetime
 from django.utils import timezone
@@ -19,7 +20,7 @@ class Assignment(models.Model):
     tag = models.ForeignKey(Tag, on_delete=models.SET_NULL, null=True)
 
     assignment_name = models.CharField(max_length=50)
-    due_date = models.DateTimeField('due date')
+    due_date = models.DateTimeField(null=True)
     timestamp = models.DateTimeField(auto_now_add=True)
     detail = models.CharField(max_length=200, default="")
 

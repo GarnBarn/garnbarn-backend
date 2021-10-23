@@ -1,7 +1,6 @@
 import datetime
 from rest_framework import serializers
 from .models import Assignment
-from django.db.models.fields import DateTimeField
 
 
 class AssignmentSerializer(serializers.ModelSerializer):
@@ -33,3 +32,6 @@ class AssignmentSerializer(serializers.ModelSerializer):
 
         extra_kwargs = {"assignment_name": {"error_messages": {
             "required": "This assigment requried a name."}}}
+
+    # def is_published(self):
+    #     due_date = self
