@@ -81,7 +81,11 @@ Example response:
     "name": "Example Assignment",
     "description": "This is example",
     "dueDate": 1634745493,
-    "tagId": "1234",
+    "tag": {
+        "id": "1",
+        "name": "ISP",
+        "color": "#4285F4"
+    },
 }
 ```
 
@@ -278,7 +282,11 @@ Example response:
     "name": "Renamed Assignment",
     "description": "This is example",
     "dueDate": 1634745493,
-    "tagId": "1234",
+    "tag": {
+        "id": "1",
+        "name": "ISP",
+        "color": "#4285F4"
+    },
 }
 ```
 
@@ -300,13 +308,21 @@ Example error response:
 
 ### Assignment Object
 
-|                             | Parameters       |  Type  | Value                                                              |
-| :-------------------------: | :--------------- | :----: | :----------------------------------------------------------------- |
-| ![Required][required_badge] | **assignmentId** | String | The ID of assignment.                                              |
-| ![Required][required_badge] | **name**         | String | The name of assignment.                                            |
-| ![Optional][optional_badge] | **description**  | String | Assignment description.                                            |
-| ![Optional][optional_badge] | **dueDate**      | Number | The due date of the current assignment presented as **Timestamp**. |
-| ![Optional][optional_badge] | **tagId**        | String | The tag id that this assignment has been assgiened to.             |
+|                             | Parameters       |           Type            | Value                                                              |
+| :-------------------------: | :--------------- | :-----------------------: | :----------------------------------------------------------------- |
+| ![Required][required_badge] | **assignmentId** |          String           | The ID of assignment.                                              |
+| ![Required][required_badge] | **name**         |          String           | The name of assignment.                                            |
+| ![Optional][optional_badge] | **description**  |          String           | Assignment description.                                            |
+| ![Optional][optional_badge] | **dueDate**      |          Number           | The due date of the current assignment presented as **Timestamp**. |
+| ![Optional][optional_badge] | **tag**          | [Tag Object](#tag-object) | The tag object that this assignment has been assgiened to.         |
+
+### Tag Object
+
+|                             | Parameters  |  Type  | Value                      |
+| :-------------------------: | :---------- | :----: | :------------------------- |
+| ![Required][required_badge] | **tagId**   | String | The ID of the Tag.         |
+| ![Required][required_badge] | **tagName** | String | The name of the Tag.       |
+| ![Optional][optional_badge] | **color**   | String | Hex color code of the tag. |
 
 ## Error responses in Common specifications
 
