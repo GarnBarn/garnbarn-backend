@@ -15,12 +15,12 @@ class Tag(models.Model):
 class Assignment(models.Model):
     """Contain data and detail about assignment"""
 
-    # The assignment shouldn't get deleted when tag is deleted
+    # The assignment shouldn't get deleted when tag is deleted.
     tag = models.ForeignKey(Tag, on_delete=models.SET_NULL, null=True)
     assignment_name = models.CharField(max_length=50)
-    due_date = models.DateTimeField('due date', default=None)
+    due_date = models.DateTimeField('due date')
     timestamp = models.DateTimeField(auto_now_add=True)
-    detail = models.CharField(max_length=200)
+    detail = models.CharField(max_length=200, default="")
 
     def __str__(self) -> str:
         return self.assignment_name
