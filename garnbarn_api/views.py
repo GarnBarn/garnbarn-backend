@@ -14,9 +14,10 @@ class AssignmentViewset(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
 
-        if serializer.is_valid():
+        if serializer.is_valid(raise_exception=True):
             Assignment.objects.create(**serializer.validated_data)
             return Response(serializer.validated_data, status=status.HTTP_201_CREATED)
+        
         return Response({
             'status': 'Bad Request',
             'message': 'Assignment could not be created with received data'
