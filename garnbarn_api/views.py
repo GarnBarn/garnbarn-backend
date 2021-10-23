@@ -44,10 +44,9 @@ class AssignmentViewset(viewsets.ModelViewSet):
             Response message telling which assignment has been deleted.
         """
         assignment = self.get_object()
-        assignment_name = assignment.assignment_name
         assignment.delete()
 
-        return Response({"message": "Assignment:" + assignment_name + " has been deleted"})
+        return Response({}, status=status.HTTP_200_OK)
 
     def partial_update(self, request, *args, **kwargs):
         """ Update data of a specified assignment
@@ -74,4 +73,4 @@ class AssignmentViewset(viewsets.ModelViewSet):
         assignment_object.save()
 
         serializer = AssignmentSerializer(assignment_object)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
