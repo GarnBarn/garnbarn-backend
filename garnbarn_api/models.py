@@ -22,7 +22,8 @@ class Assignment(models.Model):
     assignment_name = models.CharField(max_length=50)
     due_date = models.DateTimeField(null=True, blank=True, default=None)
     timestamp = models.DateTimeField(auto_now_add=True)
-    detail = models.CharField(max_length=200, default="")
+    detail = models.CharField(
+        max_length=200, null=True, blank=True, default=None)
 
     def __str__(self) -> str:
         return self.assignment_name
