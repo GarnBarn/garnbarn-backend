@@ -16,14 +16,6 @@ class SerializerTests(TestCase):
             'timestamp': '2021-10-27T19:09:03+07:00',
             'detail': 'test_with_serializer'
         }
-        # self.serializer_data = {
-        #     'id': 1,
-        #     'tag': None,
-        #     'assignment_name': 'test_with_serializer',
-        #     'due_date': '2021-10-27T19:09:03+07:00',
-        #     'timestamp': '2021-10-27T19:09:03+07:00',
-        #     'detail': 'test_with_serializer'
-        # }
 
         self.assignment_object = Assignment.objects.create(
             assignment_name='test_with_serializer',
