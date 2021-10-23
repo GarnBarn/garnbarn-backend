@@ -15,9 +15,10 @@ class AssignmentViewset(viewsets.ModelViewSet):
         """ Create Assignment object.
 
         Returns:
-            Bad request status, if the given data does not 
-            contain all required data.
-            Else, Assignment's object will be return in json form.
+            If the given data contain all
+            requirements(assignment_name, due_date)
+            , returns assignment's object in json.
+            Else, returns bad request status
         """
         serializer = self.serializer_class(data=request.data)
 
