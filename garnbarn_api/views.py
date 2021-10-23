@@ -22,7 +22,7 @@ class AssignmentViewset(viewsets.ModelViewSet):
         """
         serializer = self.serializer_class(data=request.data)
 
-        if serializer.is_valid(raise_exception=True) and serializer.is_published():
+        if serializer.is_valid(raise_exception=True):
             assignment_object = Assignment.objects.create(
                 **serializer.validated_data)
             assignment_serializer = AssignmentSerializer(assignment_object)
