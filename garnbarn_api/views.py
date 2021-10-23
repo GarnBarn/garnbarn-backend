@@ -33,12 +33,20 @@ class AssignmentViewset(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         assignment_object = self.get_object()
         data = request.data
-        tag = Tag.objects.get(tag_name=data["tag_name"])
 
-        assignment_object.tag = tag
-        assignment_object.assignment_name = data["assignment_name"]
-        assignment_object.due_date = data["due_date"]
-        assignment_object.detail = data["detail"]
+        try:
+            tag = Tag.objects.get(tag_name=data["tag_name"])
+            assignment_object.tag = tag
+        except KeyError:
+            pass
+
+        assignment_object.assignment_name = data.get(
+            "assignment_name", assignment_object.assignment_name)
+        assignment_object.due_date = data.get(
+            "due_date", assignment_object.due_date)
+        assignment_object.detial = data.get(
+            "detial", assignment_object.detail)
+
 
         assignment_object.save()
 
