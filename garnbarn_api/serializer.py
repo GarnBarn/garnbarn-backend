@@ -33,5 +33,10 @@ class AssignmentSerializer(serializers.ModelSerializer):
         extra_kwargs = {"assignment_name": {"error_messages": {
             "required": "This assigment requried a name."}}}
 
-    # def is_published(self):
-    #     due_date = self
+    def is_published(self):
+        if self.data.get('due_date'):
+            due_date = self.data.get('due_date')
+            current_time = datetime.datetime.now().timestamp()
+            if due_date < current_time:
+                return False
+        return True

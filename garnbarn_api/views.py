@@ -16,21 +16,24 @@ class AssignmentViewset(viewsets.ModelViewSet):
 
         Returns:
             If the given data contain all
-            requirements(assignment_name, due_date)
+            requirements(assignment_name is included and due_date > now)
             , returns assignment's object in json.
             Else, returns bad request status
         """
         serializer = self.serializer_class(data=request.data)
+        message = 'Assignment could not be created with received data'
 
-        if serializer.is_valid(raise_exception=True):
+        if serializer.is_valid(raise_exception=True) and serializer.is_published():
             assignment_object = Assignment.objects.create(
                 **serializer.validated_data)
             assignment_serializer = AssignmentSerializer(assignment_object)
             return Response(assignment_serializer.data, status=status.HTTP_201_CREATED)
 
+        if not serializer.is_published():
+            message = 'Invalid due date'
         return Response({
             'status': 'Bad Request',
-            'message': 'Assignment could not be created with received data'
+            'message': message
         }, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, *args, **kwargs):
