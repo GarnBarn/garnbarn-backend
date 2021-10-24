@@ -21,7 +21,7 @@ class AssignmentSerializer(serializers.ModelSerializer):
             }
     """
     name = serializers.CharField(source='assignment_name')
-    dueDate = serializers.DateTimeField(source='due_date')
+    dueDate = serializers.DateTimeField(source='due_date', default=None)
 
     class Meta:
         model = Assignment
