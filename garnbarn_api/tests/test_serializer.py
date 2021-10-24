@@ -6,6 +6,7 @@ from garnbarn_api.models import Assignment
 
 class SerializerTests(TestCase):
     """Create setup for each test case."""
+
     def setUp(self):
         due_date1 = datetime.fromtimestamp(1635361743)
         due_date2 = datetime.fromtimestamp(1603825743)
@@ -20,18 +21,19 @@ class SerializerTests(TestCase):
 
         self.assignment_object = Assignment.objects.create(
             assignment_name='test_with_serializer',
-            due_date = due_date1,
+            due_date=due_date1,
             detail='test_with_serializer'
-            )
+        )
 
         self.assignment_object2 = Assignment.objects.create(
             assignment_name='test_with_serializer',
-            due_date = due_date2,
+            due_date=due_date2,
             detail='test_with_serializer'
-            )
+        )
 
         self.serializer = AssignmentSerializer(instance=self.assignment_object)
-        self.serializer2 = AssignmentSerializer(instance=self.assignment_object2)
+        self.serializer2 = AssignmentSerializer(
+            instance=self.assignment_object2)
 
     def test_serializer_contain_expected_field(self):
         """Test that serializer have all the header."""
@@ -50,15 +52,17 @@ class SerializerTests(TestCase):
         data = self.serializer.data
         self.assertEqual(data['tag'], self.assignment_attributes['tag'])
         self.assertEqual(data['id'], self.assignment_attributes['id'])
-        self.assertEqual(data['assignment_name'], self.assignment_attributes['assignment_name'])
-        self.assertEqual(data['due_date'], self.assignment_attributes['due_date'])
+        self.assertEqual(data['assignment_name'],
+                         self.assignment_attributes['assignment_name'])
+        self.assertEqual(data['due_date'],
+                         self.assignment_attributes['due_date'])
         self.assertEqual(data['detail'], self.assignment_attributes['detail'])
 
     def test_is_published_return_True(self):
         """Test is_pulbished.
 
         Return:
-        If the serializer is published the is_published will return True.
+            If the serializer is published the is_published will return True.
         """
         data = self.serializer.data
         self.assertEqual(True, data.serializer.is_published())
@@ -67,7 +71,7 @@ class SerializerTests(TestCase):
         """Test is_pulbished.
 
         Return:
-        If the serializer is not published the is_published will return False.
+            If the serializer is not published the is_published will return False.
         """
         data = self.serializer2.data
         self.assertEqual(False, data.serializer.is_published())
