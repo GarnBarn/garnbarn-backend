@@ -38,8 +38,8 @@ class AssignmentSerializer(serializers.ModelSerializer):
             "required": "This assigment requried a name."}}}
 
     def is_published(self):
-        if self.data.get('due_date'):
-            due_date = self.data.get('due_date')
+        if self.data.get('dueDate'):
+            due_date = self.data.get('dueDate')
             current_time = datetime.datetime.now().timestamp()
             if due_date < current_time:
                 return False

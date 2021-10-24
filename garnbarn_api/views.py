@@ -26,6 +26,10 @@ class AssignmentViewset(viewsets.ModelViewSet):
         if serializer.is_valid(raise_exception=True) and serializer.is_published():
             assignment_object = Assignment.objects.create(
                 **serializer.validated_data)
+            # add tag to assignment by giving the tag's id
+            assignment_object.tag = Tag.objects.get(id=request.data["tag"])
+            assignment_object.save()
+
             assignment_serializer = AssignmentSerializer(assignment_object)
             return Response(assignment_serializer.data, status=status.HTTP_201_CREATED)
 

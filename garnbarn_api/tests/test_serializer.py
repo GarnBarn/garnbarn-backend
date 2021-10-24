@@ -13,8 +13,8 @@ class SerializerTests(TestCase):
         self.assignment_attributes = {
             'id': 1,
             'tag': None,
-            'assignment_name': 'test_with_serializer',
-            'due_date': due_date1.timestamp(),
+            'name': 'test_with_serializer',
+            'dueDate': due_date1.timestamp(),
             'timestamp': '2021-10-27T19:09:03+07:00',
             'detail': 'test_with_serializer'
         }
@@ -41,8 +41,8 @@ class SerializerTests(TestCase):
         self.assertCountEqual(set(data.keys()), set({
             'id',
             'tag',
-            'assignment_name',
-            'due_date',
+            'name',
+            'dueDate',
             'timestamp',
             'detail'
         }))
@@ -52,10 +52,10 @@ class SerializerTests(TestCase):
         data = self.serializer.data
         self.assertEqual(data['tag'], self.assignment_attributes['tag'])
         self.assertEqual(data['id'], self.assignment_attributes['id'])
-        self.assertEqual(data['assignment_name'],
-                         self.assignment_attributes['assignment_name'])
-        self.assertEqual(data['due_date'],
-                         self.assignment_attributes['due_date'])
+        self.assertEqual(data['name'],
+                         self.assignment_attributes['name'])
+        self.assertEqual(data['dueDate'],
+                         self.assignment_attributes['dueDate'])
         self.assertEqual(data['detail'], self.assignment_attributes['detail'])
 
     def test_is_published_return_True(self):
