@@ -83,6 +83,8 @@ class ViewTests(TestCase):
         })
         self.assertJSONEqual(res, converted_data)
         self.assertEqual(400, response.status_code)
+        all_assignment_objects = Assignment.objects.all()
+        self.assertEqual(len(all_assignment_objects), 1)
 
     def test_post_with_invalid_due_date(self):
         """Create assignment object with dueDate < now"""
@@ -98,6 +100,8 @@ class ViewTests(TestCase):
         })
         self.assertJSONEqual(res, converted_data)
         self.assertEqual(400, response.status_code)
+        all_assignment_objects = Assignment.objects.all()
+        self.assertEqual(len(all_assignment_objects), 1)
 
     def test_post_with_valid_data(self):
         """Create assignment object"""
@@ -110,6 +114,11 @@ class ViewTests(TestCase):
         }
         response = self.client.post("/api/v1/assignment/", data)
         self.assertEqual(201, response.status_code)
+        new_assignment = Assignment.objects.get(assignment_name="assignment 2")
+        # TODO: Uncomment these line after edit the data in this testcase.
+        # self.assertEqual(new_assignment.due_date.now(), data["dueDate"].now())
+        # self.assertEqual(new_assignment.timestamp, data["timestamp"])
+        self.assertEqual(new_assignment.detail, data["detail"])
 
     def test_patch(self):
         """Update assignment object"""
