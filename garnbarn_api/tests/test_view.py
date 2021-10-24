@@ -133,6 +133,7 @@ class ViewTests(TestCase):
             self.assertEqual(400, response.status_code)
 
     def test_delete(self):
+        """Delete assignment object"""
         response = self.client.delete("/api/v1/assignment/1/")
         converted_data = convert_to_json(response.content)
         res = json.dumps({})
