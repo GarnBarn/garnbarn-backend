@@ -113,7 +113,7 @@ class ViewTests(TestCase):
             "detail": "assignment 2's detail"
         }
         response = self.client.post("/api/v1/assignment/", data)
-        self.assertEqual(201, response.status_code)
+        self.assertEqual(200, response.status_code)
         new_assignment = Assignment.objects.get(assignment_name="assignment 2")
         # TODO: Uncomment these line after edit the data in this testcase.
         # self.assertEqual(new_assignment.due_date.now(), data["dueDate"].now())
