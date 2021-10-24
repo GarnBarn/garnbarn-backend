@@ -21,7 +21,7 @@ class AssignmentSerializer(serializers.ModelSerializer):
             }
     """
     name = serializers.CharField(source='assignment_name')
-    dueDate = serializers.DateTimeField(source='due_date')
+    dueDate = serializers.DateTimeField(source='due_date', default=None)
 
     class Meta:
         model = Assignment
@@ -38,8 +38,8 @@ class AssignmentSerializer(serializers.ModelSerializer):
             "required": "This assigment requried a name."}}}
 
     def is_published(self):
-        if self.data.get('due_date'):
-            due_date = self.data.get('due_date')
+        if self.data.get('dueDate'):
+            due_date = self.data.get('dueDate')
             current_time = datetime.datetime.now().timestamp()
             if due_date < current_time:
                 return False
