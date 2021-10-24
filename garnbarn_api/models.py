@@ -8,6 +8,8 @@ class Tag(models.Model):
     """Tag or subject"""
 
     tag_name = models.CharField(max_length=20)
+    color = models.CharField(max_length=10, null=True,
+                             blank=True, default=None)
 
     def __str__(self):
         return self.tag_name
