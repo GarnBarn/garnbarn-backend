@@ -48,7 +48,8 @@ class ViewTests(TestCase):
             "id": 1,
             "tag": {
                 "id": 1,
-                "tag_name": "test_tag"
+                "tag_name": "test_tag",
+                "color": None
             },
             "name": "assignment 1",
             "dueDate": self.end_date_timestamp,
@@ -110,7 +111,8 @@ class ViewTests(TestCase):
             "id": 1,
             "tag": {
                 "id": 1,
-                "tag_name": "test_tag"
+                "tag_name": "test_tag",
+                "color": None
             },
             "name": "renamed",
             "dueDate": self.end_date_timestamp,
