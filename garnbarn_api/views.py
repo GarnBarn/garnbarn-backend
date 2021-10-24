@@ -27,7 +27,13 @@ class AssignmentViewset(viewsets.ModelViewSet):
             assignment_object = Assignment.objects.create(
                 **serializer.validated_data)
             # add tag to assignment by giving the tag's id
-            assignment_object.tag = Tag.objects.get(id=request.data["tag"])
+            try:
+                assignment_object.tag = Tag.objects.get(id=request.data["tag"])
+            except Tag.DoesNotExist:
+                return Response({
+                    'message': "Tag's ID not found"
+                }, status=status.HTTP_400_BAD_REQUEST)
+
             assignment_object.save()
 
             assignment_serializer = AssignmentSerializer(assignment_object)
@@ -37,7 +43,6 @@ class AssignmentViewset(viewsets.ModelViewSet):
             message = 'Invalid due date'
 
         return Response({
-            'status': 'Bad Request',
             'message': message
         }, status=status.HTTP_400_BAD_REQUEST)
 

@@ -58,7 +58,7 @@ class ViewTests(TestCase):
         })
         self.assertJSONEqual(res, converted_data)
 
-    def test_post_with_invalid_data(self):
+    def test_post_without_name(self):
         """Create assignment object without a name"""
         data = {
             "detail": "no-name"
@@ -70,6 +70,20 @@ class ViewTests(TestCase):
         })
         self.assertJSONEqual(res, converted_data)
 
+    def test_post_with_invalid_tag_id(self):
+        """Create assignment object with non-exist tag's id"""
+        data = {
+            "name": "asssignment",
+            "tag": 0
+        }
+        response = self.client.post("/api/v1/assignment/", data)
+        converted_data = convert_to_json(response.content)
+        res = json.dumps({
+            "message": "Tag's ID not found"
+        })
+        self.assertJSONEqual(res, converted_data)
+        self.assertEqual(400, response.status_code)
+
     def test_post_with_invalid_due_date(self):
         """Create assignment object with dueDate < now"""
         data = {
@@ -80,10 +94,10 @@ class ViewTests(TestCase):
         response = self.client.post("/api/v1/assignment/", data)
         converted_data = convert_to_json(response.content)
         res = json.dumps({
-            "status": "Bad Request",
             "message": "Invalid due date"
         })
         self.assertJSONEqual(res, converted_data)
+        self.assertEqual(400, response.status_code)
 
     def test_post_with_valid_data(self):
         """Create assignment object"""
