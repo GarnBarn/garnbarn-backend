@@ -22,8 +22,7 @@ class AssignmentViewset(viewsets.ModelViewSet):
         message = 'Assignment could not be created with received data'
 
         if serializer.is_valid(raise_exception=True) and serializer.is_published():
-            assignment_object = Assignment.objects.create(
-                **serializer.validated_data)
+            assignment_object = Assignment(**serializer.validated_data)
             # add tag to assignment by giving the tag's id
             try:
                 assignment_object.tag = Tag.objects.get(id=request.data["tag"])
