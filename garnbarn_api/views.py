@@ -23,6 +23,7 @@ class AssignmentViewset(viewsets.ModelViewSet):
 
         if serializer.is_valid(raise_exception=True) and serializer.is_published():
             assignment_object = Assignment(**serializer.validated_data)
+
             # add tag to assignment by giving the tag's id
             try:
                 assignment_object.tag = Tag.objects.get(id=request.data["tag"])
@@ -34,7 +35,7 @@ class AssignmentViewset(viewsets.ModelViewSet):
             assignment_object.save()
 
             assignment_serializer = AssignmentSerializer(assignment_object)
-            return Response(assignment_serializer.data, status=status.HTTP_201_CREATED)
+            return Response(assignment_serializer.data, status=status.HTTP_200_OK)
 
         if not serializer.is_published():
             message = 'Invalid due date'
