@@ -145,13 +145,19 @@ curl -v -X POST {PREFIX}/api/v1/assignments/ \
 
 #### Response
 
-Return status code `200` and the new assignment id
+Return status code `200` and the new [Assignment Object](#assignment-object)
 
 Example response:
 
 ```JSON
 {
-    "assignmentId": "1",
+    "name": "Example",
+    "dueDate": 1634745493,
+    "tag": {
+        "id": "1234",
+        "name": "Example Tag",
+        "color": "#11111"
+    }
 }
 ```
 
@@ -318,11 +324,11 @@ Example error response:
 
 ### Tag Object
 
-|                             | Parameters  |  Type  | Value                      |
-| :-------------------------: | :---------- | :----: | :------------------------- |
-| ![Required][required_badge] | **tagId**   | String | The ID of the Tag.         |
-| ![Required][required_badge] | **tagName** | String | The name of the Tag.       |
-| ![Optional][optional_badge] | **color**   | String | Hex color code of the tag. |
+|                             | Parameters |  Type  | Value                      |
+| :-------------------------: | :--------- | :----: | :------------------------- |
+| ![Required][required_badge] | **id**     | String | The ID of the Tag.         |
+| ![Required][required_badge] | **name**   | String | The name of the Tag.       |
+| ![Optional][optional_badge] | **color**  | String | Hex color code of the tag. |
 
 ## Error responses in Common specifications
 
