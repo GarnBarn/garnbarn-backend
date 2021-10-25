@@ -1,7 +1,16 @@
 import datetime
-from django.db.models import fields
+from enum import auto
+import time
 from rest_framework import serializers
 from .models import Assignment, Tag
+
+
+class TimestampField(serializers.Field):
+    def to_representation(self, value):
+        return int(value.timestamp())
+
+    def to_internal_value(self, value):
+        return datetime.datetime.fromtimestamp(int(value))
 
 
 class AssignmentSerializer(serializers.ModelSerializer):
@@ -17,11 +26,11 @@ class AssignmentSerializer(serializers.ModelSerializer):
             "name": "example_assignment_name",
             "dueDate": 1635336554,
             "timestamp": 1634904558,
-            "detail": "example_detail"
+            "description": "example_detail"
             }
     """
     name = serializers.CharField(source='assignment_name')
-    dueDate = serializers.DateTimeField(source='due_date', default=None)
+    dueDate = TimestampField(source='due_date', default=None)
 
     class Meta:
         model = Assignment
@@ -30,17 +39,8 @@ class AssignmentSerializer(serializers.ModelSerializer):
                   'name',
                   'dueDate',
                   'timestamp',
-                  'detail'
+                  'description'
                   ]
         depth = 1
 
-        extra_kwargs = {"assignment_name": {"error_messages": {
-            "required": "This assigment requried a name."}}}
-
-    def is_published(self):
-        if self.data.get('dueDate'):
-            due_date = self.data.get('dueDate')
-            current_time = datetime.datetime.now().timestamp()
-            if due_date < current_time:
-                return False
-        return True
+        read_only_fields = ['timestamp']
