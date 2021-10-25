@@ -1,2 +1,8 @@
 # Mac DS Store
 *.DS_Store
+
+# File from other branches
+app/
+config/
+db.sqlite3
+garnbarn_api/
