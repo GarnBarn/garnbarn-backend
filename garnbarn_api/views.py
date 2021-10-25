@@ -27,7 +27,8 @@ class AssignmentViewset(viewsets.ModelViewSet):
 
             # add tag to assignment by giving the tag's id
             try:
-                assignment_object.tag = Tag.objects.get(id=request.data["tag"])
+                tag_id = int(request.data["tagId"])
+                assignment_object.tag = Tag.objects.get(id=tag_id)
             except Tag.DoesNotExist:
                 return Response({
                     'message': "Tag's ID not found"

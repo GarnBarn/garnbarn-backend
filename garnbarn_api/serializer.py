@@ -4,6 +4,7 @@ import time
 from django.db import models
 from django.db.models import fields
 from rest_framework import serializers
+from rest_framework.relations import PKOnlyObject
 from .models import Assignment, Tag
 
 

@@ -76,7 +76,7 @@ class ViewTests(TestCase):
         """Create assignment object with non-exist tag's id"""
         data = {
             "name": "asssignment",
-            "tag": 0
+            "tagId": 0
         }
         response = self.client.post("/api/v1/assignment/", data)
         converted_data = convert_to_json(response.content)
@@ -91,7 +91,7 @@ class ViewTests(TestCase):
     def test_post_with_valid_data(self):
         """Create assignment object"""
         data = {
-            "tag": 1,
+            "tagId": 1,
             "name": "assignment 2",
             "timestamp": self.current_time,
             "dueDate": self.end_date_timestamp,
