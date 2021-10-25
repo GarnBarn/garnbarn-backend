@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from django.test import TestCase
 from garnbarn_api.serializer import AssignmentSerializer
 from garnbarn_api.models import Assignment
@@ -8,27 +8,27 @@ class SerializerTests(TestCase):
     """Create setup for each test case."""
 
     def setUp(self):
-        due_date1 = datetime.fromtimestamp(1635361743)
-        due_date2 = datetime.fromtimestamp(1603825743)
+        self.end_date = datetime.now() + timedelta(days=1)
+        self.end_date_timestamp = self.end_date.timestamp()
+
         self.assignment_attributes = {
             'id': 1,
             'tag': None,
             'name': 'test_with_serializer',
-            'dueDate': due_date1.timestamp(),
-            'timestamp': '2021-10-27T19:09:03+07:00',
-            'detail': 'test_with_serializer'
+            'dueDate': self.end_date,
+            'description': 'test_with_serializer'
         }
 
         self.assignment_object = Assignment.objects.create(
             assignment_name='test_with_serializer',
-            due_date=due_date1,
-            detail='test_with_serializer'
+            due_date=self.end_date,
+            description='test_with_serializer'
         )
 
         self.assignment_object2 = Assignment.objects.create(
             assignment_name='test_with_serializer',
-            due_date=due_date2,
-            detail='test_with_serializer'
+            due_date=self.end_date,
+            description='test_with_serializer'
         )
 
         self.serializer = AssignmentSerializer(instance=self.assignment_object)
@@ -44,7 +44,7 @@ class SerializerTests(TestCase):
             'name',
             'dueDate',
             'timestamp',
-            'detail'
+            'description'
         }))
 
     def test_field_content_except_timestamp(self):
@@ -55,23 +55,6 @@ class SerializerTests(TestCase):
         self.assertEqual(data['name'],
                          self.assignment_attributes['name'])
         self.assertEqual(data['dueDate'],
-                         self.assignment_attributes['dueDate'])
-        self.assertEqual(data['detail'], self.assignment_attributes['detail'])
-
-    def test_is_published_return_True(self):
-        """Test is_pulbished.
-
-        Return:
-            If the serializer is published the is_published will return True.
-        """
-        data = self.serializer.data
-        self.assertEqual(True, data.serializer.is_published())
-
-    def test_is_published_return_False(self):
-        """Test is_pulbished.
-
-        Return:
-            If the serializer is not published the is_published will return False.
-        """
-        data = self.serializer2.data
-        self.assertEqual(False, data.serializer.is_published())
+                         int(self.assignment_attributes['dueDate'].timestamp()))
+        self.assertEqual(data['description'],
+                         self.assignment_attributes['description'])

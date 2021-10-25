@@ -6,11 +6,13 @@ import datetime
 class AssignmentModelTests(TestCase):
     def setUp(self):
         """Create a setup for each test case."""
-        due_date1 = datetime.datetime.fromtimestamp(1635361743)
+        self.end_date = datetime.datetime.now() + datetime.timedelta(days=1)
+        self.end_data_timestamp = self.end_date.timestamp()
+
         self.assignment = Assignment.objects.create(
             assignment_name="test_name",
-            due_date=due_date1,
-            detail="test_detail"
+            due_date=self.end_date,
+            description="test_detail"
         )
 
     def test_get_assignment_name(self):
@@ -19,11 +21,11 @@ class AssignmentModelTests(TestCase):
 
     def test_assignment_due_date(self):
         """Test assigment due date."""
-        self.assertEqual(datetime.datetime.fromtimestamp(1635361743), self.assignment.due_date)
+        self.assertIsInstance(self.assignment.due_date, datetime.datetime)
 
     def test_assignment_detail(self):
         """Test assignment deatail."""
-        self.assertEqual('test_detail', self.assignment.detail)
+        self.assertEqual('test_detail', self.assignment.description)
 
     def test_assigmnet_timestamp(self):
         """Test the type of assignment timestamp."""

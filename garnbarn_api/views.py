@@ -18,10 +18,11 @@ class AssignmentViewset(viewsets.ModelViewSet):
             , returns assignment's object in json.
             Else, returns bad request status
         """
-        serializer = self.serializer_class(data=request.data)
+        data = request.data
+        serializer = self.serializer_class(data=data)
         message = 'Assignment could not be created with received data'
 
-        if serializer.is_valid(raise_exception=True) and serializer.is_published():
+        if serializer.is_valid(raise_exception=True):
             assignment_object = Assignment(**serializer.validated_data)
 
             # add tag to assignment by giving the tag's id
@@ -36,9 +37,6 @@ class AssignmentViewset(viewsets.ModelViewSet):
 
             assignment_serializer = AssignmentSerializer(assignment_object)
             return Response(assignment_serializer.data, status=status.HTTP_200_OK)
-
-        if not serializer.is_published():
-            message = 'Invalid due date'
 
         return Response({
             'message': message
@@ -64,18 +62,12 @@ class AssignmentViewset(viewsets.ModelViewSet):
         assignment_object = self.get_object()
         data = request.data
 
-        try:
-            tag = Tag.objects.get(tag_name=data["tag_name"])
-            assignment_object.tag = tag
-        except KeyError:
-            pass
-
         assignment_object.assignment_name = data.get(
             "name", assignment_object.assignment_name)
         assignment_object.due_date = data.get(
             "dueDate", assignment_object.due_date)
         assignment_object.detial = data.get(
-            "detial", assignment_object.detail)
+            "description", assignment_object.description)
 
         assignment_object.save()
 
