@@ -6,6 +6,7 @@ from .models import Assignment, Tag
 
 
 class AssignmentViewset(viewsets.ModelViewSet):
+    serializer_class = AssignmentSerializer
     queryset = Assignment.objects.get_queryset().order_by('id')
 
     def create(self, request, *args, **kwargs):
