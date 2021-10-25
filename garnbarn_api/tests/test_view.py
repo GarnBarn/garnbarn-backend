@@ -56,6 +56,7 @@ class ViewTests(TestCase):
             "description": "test"
         })
         self.assertJSONEqual(expected_result, converted_data)
+        self.assertEqual(200, response.status_code)
 
     def test_post_without_name(self):
         """Create assignment object without a name"""
@@ -69,6 +70,7 @@ class ViewTests(TestCase):
             "name": ["This field is required."]
         })
         self.assertJSONEqual(res, converted_data)
+        self.assertEqual(400, response.status_code)
 
     def test_post_with_invalid_tag_id(self):
         """Create assignment object with non-exist tag's id"""
