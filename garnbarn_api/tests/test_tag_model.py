@@ -4,8 +4,9 @@ from garnbarn_api.models import Tag
 
 class TagModelTests(TestCase):
     """Create setup for Tag case."""
+
     def setUp(self):
-        self.tag = Tag(tag_name='tag1')
+        self.tag = Tag(name='tag1')
 
     def test_get_tag_name(self):
         """Test that tag object will return tag name in string."""

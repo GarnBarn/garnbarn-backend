@@ -12,7 +12,7 @@ class Tag(models.Model):
                              blank=True, default=None)
 
     def __str__(self):
-        return self.tag_name
+        return self.name
 
 
 class Assignment(models.Model):

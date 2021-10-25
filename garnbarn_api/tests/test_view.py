@@ -20,7 +20,7 @@ class ViewTests(TestCase):
         self.current_timestamp = int(self.current_time.timestamp())
         self.end_date_timestamp = int(self.end_date.timestamp())
 
-        self.tag = Tag(tag_name="test_tag")
+        self.tag = Tag(name="test_tag")
         self.tag.save()
 
         assignment = Assignment(
@@ -99,7 +99,7 @@ class ViewTests(TestCase):
         response = self.client.post("/api/v1/assignment/", data)
         self.assertEqual(200, response.status_code)
         new_assignment = Assignment.objects.get(assignment_name="assignment 2")
-        self.assertEqual(new_assignment.due_date, data["dueDate"])
+        self.assertEqual(new_assignment.due_date.timestamp(), data["dueDate"])
         self.assertEqual(new_assignment.timestamp, data["timestamp"])
         self.assertEqual(new_assignment.detail, data["detail"])
 
