@@ -48,7 +48,7 @@ class ViewTests(TestCase):
             "id": 1,
             "tag": {
                 "id": 1,
-                "tag_name": "test_tag",
+                "name": "test_tag",
                 "color": None
             },
             "name": "assignment 1",
