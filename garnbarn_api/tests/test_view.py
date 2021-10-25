@@ -56,6 +56,7 @@ class ViewTests(TestCase):
             "description": "test"
         })
         self.assertJSONEqual(expected_result, converted_data)
+        self.assertEqual(200, response.status_code)
 
     def test_post_without_name(self):
         """Create assignment object without a name"""
@@ -101,7 +102,7 @@ class ViewTests(TestCase):
         # TODO: Uncomment these line after edit the data in this testcase.
         # self.assertEqual(new_assignment.due_date.now(), data["dueDate"].now())
         # self.assertEqual(new_assignment.timestamp, data["timestamp"])
-        self.assertEqual(new_assignment.detail, data["detail"])
+        self.assertEqual(new_assignment.description, data["description"])
 
     def test_patch(self):
         """Update assignment object"""
