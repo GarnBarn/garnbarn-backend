@@ -56,6 +56,7 @@ class ViewTests(TestCase):
             "description": "test"
         })
         self.assertJSONEqual(expected_result, converted_data)
+        self.assertEqual(200, response.status_code)
 
     def test_post_without_name(self):
         """Create assignment object without a name"""
