@@ -92,13 +92,15 @@ class ViewTests(TestCase):
         """Create assignment object"""
         data = {
             "tag": 1,
-            "name": "assignment 2",
+            "name": "assignment2",
             "dueDate": self.end_date_timestamp,
             "description": "assignment 2's detail"
         }
-        response = self.client.post("/api/v1/assignment/", data)
+        response = self.client.post(
+            "/api/v1/assignment/", json.dumps(data), content_type="application/json")
         self.assertEqual(200, response.status_code)
-        new_assignment = Assignment.objects.get(assignment_name="assignment 2")
+
+        new_assignment = Assignment.objects.get(assignment_name="assignment2")
         self.assertEqual(new_assignment.due_date.timestamp(), data["dueDate"])
         self.assertEqual(new_assignment.timestamp, data["timestamp"])
         self.assertEqual(new_assignment.detail, data["detail"])
