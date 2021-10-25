@@ -98,10 +98,10 @@ class ViewTests(TestCase):
             "description": "assignment 2's detail"
         }
         response = self.client.post(
-            "/api/v1/assignment/", json.dumps(data), content_type="application/json")
+            "/api/v1/assignment/", data, content_type="application/json")
         self.assertEqual(200, response.status_code)
 
-        new_assignment = Assignment.objects.get(assignment_name="assignment2")
+        new_assignment = Assignment.objects.get(assignment_name="assignment 2")
         self.assertEqual(new_assignment.due_date.timestamp(), data["dueDate"])
         self.assertEqual(int(new_assignment.timestamp.timestamp()),
                          int(data["timestamp"].timestamp()))
