@@ -7,7 +7,7 @@ from django.utils import timezone
 class Tag(models.Model):
     """Tag or subject"""
 
-    tag_name = models.CharField(max_length=20)
+    name = models.CharField(max_length=20)
     color = models.CharField(max_length=10, null=True,
                              blank=True, default=None)
 
