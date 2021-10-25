@@ -161,6 +161,11 @@ class ViewTests(TestCase):
         converted_data = convert_to_json(response.content)
         res = json.dumps({})
         self.assertJSONEqual(res, converted_data)
+        self.assertEqual(200, response.status_code)
+        # The Assignment in database should be empty now. (Since we remove the assignment 1)
+        all_assignment_objects = Assignment.objects.all()
+        self.assertEqual(len(all_assignment_objects), 0)
+
         # Check if the assignment object has been deleted
         # Status code sould be 404 (Not Found)
         response_after_deleted = self.client.get("/api/v1/assignment/1/")
