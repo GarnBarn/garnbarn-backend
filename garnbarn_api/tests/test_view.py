@@ -69,6 +69,7 @@ class ViewTests(TestCase):
             "name": ["This field is required."]
         })
         self.assertJSONEqual(res, converted_data)
+        self.assertEqual(400, response.status_code)
 
     def test_post_with_invalid_tag_id(self):
         """Create assignment object with non-exist tag's id"""
