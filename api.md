@@ -284,7 +284,7 @@ Example response:
 
 ```JSON
 {
-    "assignmentId": "1",
+    "id": "1",
     "name": "Renamed Assignment",
     "description": "This is example",
     "dueDate": 1634745493,
