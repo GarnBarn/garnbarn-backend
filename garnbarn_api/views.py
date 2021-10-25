@@ -66,7 +66,7 @@ class AssignmentViewset(viewsets.ModelViewSet):
             "name", assignment_object.assignment_name)
         assignment_object.due_date = data.get(
             "dueDate", assignment_object.due_date)
-        assignment_object.detial = data.get(
+        assignment_object.description = data.get(
             "description", assignment_object.description)
 
         assignment_object.save()
