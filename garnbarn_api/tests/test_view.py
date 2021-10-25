@@ -92,7 +92,8 @@ class ViewTests(TestCase):
         """Create assignment object"""
         data = {
             "tag": 1,
-            "name": "assignment2",
+            "name": "assignment 2",
+            "timestamp": self.current_time,
             "dueDate": self.end_date_timestamp,
             "description": "assignment 2's detail"
         }
@@ -102,8 +103,9 @@ class ViewTests(TestCase):
 
         new_assignment = Assignment.objects.get(assignment_name="assignment2")
         self.assertEqual(new_assignment.due_date.timestamp(), data["dueDate"])
-        self.assertEqual(new_assignment.timestamp, data["timestamp"])
-        self.assertEqual(new_assignment.detail, data["detail"])
+        self.assertEqual(int(new_assignment.timestamp.timestamp()),
+                         int(data["timestamp"].timestamp()))
+        self.assertEqual(new_assignment.description, data["description"])
 
     def test_patch(self):
         """Update assignment object"""
