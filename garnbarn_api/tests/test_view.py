@@ -102,7 +102,7 @@ class ViewTests(TestCase):
         # TODO: Uncomment these line after edit the data in this testcase.
         # self.assertEqual(new_assignment.due_date.now(), data["dueDate"].now())
         # self.assertEqual(new_assignment.timestamp, data["timestamp"])
-        self.assertEqual(new_assignment.detail, data["detail"])
+        self.assertEqual(new_assignment.description, data["description"])
 
     def test_patch(self):
         """Update assignment object"""
