@@ -6,7 +6,6 @@ from .models import Assignment, Tag
 
 
 class AssignmentViewset(viewsets.ModelViewSet):
-    serializer_class = AssignmentSerializer
     queryset = Assignment.objects.get_queryset().order_by('id')
 
     def create(self, request, *args, **kwargs):
@@ -19,7 +18,7 @@ class AssignmentViewset(viewsets.ModelViewSet):
             Else, returns bad request status
         """
         data = request.data
-        serializer = self.serializer_class(data=data)
+        serializer = AssignmentSerializer(data=data)
         message = 'Assignment could not be created with received data'
 
         if serializer.is_valid(raise_exception=True):
