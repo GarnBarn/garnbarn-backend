@@ -2,6 +2,7 @@ from typing import Optional
 from django.db import models
 import datetime
 from django.utils import timezone
+import math
 
 
 class Tag(models.Model):
@@ -44,8 +45,8 @@ class Assignment(models.Model):
             "name": self.assignment_name,
             "tag": tag,
             "description": self.description,
-            "timestamp": timestamp,
-            "dueDate": due_date,
+            "timestamp": math.floor(timestamp),
+            "dueDate": math.floor(due_date),
         }
 
     def __str__(self) -> str:

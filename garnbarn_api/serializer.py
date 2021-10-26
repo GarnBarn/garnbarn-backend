@@ -6,11 +6,12 @@ from django.db.models import fields
 from rest_framework import serializers
 from rest_framework.relations import PKOnlyObject
 from .models import Assignment, Tag
+import math
 
 
 class TimestampField(serializers.Field):
     def to_representation(self, value):
-        return int(value.timestamp())
+        return math.floor(value.timestamp() * 1000)
 
     def to_internal_value(self, value):
         try:
@@ -18,7 +19,12 @@ class TimestampField(serializers.Field):
         except ValueError:
             raise serializers.ValidationError(
                 "The timestamp must be an integer")
-        return datetime.datetime.fromtimestamp(value / 1000)
+        if len(str(value)) != 13:
+            raise serializers.ValidationError(
+                "The timestamp must be in the milisecond format")
+        # Convert the value to Second based timestamp and floor down
+        date_converted = datetime.datetime.fromtimestamp(math.floor(value/1000))
+        return date_converted
 
 
 class TagIdField(serializers.Field):
