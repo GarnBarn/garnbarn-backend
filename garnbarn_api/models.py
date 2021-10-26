@@ -37,16 +37,18 @@ class Assignment(models.Model):
 
     def get_json_data(self):
         # Convert timestamp from second to miliseconds base.
-        timestamp = self.timestamp.timestamp() * 1000 if self.timestamp else None
-        due_date = self.due_date.timestamp() * 1000 if self.due_date else None
+        timestamp = math.floor(self.timestamp.timestamp()
+                               * 1000) if self.timestamp else None
+        due_date = math.floor(self.due_date.timestamp() *
+                              1000) if self.due_date else None
         tag = self.tag.get_json_data() if self.tag else None
         return {
             "id": self.id,
             "name": self.assignment_name,
             "tag": tag,
             "description": self.description,
-            "timestamp": math.floor(timestamp),
-            "dueDate": math.floor(due_date),
+            "timestamp": timestamp,
+            "dueDate": due_date,
         }
 
     def __str__(self) -> str:
