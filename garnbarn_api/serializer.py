@@ -13,7 +13,12 @@ class TimestampField(serializers.Field):
         return int(value.timestamp())
 
     def to_internal_value(self, value):
-        return datetime.datetime.fromtimestamp(int(value))
+        try:
+            value = int(value)
+        except ValueError:
+            raise serializers.ValidationError(
+                "The timestamp must be an integer")
+        return datetime.datetime.fromtimestamp(value)
 
 
 class AssignmentSerializer(serializers.ModelSerializer):

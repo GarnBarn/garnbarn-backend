@@ -21,10 +21,10 @@ class AssignmentViewset(viewsets.ModelViewSet):
         data = request.data
         serializer = AssignmentSerializer(data=data)
 
-        if not serializer.is_valid(raise_exception=True):
+        if not serializer.is_valid():
             # Response 400 if the reuqest body is invalid
             return Response({
-                'message': 'Assignment could not be created with received data'
+                'message': serializer.errors
             }, status=status.HTTP_400_BAD_REQUEST)
 
         assignment_object = Assignment(**serializer.validated_data)
