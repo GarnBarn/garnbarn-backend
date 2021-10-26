@@ -119,7 +119,8 @@ class ViewTests(TestCase):
     def test_patch(self):
         """Update assignment object"""
         data = json.dumps({
-            "name": "renamed"
+            "name": "renamed",
+            "dueDate": self.end_date_timestamp + 10000
         })
         # rename assignment from "assignment 1" to "renamed"
         response = self.client.patch("/api/v1/assignment/1/", data,
@@ -134,14 +135,17 @@ class ViewTests(TestCase):
                 "color": None
             },
             "name": "renamed",
-            "dueDate": self.end_date_timestamp,
             "description": "test"
         })
         timestamp_cache_from_request = converted_data["timestamp"]
+        due_date_cache_from_request = converted_data["dueDate"]
         del converted_data["timestamp"]
+        del converted_data["dueDate"]
         self.assertJSONEqual(expected_result, converted_data)
         self.assertAlmostEqual(timestamp_cache_from_request,
                                self.current_timestamp, delta=2)
+        self.assertAlmostEqual(self.end_date_timestamp +
+                               10000, due_date_cache_from_request, delta=1000)
         self.assertEqual(200, response.status_code)
         all_assignment_in_database = Assignment.objects.all()
         self.assertEqual(len(all_assignment_in_database), 1)
