@@ -20,12 +20,11 @@ class AssignmentViewset(viewsets.ModelViewSet):
         """
         data = request.data
         serializer = AssignmentSerializer(data=data)
-        message = 'Assignment could not be created with received data'
 
         if not serializer.is_valid(raise_exception=True):
             # Response 400 if the reuqest body is invalid
             return Response({
-                'message': message
+                'message': 'Assignment could not be created with received data'
             }, status=status.HTTP_400_BAD_REQUEST)
 
         assignment_object = Assignment(**serializer.validated_data)
@@ -70,6 +69,25 @@ class AssignmentViewset(viewsets.ModelViewSet):
         assignment_object = self.get_object()
         data = request.data
 
+        if data.get("id") is not None:
+            return Response({
+                "message": "You can't update the assignment's id"
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        if data.get("tagId") is not None:
+            tag_id_from_request = data.get("tagId")
+            try:
+                tag_id_from_request = int(tag_id_from_request)
+                assignment_object.tag = Tag.objects.get(id=tag_id_from_request)
+            except Tag.DoesNotExist:
+                return Response({
+                    'message': "Tag's ID not found"
+                }, status=status.HTTP_400_BAD_REQUEST)
+            except ValueError:
+                return Response({
+                    'message': "tagId must be able to be converted to an integer"
+                }, status=status.HTTP_400_BAD_REQUEST)
+
         assignment_object.assignment_name = data.get(
             "name", assignment_object.assignment_name)
         assignment_object.due_date = data.get(
@@ -78,6 +96,5 @@ class AssignmentViewset(viewsets.ModelViewSet):
             "description", assignment_object.description)
 
         assignment_object.save()
-
         serializer = AssignmentSerializer(assignment_object)
         return Response(serializer.data, status=status.HTTP_200_OK)

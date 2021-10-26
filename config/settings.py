@@ -32,6 +32,8 @@ ALLOWED_HOSTS = config("ALLOW_HOSTS", default=[
                        "127.0.0.1", "localhost"], cast=list)
 
 
+APPEND_SLASH = False
+
 # Application definition
 
 INSTALLED_APPS = [
