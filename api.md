@@ -57,9 +57,9 @@ This API return the specific Assignment Object related to the Assignment ID pass
 
 **Path parameters**
 
-|                             | Parameters       |  Type  | Description           |
-| :-------------------------: | :--------------- | :----: | :-------------------- |
-| ![Required][required_badge] | **assignmentId** | String | The ID of assignment. |
+|                             | Parameters       | Description           |
+| :-------------------------: | :--------------- | :-------------------- |
+| ![Required][required_badge] | **assignmentId** | The ID of assignment. |
 
 Example request:
 
@@ -77,12 +77,12 @@ Example response:
 
 ```JSON
 {
-    "assignmentId": "1",
+    "id": 1,
     "name": "Example Assignment",
     "description": "This is example",
     "dueDate": 1634745493,
     "tag": {
-        "id": "1",
+        "id": 1,
         "name": "ISP",
         "color": "#4285F4"
     },
@@ -128,7 +128,7 @@ This API will create the assignment in the Database.
 | :-------------------------: | :---------- | :----: | :------------------------------------------------------------ |
 | ![Required][required_badge] | **name**    | String | The name of the new assignment.                               |
 | ![Optional][optional_badge] | **dueDate** | Number | The due date of the new assignment specifed as **Timestamp**. |
-| ![Optional][optional_badge] | **tagId**   | String | The tag id that this assignment will be assgiened to.         |
+| ![Optional][optional_badge] | **tagId**   | Number | The tag id that this assignment will be assgiened to.         |
 
 Example request:
 
@@ -195,9 +195,9 @@ This API will delete the specifed assignment from the Database.
 
 **Path parameters**
 
-|                             | Parameters       |  Type  | Description                              |
-| :-------------------------: | :--------------- | :----: | :--------------------------------------- |
-| ![Required][required_badge] | **assignmentId** | String | The ID of assignment you want to remove. |
+|                             | Parameters       | Description                              |
+| :-------------------------: | :--------------- | :--------------------------------------- |
+| ![Required][required_badge] | **assignmentId** | The ID of assignment you want to remove. |
 
 Example request:
 
@@ -284,12 +284,12 @@ Example response:
 
 ```JSON
 {
-    "id": "1",
+    "id": 1,
     "name": "Renamed Assignment",
     "description": "This is example",
     "dueDate": 1634745493,
     "tag": {
-        "id": "1",
+        "id": 1,
         "name": "ISP",
         "color": "#4285F4"
     },
@@ -314,19 +314,19 @@ Example error response:
 
 ### Assignment Object
 
-|                             | Parameters       |           Type            | Value                                                              |
-| :-------------------------: | :--------------- | :-----------------------: | :----------------------------------------------------------------- |
-| ![Required][required_badge] | **assignmentId** |          String           | The ID of assignment.                                              |
-| ![Required][required_badge] | **name**         |          String           | The name of assignment.                                            |
-| ![Optional][optional_badge] | **description**  |          String           | Assignment description.                                            |
-| ![Optional][optional_badge] | **dueDate**      |          Number           | The due date of the current assignment presented as **Timestamp**. |
-| ![Optional][optional_badge] | **tag**          | [Tag Object](#tag-object) | The tag object that this assignment has been assgiened to.         |
+|                             | Parameters      |           Type            | Value                                                              |
+| :-------------------------: | :-------------- | :-----------------------: | :----------------------------------------------------------------- |
+| ![Required][required_badge] | **id**          |          Number           | The ID of assignment.                                              |
+| ![Required][required_badge] | **name**        |          String           | The name of assignment.                                            |
+| ![Optional][optional_badge] | **description** |          String           | Assignment description.                                            |
+| ![Optional][optional_badge] | **dueDate**     |          Number           | The due date of the current assignment presented as **Timestamp**. |
+| ![Optional][optional_badge] | **tag**         | [Tag Object](#tag-object) | The tag object that this assignment has been assgiened to.         |
 
 ### Tag Object
 
 |                             | Parameters |  Type  | Value                      |
 | :-------------------------: | :--------- | :----: | :------------------------- |
-| ![Required][required_badge] | **id**     | String | The ID of the Tag.         |
+| ![Required][required_badge] | **id**     | Number | The ID of the Tag.         |
 | ![Required][required_badge] | **name**   | String | The name of the Tag.       |
 | ![Optional][optional_badge] | **color**  | String | Hex color code of the tag. |
 
