@@ -22,7 +22,7 @@ class AssignmentViewset(viewsets.ModelViewSet):
         serializer = CreateAssignmentApiSerializer(data=data)
 
         if not serializer.is_valid():
-            # Response 400 if the reuqest body is invalid
+            # Response 400 if the request body is invalid
             return Response({
                 'message': serializer.errors
             }, status=status.HTTP_400_BAD_REQUEST)
@@ -68,7 +68,7 @@ class AssignmentViewset(viewsets.ModelViewSet):
         serializer = UpdateAssignmentApiSerializer(
             instance=self.get_object(), data=data, partial=True)
         if not serializer.is_valid():
-            # Response 400 if the reuqest body is invalid
+            # Response 400 if the request body is invalid
             return Response({
                 'message': serializer.errors
             }, status=status.HTTP_400_BAD_REQUEST)
