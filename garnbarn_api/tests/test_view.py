@@ -18,9 +18,9 @@ class ViewTests(TestCase):
         self.end_date = self.current_time + timedelta(days=1)
         # datetime.timestamp() will give float
         # so we have to change its format to int.
-        self.current_timestamp = round(
+        self.current_timestamp = math.floor(
             self.current_time.timestamp() * 1000)
-        self.end_date_timestamp = round(self.end_date.timestamp() * 1000)
+        self.end_date_timestamp = math.floor(self.end_date.timestamp() * 1000)
 
         self.tag = Tag(name="test_tag")
         self.tag.save()
@@ -45,6 +45,8 @@ class ViewTests(TestCase):
 
         response = self.client.get("/api/v1/assignment/1/")
         converted_data = convert_to_json(response.content)
+        timestamp_cache_from_request = converted_data["timestamp"]
+        del converted_data["timestamp"]
         expected_result = json.dumps({
             "id": 1,
             "tag": {
@@ -54,10 +56,11 @@ class ViewTests(TestCase):
             },
             "name": "assignment 1",
             "dueDate": self.end_date_timestamp,
-            "timestamp": self.current_timestamp,
             "description": "test"
         })
         self.assertJSONEqual(expected_result, converted_data)
+        self.assertAlmostEqual(timestamp_cache_from_request,
+                               self.current_timestamp, delta=2)
         self.assertEqual(200, response.status_code)
 
     def test_post_without_name(self):
@@ -97,18 +100,20 @@ class ViewTests(TestCase):
         data = {
             "tagId": 1,
             "name": "assignment 2",
-            "timestamp": self.current_time,
             "dueDate": self.end_date_timestamp,
             "description": "assignment 2's detail"
         }
         response = self.client.post(
             "/api/v1/assignment/", data, content_type="application/json")
         self.assertEqual(200, response.status_code)
-
         new_assignment = Assignment.objects.get(assignment_name="assignment 2")
-        self.assertEqual(new_assignment.due_date.timestamp(), data["dueDate"])
-        self.assertEqual(int(new_assignment.timestamp.timestamp()),
-                         int(data["timestamp"].timestamp()))
+        # For dueDate, Python used second based timestamp. So converting between milisec timestamp
+        # Will lose 3 unit presistion. So delta=1000
+        self.assertAlmostEqual(math.floor(new_assignment.due_date.timestamp()
+                                          * 1000), data["dueDate"], delta=1000)
+        # The creation time may not equal the current timestamp, The acceptable creation time is 2s or 2000 ms
+        self.assertAlmostEqual(math.floor(new_assignment.timestamp.timestamp() * 1000),
+                               self.current_timestamp, delta=2000)
         self.assertEqual(new_assignment.description, data["description"])
 
     def test_patch(self):
@@ -130,15 +135,18 @@ class ViewTests(TestCase):
             },
             "name": "renamed",
             "dueDate": self.end_date_timestamp,
-            "timestamp": self.current_timestamp,
             "description": "test"
         })
+        timestamp_cache_from_request = converted_data["timestamp"]
+        del converted_data["timestamp"]
         self.assertJSONEqual(expected_result, converted_data)
+        self.assertAlmostEqual(timestamp_cache_from_request,
+                               self.current_timestamp, delta=2)
         self.assertEqual(200, response.status_code)
         all_assignment_in_database = Assignment.objects.all()
         self.assertEqual(len(all_assignment_in_database), 1)
         focused_assignment = all_assignment_in_database[0]
-        self.assertEqual(focused_assignment.name, "renamed")
+        self.assertEqual(focused_assignment.assignment_name, "renamed")
 
     def test_delete(self):
         """Delete assignment object"""

@@ -2,6 +2,7 @@ from datetime import date, datetime, timedelta
 from django.test import TestCase
 from garnbarn_api.serializer import CreateAssignmentApiSerializer
 from garnbarn_api.models import Assignment
+import math
 
 
 class SerializerTests(TestCase):
@@ -9,13 +10,13 @@ class SerializerTests(TestCase):
 
     def setUp(self):
         self.end_date = datetime.now() + timedelta(days=1)
-        self.end_date_timestamp = self.end_date.timestamp()
+        self.end_date_timestamp = self.end_date.timestamp() * 1000
 
         self.assignment_attributes = {
             'id': 1,
             'tag': None,
             'name': 'test_with_serializer',
-            'dueDate': self.end_date,
+            'dueDate': self.end_date_timestamp,
             'description': 'test_with_serializer'
         }
 
@@ -55,7 +56,7 @@ class SerializerTests(TestCase):
         self.assertEqual(data['id'], self.assignment_attributes['id'])
         self.assertEqual(data['name'],
                          self.assignment_attributes['name'])
-        self.assertEqual(data['dueDate'],
-                         int(self.assignment_attributes['dueDate'].timestamp()))
+        self.assertAlmostEqual(data['dueDate'],
+                               math.floor(self.assignment_attributes['dueDate']))
         self.assertEqual(data['description'],
                          self.assignment_attributes['description'])
