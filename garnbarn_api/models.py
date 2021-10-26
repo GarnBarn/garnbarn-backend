@@ -11,6 +11,13 @@ class Tag(models.Model):
     color = models.CharField(max_length=10, null=True,
                              blank=True, default=None)
 
+    def get_json_data(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "color": self.color,
+        }
+
     def __str__(self):
         return self.name
 
@@ -26,6 +33,20 @@ class Assignment(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     description = models.CharField(
         max_length=1000, null=True, blank=True, default=None)
+
+    def get_json_data(self):
+        # Convert timestamp from second to miliseconds base.
+        timestamp = self.timestamp.timestamp() * 1000 if self.timestamp else None
+        due_date = self.due_date.timestamp() * 1000 if self.due_date else None
+        tag = self.tag.get_json_data() if self.tag else None
+        return {
+            "id": self.id,
+            "name": self.assignment_name,
+            "tag": tag,
+            "description": self.description,
+            "timestamp": timestamp,
+            "dueDate": due_date,
+        }
 
     def __str__(self) -> str:
         return self.assignment_name
