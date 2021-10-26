@@ -3,3 +3,7 @@ flake8
 coverage
 python-decouple
 mysqlclient
+djangorestframework
+markdown
+django-filter
+requests
