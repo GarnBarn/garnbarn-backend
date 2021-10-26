@@ -2,6 +2,7 @@ from django.test import TestCase
 from garnbarn_api.models import Tag, Assignment
 from datetime import datetime, timedelta
 import json
+import math
 
 
 def convert_to_json(data):
@@ -17,8 +18,9 @@ class ViewTests(TestCase):
         self.end_date = self.current_time + timedelta(days=1)
         # datetime.timestamp() will give float
         # so we have to change its format to int.
-        self.current_timestamp = int(self.current_time.timestamp())
-        self.end_date_timestamp = int(self.end_date.timestamp())
+        self.current_timestamp = round(
+            self.current_time.timestamp() * 1000)
+        self.end_date_timestamp = round(self.end_date.timestamp() * 1000)
 
         self.tag = Tag(name="test_tag")
         self.tag.save()
@@ -132,6 +134,11 @@ class ViewTests(TestCase):
             "description": "test"
         })
         self.assertJSONEqual(expected_result, converted_data)
+        self.assertEqual(200, response.status_code)
+        all_assignment_in_database = Assignment.objects.all()
+        self.assertEqual(len(all_assignment_in_database), 1)
+        focused_assignment = all_assignment_in_database[0]
+        self.assertEqual(focused_assignment.name, "renamed")
 
     def test_delete(self):
         """Delete assignment object"""

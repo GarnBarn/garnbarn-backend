@@ -1,6 +1,6 @@
 from datetime import date, datetime, timedelta
 from django.test import TestCase
-from garnbarn_api.serializer import AssignmentSerializer
+from garnbarn_api.serializer import CreateAssignmentApiSerializer
 from garnbarn_api.models import Assignment
 
 
@@ -31,8 +31,9 @@ class SerializerTests(TestCase):
             description='test_with_serializer'
         )
 
-        self.serializer = AssignmentSerializer(instance=self.assignment_object)
-        self.serializer2 = AssignmentSerializer(
+        self.serializer = CreateAssignmentApiSerializer(
+            instance=self.assignment_object)
+        self.serializer2 = CreateAssignmentApiSerializer(
             instance=self.assignment_object2)
 
     def test_serializer_contain_expected_field(self):
