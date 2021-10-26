@@ -166,3 +166,6 @@ class ViewTests(TestCase):
         # Status code should be 404 (Not Found)
         response_after_deleted = self.client.get("/api/v1/assignment/1/")
         self.assertEqual(404, response_after_deleted.status_code)
+        # Check if the assignment has been deleted from database, (The number of datas should be 0)
+        assignments_in_database = Assignment.objects.all()
+        self.assertEqual(len(assignments_in_database), 0)
