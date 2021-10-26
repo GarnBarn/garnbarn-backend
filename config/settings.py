@@ -143,7 +143,7 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-TIMESTAMP = '%s'
+TIMESTAMP = '%s.%f'
 
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,

@@ -23,7 +23,8 @@ class TimestampField(serializers.Field):
             raise serializers.ValidationError(
                 "The timestamp must be in the milisecond format")
         # Convert the value to Second based timestamp and floor down
-        date_converted = datetime.datetime.fromtimestamp(math.floor(value/1000))
+        date_converted = datetime.datetime.fromtimestamp(
+            math.floor(value/1000))
         return date_converted
 
 
@@ -59,6 +60,7 @@ class CreateAssignmentApiSerializer(serializers.ModelSerializer):
     """
     name = serializers.CharField(source='assignment_name')
     dueDate = TimestampField(source='due_date', default=None)
+    timestamp = TimestampField(default=None)
 
     class Meta:
         model = Assignment

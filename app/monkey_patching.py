@@ -21,10 +21,10 @@ def to_representation_ext(self, value):
         return value
 
     # FOR INTEGER RESULT 'DATETIME_FORMAT': '%s',
-    return int(value.timestamp())
+    # return int(value.timestamp())
 
     # FOR FLOAT RESULT 'DATETIME_FORMAT': '%s.%f',
-    # return value.timestamp()
+    return value.timestamp()
 
 
 DateTimeField.to_representation = to_representation_ext
