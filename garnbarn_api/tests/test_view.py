@@ -67,7 +67,9 @@ class ViewTests(TestCase):
         response = self.client.post("/api/v1/assignment/", data)
         converted_data = convert_to_json(response.content)
         res = json.dumps({
-            "name": ["This field is required."]
+            "message": {
+                "name": ["This field is required."]
+            }
         })
         self.assertJSONEqual(res, converted_data)
         self.assertEqual(400, response.status_code)
