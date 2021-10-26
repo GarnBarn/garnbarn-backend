@@ -30,9 +30,9 @@ class AssignmentViewset(viewsets.ModelViewSet):
 
         assignment_object = Assignment(**serializer.validated_data)
 
-        # add tag to assignment by giving the tag's id
         tag_id_from_request = request.data.get("tagId")
         if tag_id_from_request is not None:
+            # Check the tagId is founded in the database. If not, Response 400.
             try:
                 tag_id_from_request = int(tag_id_from_request)
                 assignment_object.tag = Tag.objects.get(id=tag_id_from_request)
