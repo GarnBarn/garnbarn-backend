@@ -18,24 +18,37 @@ class TimestampField(serializers.Field):
         except ValueError:
             raise serializers.ValidationError(
                 "The timestamp must be an integer")
-        return datetime.datetime.fromtimestamp(value)
+        return datetime.datetime.fromtimestamp(value / 1000)
 
 
-class AssignmentSerializer(serializers.ModelSerializer):
-    """Serializer for Assignment's object
+class TagIdField(serializers.Field):
+    def to_representation(self, value):
+        return {
+            "id": value.id,
+            "name": value.name,
+            "color": value.color
+        }
+
+    def to_internal_value(self, value):
+        try:
+            tag_id_from_request = int(value)
+            tag_object = Tag.objects.get(id=tag_id_from_request)
+        except Tag.DoesNotExist:
+            raise serializers.ValidationError("Tag not found")
+        except ValueError:
+            raise serializers.ValidationError("Tag id must be a number")
+        return tag_object
+
+
+class CreateAssignmentApiSerializer(serializers.ModelSerializer):
+    """Serializer for Create Assignment API
 
     template:
             {
-            "id": 1,
-            "tag": {
-                "id": 1,
-                "name": "example_tag_name"
-                "color": "example_color"
-            },
             "name": "example_assignment_name",
             "dueDate": 1635336554,
-            "timestamp": 1634904558,
-            "description": "example_detail"
+            "description": "example_detail",
+            "tagId": 1
             }
     """
     name = serializers.CharField(source='assignment_name')
@@ -53,3 +66,23 @@ class AssignmentSerializer(serializers.ModelSerializer):
         depth = 1
 
         read_only_fields = ['timestamp']
+
+
+class UpdateAssignmentApiSerializer(serializers.ModelSerializer):
+    """Serializer for Update API
+    """
+    name = serializers.CharField(source='assignment_name', required=False)
+    dueDate = TimestampField(source='due_date', default=None)
+    tagId = TagIdField(source='tag')
+
+    class Meta:
+        model = Assignment
+        fields = ['id',
+                  'tagId',
+                  'name',
+                  'dueDate',
+                  'description'
+                  ]
+        depth = 1
+
+        read_only_fields = ['tagId', ]

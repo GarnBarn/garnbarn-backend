@@ -1,12 +1,11 @@
 from rest_framework.response import Response
 from rest_framework import viewsets, status
-from .serializer import AssignmentSerializer
+from .serializer import CreateAssignmentApiSerializer, UpdateAssignmentApiSerializer
 
 from .models import Assignment, Tag
 
 
 class AssignmentViewset(viewsets.ModelViewSet):
-    serializer_class = AssignmentSerializer
     queryset = Assignment.objects.get_queryset().order_by('id')
 
     def create(self, request, *args, **kwargs):
@@ -19,7 +18,7 @@ class AssignmentViewset(viewsets.ModelViewSet):
             Else, returns bad request status
         """
         data = request.data
-        serializer = AssignmentSerializer(data=data)
+        serializer = CreateAssignmentApiSerializer(data=data)
 
         if not serializer.is_valid():
             # Response 400 if the reuqest body is invalid
@@ -45,9 +44,7 @@ class AssignmentViewset(viewsets.ModelViewSet):
                 }, status=status.HTTP_400_BAD_REQUEST)
 
         assignment_object.save()
-
-        assignment_serializer = AssignmentSerializer(assignment_object)
-        return Response(assignment_serializer.data, status=status.HTTP_200_OK)
+        return Response(assignment_object.get_json_data(), status=status.HTTP_200_OK)
 
     def destroy(self, request, *args, **kwargs):
         """ Remove assignment with specified id.
@@ -66,35 +63,14 @@ class AssignmentViewset(viewsets.ModelViewSet):
         Returns:
             Assignment's object in json.
         """
-        assignment_object = self.get_object()
         data = request.data
-
-        if data.get("id") is not None:
+        serializer = UpdateAssignmentApiSerializer(
+            instance=self.get_object(), data=data, partial=True)
+        if not serializer.is_valid():
+            # Response 400 if the reuqest body is invalid
             return Response({
-                "message": "You can't update the assignment's id"
+                'message': serializer.errors
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        if data.get("tagId") is not None:
-            tag_id_from_request = data.get("tagId")
-            try:
-                tag_id_from_request = int(tag_id_from_request)
-                assignment_object.tag = Tag.objects.get(id=tag_id_from_request)
-            except Tag.DoesNotExist:
-                return Response({
-                    'message': "Tag's ID not found"
-                }, status=status.HTTP_400_BAD_REQUEST)
-            except ValueError:
-                return Response({
-                    'message': "tagId must be able to be converted to an integer"
-                }, status=status.HTTP_400_BAD_REQUEST)
-
-        assignment_object.assignment_name = data.get(
-            "name", assignment_object.assignment_name)
-        assignment_object.due_date = data.get(
-            "dueDate", assignment_object.due_date)
-        assignment_object.description = data.get(
-            "description", assignment_object.description)
-
-        assignment_object.save()
-        serializer = AssignmentSerializer(assignment_object)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        self.perform_update(serializer)
+        return Response(self.get_object().get_json_data(), status=status.HTTP_200_OK)
