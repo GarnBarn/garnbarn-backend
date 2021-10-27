@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'garnbarn_api.apps.GarnbarnApiConfig',
-    'rest_framework'
+    'rest_framework',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
@@ -55,6 +56,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -157,3 +160,9 @@ REST_FRAMEWORK = {
     'DATETIME_FORMAT': TIMESTAMP,
     'DATE_FORMAT': TIMESTAMP
 }
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:8080',
+    'https://garnbarn.web.app',
+    'https://garnbarn.app'
+]
