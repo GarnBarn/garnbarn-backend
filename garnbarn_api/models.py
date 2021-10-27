@@ -1,8 +1,10 @@
-from typing import Optional
+from typing import AbstractSet, Optional
 from django.db import models
 import datetime
+from django.db.models.deletion import SET_NULL
 from django.utils import timezone
 import math
+import uuid
 
 
 class Tag(models.Model):
@@ -53,3 +55,11 @@ class Assignment(models.Model):
 
     def __str__(self) -> str:
         return self.assignment_name
+
+
+class CustomUser(models.Model):
+    """Information of the User."""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    line = models.ForeignKey(object, on_delete=models.SET_NULL, null=True)
+    discord = models.ForeignKey(object, on_delete=models.SET_NULL, null=True)
+    
