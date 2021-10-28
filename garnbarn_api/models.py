@@ -7,6 +7,22 @@ import math
 import uuid
 
 
+class SocialObject(models.Model):
+    """Social and notification."""
+    social_id = models.CharField(max_length=40)
+    notification = None
+
+
+class CustomUser(models.Model):
+    """Information of the User."""
+    # uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    uid = models.CharField(max_length=40, primary_key=True, default='Unknown')
+    name = models.CharField(max_length=20)
+
+    line = models.ForeignKey(
+        SocialObject, on_delete=models.SET_NULL, null=True)
+
+
 class Tag(models.Model):
     """Tag or subject"""
 
@@ -55,18 +71,3 @@ class Assignment(models.Model):
 
     def __str__(self) -> str:
         return self.assignment_name
-
-
-class SocialObject(models.Model):
-    """Social and notification."""
-    social_id = models.CharField(max_length=40)
-    notification = None
-
-
-class CustomUser(models.Model):
-    """Information of the User."""
-    # uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    uid = models.CharField(max_length=40, primary_key=True, default='Unknown')
-    name = models.CharField(max_length=20)
-
-    line = models.ForeignKey(SocialObject, on_delete=models.SET_NULL, null=True)
