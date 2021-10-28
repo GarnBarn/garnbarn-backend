@@ -4,7 +4,6 @@ import datetime
 from django.db.models.deletion import SET_NULL
 from django.utils import timezone
 import math
-import uuid
 
 
 class Tag(models.Model):
@@ -59,7 +58,7 @@ class Assignment(models.Model):
 
 class SocialObject(models.Model):
     """Social and notification."""
-    id = models.CharField(max_length=40)
+    social_id = models.CharField(max_length=40)
     notification = None
 
 
