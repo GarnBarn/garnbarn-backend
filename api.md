@@ -17,7 +17,7 @@ Definition:
 Example of the fully assembled API endpoint:
 
 ```
-https://garnbarn.example/api/v1/assignments
+https://garnbarn.example/api/v1/assignment/
 ```
 
 _Note: https://garnbarn.example is an example PREFIX. Please don't send any request to this prefix_
@@ -46,7 +46,7 @@ This API return the specific Assignment Object related to the Assignment ID pass
 
 #### HTTP Request
 
-`GET /api/v1/assignments/{assignmentId}`
+`GET /api/v1/assignment/{assignmentId}`
 
 **Request headers**
 
@@ -64,7 +64,7 @@ This API return the specific Assignment Object related to the Assignment ID pass
 Example request:
 
 ```bash
-curl -v -X GET {PREFIX}/api/v1/assignments/{assignmentId}/ \
+curl -v -X GET {PREFIX}/api/v1/assignment/{assignmentId}/ \
 -H 'Content-Type: application/json' \
 -H 'Authorization: Bearer {ID Token}' \
 ```
@@ -113,7 +113,7 @@ This API will create the assignment in the Database.
 
 #### HTTP Request
 
-`POST /api/v1/assignments/`
+`POST /api/v1/assignment/`
 
 **Request headers**
 
@@ -133,7 +133,7 @@ This API will create the assignment in the Database.
 Example request:
 
 ```bash
-curl -v -X POST {PREFIX}/api/v1/assignments/ \
+curl -v -X POST {PREFIX}/api/v1/assignment/ \
 -H 'Content-Type: application/json' \
 -H 'Authorization: Bearer {ID Token}' \
 -d '{
@@ -184,7 +184,7 @@ This API will delete the specifed assignment from the Database.
 
 #### HTTP Request
 
-`DELETE /api/v1/assignments/{assignmentId}`
+`DELETE /api/v1/assignment/{assignmentId}`
 
 **Request headers**
 
@@ -202,7 +202,7 @@ This API will delete the specifed assignment from the Database.
 Example request:
 
 ```bash
-curl -v -X DELETE {PREFIX}/api/v1/assignments/{assignmentId} \
+curl -v -X DELETE {PREFIX}/api/v1/assignment/{assignmentId} \
 -H 'Content-Type: application/json' \
 -H 'Authorization: Bearer {ID Token}' \
 ```
@@ -242,7 +242,7 @@ This API will update the specifed assignment with the new detail.
 
 #### HTTP Request
 
-`PATCH /api/v1/assignments/{assignmentId}`
+`PATCH /api/v1/assignment/{assignmentId}`
 
 **Request headers**
 
@@ -268,7 +268,7 @@ This API will update the specifed assignment with the new detail.
 Example request:
 
 ```bash
-curl -v -X PATCH {PREFIX}/api/v1/assignments/{assignmentId} \
+curl -v -X PATCH {PREFIX}/api/v1/assignment/{assignmentId} \
 -H 'Content-Type: application/json' \
 -H 'Authorization: Bearer {ID Token}' \
 -d '{
