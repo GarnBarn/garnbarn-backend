@@ -2,10 +2,10 @@ import datetime
 from enum import auto
 import time
 from django.db import models
-from django.db.models import fields
+from django.db.models import fields, query_utils
 from rest_framework import serializers
 from rest_framework.relations import PKOnlyObject
-from .models import Assignment, Tag
+from .models import Assignment, CustomUser, Tag
 import math
 
 
@@ -26,6 +26,14 @@ class TimestampField(serializers.Field):
         date_converted = datetime.datetime.fromtimestamp(
             math.floor(value/1000))
         return date_converted
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['uid', 'name', 'line']
+
+        read_only_fields = ['uid']
 
 
 class TagIdField(serializers.Field):
@@ -61,10 +69,12 @@ class CreateAssignmentApiSerializer(serializers.ModelSerializer):
     name = serializers.CharField(source='assignment_name')
     dueDate = TimestampField(source='due_date', default=None)
     timestamp = TimestampField(default=None)
+    uid = serializers.CharField(source='owner.uid')
 
     class Meta:
         model = Assignment
         fields = ['id',
+                  'uid',
                   'tag',
                   'name',
                   'dueDate',
@@ -73,7 +83,7 @@ class CreateAssignmentApiSerializer(serializers.ModelSerializer):
                   ]
         depth = 1
 
-        read_only_fields = ['timestamp']
+        read_only_fields = ['timestamp', 'uid']
 
 
 class UpdateAssignmentApiSerializer(serializers.ModelSerializer):

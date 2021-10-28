@@ -1,7 +1,7 @@
 from typing import AbstractSet, Optional
 from django.db import models
 import datetime
-from django.db.models.deletion import SET_NULL
+from django.db.models.deletion import CASCADE, SET_NULL
 from django.utils import timezone
 import math
 import uuid
@@ -20,7 +20,17 @@ class CustomUser(models.Model):
     name = models.CharField(max_length=20)
 
     line = models.ForeignKey(
-        SocialObject, on_delete=models.SET_NULL, null=True)
+        SocialObject, on_delete=models.SET_NULL, null=True, blank=True)
+
+    def get_json_data(self):
+        return {
+            "uid": self.uid,
+            "name": self.name,
+            "line": self.line
+        }
+
+    def __str__(self):
+        return self.name
 
 
 class Tag(models.Model):
@@ -46,6 +56,7 @@ class Assignment(models.Model):
 
     # The assignment shouldn't get deleted when tag is deleted.
     tag = models.ForeignKey(Tag, on_delete=models.SET_NULL, null=True)
+    owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True)
 
     assignment_name = models.CharField(max_length=50)
     due_date = models.DateTimeField(null=True, blank=True, default=None)
@@ -62,6 +73,7 @@ class Assignment(models.Model):
         tag = self.tag.get_json_data() if self.tag else None
         return {
             "id": self.id,
+            "owner": self.owner,
             "name": self.assignment_name,
             "tag": tag,
             "description": self.description,
