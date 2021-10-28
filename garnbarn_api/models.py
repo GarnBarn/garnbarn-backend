@@ -57,9 +57,14 @@ class Assignment(models.Model):
         return self.assignment_name
 
 
+class SocialObject(models.Model):
+    """Social and notification."""
+    id = models.CharField(max_length=40)
+    notification = None
+
+
 class CustomUser(models.Model):
     """Information of the User."""
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    line = models.ForeignKey(object, on_delete=models.SET_NULL, null=True)
-    discord = models.ForeignKey(object, on_delete=models.SET_NULL, null=True)
-    
+    name = models.CharField(max_length=20)
+
+    line = models.ForeignKey(SocialObject, on_delete=models.SET_NULL, null=True)
