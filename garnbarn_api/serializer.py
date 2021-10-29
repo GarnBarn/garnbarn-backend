@@ -94,3 +94,22 @@ class UpdateAssignmentApiSerializer(serializers.ModelSerializer):
         depth = 1
 
         read_only_fields = ['tagId', ]
+
+class CreateTagApiSerializer(serializers.ModelSerializer):
+    """Serializer for Create Tag API
+
+    template:
+        {
+            "id": 1
+            "name": "example_tag_name"
+            "color": "example_color"
+        }
+    """
+    class Meta:
+        model = Tag
+        fields = ['id',
+                'name',
+                'color'
+                ]
+        depth = 1
+

@@ -1,6 +1,7 @@
+from django.db.models.query import QuerySet
 from rest_framework.response import Response
-from rest_framework import viewsets, status
-from .serializer import CreateAssignmentApiSerializer, UpdateAssignmentApiSerializer
+from rest_framework import serializers, viewsets, status
+from .serializer import CreateAssignmentApiSerializer, CreateTagApiSerializer, UpdateAssignmentApiSerializer, CreateTagApiSerializer
 
 from .models import Assignment, Tag
 
@@ -75,3 +76,30 @@ class AssignmentViewset(viewsets.ModelViewSet):
 
         self.perform_update(serializer)
         return Response(self.get_object().get_json_data(), status=status.HTTP_200_OK)
+
+
+class TagViewset(viewsets.ModelViewSet):
+    serializer_class = CreateTagApiSerializer
+    queryset = Tag.objects.get_queryset().order_by('id')
+
+    def create(self, request, *args, **kwargs):
+        """Create Tag object.
+
+        Returns:
+            If the given data contain all
+            requirements(tag id and name are included),
+            return tag's object in json.
+            Else, return bad request status
+        """
+        data = request.data
+        serializer = CreateTagApiSerializer(data=data)
+
+        if not serializer.is_valid():
+            """Response 400 if the request body is invalid"""
+            return Response({
+                'message': serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        tag_object = Tag(**serializer.validated_data)
+        tag_object.save()
+        return Response(tag_object.get_json_data(), status=status.HTTP_200_OK)
