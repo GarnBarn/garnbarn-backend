@@ -377,6 +377,26 @@ Example error response:
 
 ---
 
+## Tag API
+
+### Get Tag
+
+**To be specified**
+
+### Create Tag
+
+**To be specified**
+
+### Delete Tag
+
+**To be specified**
+
+### Update Tag
+
+**To be specified**
+
+---
+
 ## Object Structure
 
 ### Assignment Object
