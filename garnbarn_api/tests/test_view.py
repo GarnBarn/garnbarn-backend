@@ -1,5 +1,6 @@
 from django.test import TestCase
-from garnbarn_api.models import Tag, Assignment
+from rest_framework import serializers
+from garnbarn_api.models import Tag, Assignment, CustomUser
 from datetime import datetime, timedelta
 import json
 import math
@@ -8,7 +9,6 @@ import math
 def convert_to_json(data):
     """Convert data into json format"""
     data = json.loads(data)
-    # data = json.dumps(data)
     return data
 
 
@@ -25,14 +25,20 @@ class ViewTests(TestCase):
         self.tag = Tag(name="test_tag")
         self.tag.save()
 
-        assignment = Assignment(
+        self.user = CustomUser(uid="user_id",
+                               name="user_name",
+                               )
+        self.user.save()
+
+        self.assignment = Assignment(
             assignment_name="assignment 1",
+            owner=self.user,
             tag=self.tag,
             timestamp=self.current_time,
             due_date=self.end_date,
             description="test"
         )
-        assignment.save()
+        self.assignment.save()
 
     def test_assignment_not_found(self):
         """Raise 404 status code when assignment's object does not exist"""
@@ -49,6 +55,7 @@ class ViewTests(TestCase):
         del converted_data["timestamp"]
         expected_result = json.dumps({
             "id": 1,
+            "owner": "user_id",
             "tag": {
                 "id": 1,
                 "name": "test_tag",
@@ -67,6 +74,7 @@ class ViewTests(TestCase):
         """Create assignment object without a name"""
 
         data = {
+            "owner": self.user,
             "description": "no-name"
         }
         response = self.client.post("/api/v1/assignment/", data)
@@ -104,7 +112,7 @@ class ViewTests(TestCase):
             "description": "assignment 2's detail"
         }
         response = self.client.post(
-            "/api/v1/assignment/", data, content_type="application/json")
+            "/api/v1/assignment/", data)
         self.assertEqual(200, response.status_code)
         new_assignment = Assignment.objects.get(assignment_name="assignment 2")
         # For dueDate, Python used second based timestamp. So converting between milisec timestamp
@@ -129,6 +137,7 @@ class ViewTests(TestCase):
         converted_data = convert_to_json(response.content)
         expected_result = json.dumps({
             "id": 1,
+            "owner": "user_id",
             "tag": {
                 "id": 1,
                 "name": "test_tag",

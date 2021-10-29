@@ -6,6 +6,8 @@ from django.utils import timezone
 import math
 import uuid
 
+from rest_framework import serializers
+
 
 class SocialObject(models.Model):
     """Social and notification."""
@@ -71,9 +73,10 @@ class Assignment(models.Model):
         due_date = math.floor(self.due_date.timestamp() *
                               1000) if self.due_date else None
         tag = self.tag.get_json_data() if self.tag else None
+        owner = self.owner.uid if self.owner else None
         return {
             "id": self.id,
-            "owner": self.owner,
+            "owner": owner,
             "name": self.assignment_name,
             "tag": tag,
             "description": self.description,
