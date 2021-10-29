@@ -1,7 +1,8 @@
+from functools import partial
 from django.db.models.query import QuerySet
 from rest_framework.response import Response
 from rest_framework import serializers, viewsets, status
-from .serializer import CreateAssignmentApiSerializer, CreateTagApiSerializer, UpdateAssignmentApiSerializer, CreateTagApiSerializer
+from .serializer import CreateAssignmentApiSerializer, CreateTagApiSerializer, UpdateAssignmentApiSerializer, CreateTagApiSerializer, UpdateTagApiSerializer
 
 from .models import Assignment, Tag
 
@@ -103,3 +104,33 @@ class TagViewset(viewsets.ModelViewSet):
         tag_object = Tag(**serializer.validated_data)
         tag_object.save()
         return Response(tag_object.get_json_data(), status=status.HTTP_200_OK)
+
+    def destroy(self, request, *args, **kwargs):
+        """Remove tag with specified id.
+
+        Returns:
+            Response message telling which tag has been deleted.
+        """
+        tag = self.get_object()
+        tag.delete()
+
+        return Response({}, status=status.HTTP_200_OK)
+
+    def partial_update(self, request, *args, **kwargs):
+        """Update data of the specified tag
+        
+        Returns:
+            Tag's object in json.
+        """
+        data = request.data
+        serializer = UpdateTagApiSerializer(
+            instance=self.get_object(), data=data, partial=True)
+
+        if not serializer.is_valid():
+            """Response 400 if the request body is invaild."""
+            return Response({
+                'message': serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        self.perform_update(serializer)
+        return Response(self.get_object().get_json_data(), status=status.HTTP_200_OK)
