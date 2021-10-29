@@ -3,6 +3,7 @@ from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
 from .serializer import CreateAssignmentApiSerializer, UpdateAssignmentApiSerializer
 from .authentication import FirebaseAuthIDTokenAuthentication
+from datetime import datetime
 
 from .models import Assignment, Tag
 
@@ -11,7 +12,14 @@ class AssignmentViewset(viewsets.ModelViewSet):
     authentication_classes = [FirebaseAuthIDTokenAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = CreateAssignmentApiSerializer
-    queryset = Assignment.objects.get_queryset().order_by('id')
+
+    def get_queryset(self):
+        if self.request.query_params.get('fromPresent') == "true":
+            data = Assignment.objects.exclude(
+                due_date__lt=datetime.now()).order_by('due_date')
+        else:
+            data = Assignment.objects.get_queryset().order_by('id')
+        return data
 
     def create(self, request, *args, **kwargs):
         """ Create Assignment object.
