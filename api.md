@@ -79,6 +79,7 @@ Example response:
 {
     "id": 1,
     "name": "Example Assignment",
+    "author": "0000000000000000000000000000",
     "description": "This is example",
     "dueDate": 1634745493,
     "tag": {
@@ -98,6 +99,67 @@ Example error response:
 ```JSON
 {
     "message": "Assignment not found"
+}
+```
+
+---
+
+### Get All Assignments
+
+This API return the specific Assignment Object related to the Assignment ID passed in the request body.
+
+#### Permission
+
+- User must have permission to view the requested Assignment </br> (By being the **owner of the assignment** or the **subscriber of the Tag** that the Assignment has been assigned).
+
+#### HTTP Request
+
+`GET /api/v1/assignment/`
+
+**Request headers**
+
+|                             | Parameters        | Value               |
+| :-------------------------: | :---------------- | ------------------- |
+| ![Required][required_badge] | **Content-Type**  | application/json    |
+| ![Required][required_badge] | **Authorization** | Bearer `{ID Token}` |
+
+**URL parameters**
+
+|                             | Parameters      |  type   | Description                                                                           |
+| :-------------------------: | :-------------- | :-----: | :------------------------------------------------------------------------------------ |
+| ![Optional][optional_badge] | **fromPresent** | boolean | If true, The API will return only the assignment that dueDate >= today (Focus on Day) |
+
+Example request:
+
+```bash
+curl -v -X GET {PREFIX}/api/v1/assignment/{assignmentId}/ \
+-H 'Content-Type: application/json' \
+-H 'Authorization: Bearer {ID Token}' \
+```
+
+#### Response
+
+Return status code `200` and [Assignment Object](#assignment-object)
+
+Example response:
+
+```JSON
+{
+    "count": 1,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "id": 1,
+            "author": "0000000000000000000000000000",
+            "tag": null,
+            "author": ,
+            "name": "Test",
+            "dueDate": null,
+            "timestamp": 1635261404498,
+            "description": "Example!"
+        }
+    ]
 }
 ```
 
@@ -124,11 +186,12 @@ This API will create the assignment in the Database.
 
 **Request body**
 
-|                             | Parameters  |  Type  | Description                                                   |
-| :-------------------------: | :---------- | :----: | :------------------------------------------------------------ |
-| ![Required][required_badge] | **name**    | String | The name of the new assignment.                               |
-| ![Optional][optional_badge] | **dueDate** | Number | The due date of the new assignment specifed as **Timestamp**. |
-| ![Optional][optional_badge] | **tagId**   | Number | The tag id that this assignment will be assgiened to.         |
+|                             | Parameters      |  Type  | Description                                                   |
+| :-------------------------: | :-------------- | :----: | :------------------------------------------------------------ |
+| ![Required][required_badge] | **name**        | String | The name of the new assignment.                               |
+| ![Optional][optional_badge] | **description** | String | The description of assignment.                                |
+| ![Optional][optional_badge] | **dueDate**     | Number | The due date of the new assignment specifed as **Timestamp**. |
+| ![Optional][optional_badge] | **tagId**       | Number | The tag id that this assignment will be assgiened to.         |
 
 Example request:
 
@@ -151,10 +214,12 @@ Example response:
 
 ```JSON
 {
+    "id": 1,
     "name": "Example",
+    "author": "0000000000000000000000000000",
     "dueDate": 1634745493,
     "tag": {
-        "id": "1234",
+        "id": 1234,
         "name": "Example Tag",
         "color": "#11111"
     }
@@ -259,11 +324,12 @@ This API will update the specifed assignment with the new detail.
 
 **Request body**
 
-|                             | Parameters  |  Type  | Description                                                   |
-| :-------------------------: | :---------- | :----: | :------------------------------------------------------------ |
-| ![Optional][optional_badge] | **name**    | String | The name of the new assignment.                               |
-| ![Optional][optional_badge] | **dueDate** | Number | The due date of the new assignment specifed as **Timestamp**. |
-| ![Optional][optional_badge] | **tagId**   | String | The tag id that this assignment will be assgiened to.         |
+|                             | Parameters      |  Type  | Description                                                   |
+| :-------------------------: | :-------------- | :----: | :------------------------------------------------------------ |
+| ![Optional][optional_badge] | **name**        | String | The name of the new assignment.                               |
+| ![Optional][optional_badge] | **description** | String | The description of assignment.                                |
+| ![Optional][optional_badge] | **dueDate**     | Number | The due date of the new assignment specifed as **Timestamp**. |
+| ![Optional][optional_badge] | **tagId**       | String | The tag id that this assignment will be assgiened to.         |
 
 Example request:
 
@@ -286,6 +352,7 @@ Example response:
 {
     "id": 1,
     "name": "Renamed Assignment",
+    "author": "0000000000000000000000000000",
     "description": "This is example",
     "dueDate": 1634745493,
     "tag": {
@@ -318,6 +385,7 @@ Example error response:
 | :-------------------------: | :-------------- | :-----------------------: | :----------------------------------------------------------------- |
 | ![Required][required_badge] | **id**          |          Number           | The ID of assignment.                                              |
 | ![Required][required_badge] | **name**        |          String           | The name of assignment.                                            |
+| ![Required][required_badge] | **author**      |          String           | The Firebase Auth UID of the assignment author.                    |
 | ![Optional][optional_badge] | **description** |          String           | Assignment description.                                            |
 | ![Optional][optional_badge] | **dueDate**     |          Number           | The due date of the current assignment presented as **Timestamp**. |
 | ![Optional][optional_badge] | **tag**         | [Tag Object](#tag-object) | The tag object that this assignment has been assgiened to.         |

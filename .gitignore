@@ -6,3 +6,4 @@ app/
 config/
 db.sqlite3
 garnbarn_api/
+firebase-adminsdk-credential.json
