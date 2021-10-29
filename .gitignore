@@ -136,3 +136,6 @@ mysql_credential.cnf
 
 # Firebase Admin SDK Credential
 firebase-adminsdk-credential.json
+
+# Static File
+static/
