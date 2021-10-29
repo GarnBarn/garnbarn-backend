@@ -9,6 +9,7 @@ from .models import Assignment, Tag
 
 class AssignmentViewset(viewsets.ModelViewSet):
     authentication_classes = [FirebaseAuthIDTokenAuthentication]
+    permission_classes = [IsAuthenticated]
     serializer_class = CreateAssignmentApiSerializer
     queryset = Assignment.objects.get_queryset().order_by('id')
 
