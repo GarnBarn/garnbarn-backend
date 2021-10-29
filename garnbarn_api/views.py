@@ -12,7 +12,7 @@ class AssignmentViewset(viewsets.ModelViewSet):
     def get_queryset(self):
         if self.request.query_params.get('fromPresent') == "true":
             data = Assignment.objects.exclude(
-                due_date__lt=datetime.now()).order_by('id')
+                due_date__lt=datetime.now()).order_by('due_date')
         else:
             data = Assignment.objects.get_queryset().order_by('id')
         return data
