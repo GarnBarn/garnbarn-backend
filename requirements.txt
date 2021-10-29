@@ -7,5 +7,3 @@ djangorestframework
 markdown
 django-filter
 requests
-django-cors-headers
-firebase-admin==5.0.3
