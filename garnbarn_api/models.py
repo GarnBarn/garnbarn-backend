@@ -1,42 +1,8 @@
-from typing import AbstractSet, Optional
+from typing import Optional
 from django.db import models
 import datetime
-from django.db.models.deletion import SET_NULL
 from django.utils import timezone
 import math
-import uuid
-
-
-class SocialObject(models.Model):
-    """Social and notification."""
-    social_id = models.CharField(max_length=40)
-    notification = None
-
-
-class CustomUser(models.Model):
-    """Information of the User."""
-    # uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    uid = models.CharField(max_length=40, primary_key=True, default='Unknown')
-    name = models.CharField(max_length=20)
-
-    line = models.ForeignKey(
-        SocialObject, on_delete=models.SET_NULL, null=True)
-
-    @property
-    def is_anonymous(self):
-        """
-        Always return False. This is a way of comparing User objects to
-        anonymous users.
-        """
-        return False
-
-    @property
-    def is_authenticated(self):
-        """
-        Always return True. This is a way to tell if the user has been
-        authenticated in templates.
-        """
-        return True
 
 
 class Tag(models.Model):
