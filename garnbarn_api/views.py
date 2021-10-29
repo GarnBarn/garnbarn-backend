@@ -1,11 +1,14 @@
 from rest_framework.response import Response
 from rest_framework import viewsets, status
+from rest_framework.permissions import IsAuthenticated
 from .serializer import CreateAssignmentApiSerializer, UpdateAssignmentApiSerializer
+from .authentication import FirebaseAuthIDTokenAuthentication
 
 from .models import Assignment, Tag
 
 
 class AssignmentViewset(viewsets.ModelViewSet):
+    authentication_classes = [FirebaseAuthIDTokenAuthentication]
     serializer_class = CreateAssignmentApiSerializer
     queryset = Assignment.objects.get_queryset().order_by('id')
 
