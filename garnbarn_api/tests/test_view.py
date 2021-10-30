@@ -1,4 +1,3 @@
-from django.test import TestCase
 from garnbarn_api.models import Tag, Assignment, CustomUser
 from datetime import datetime, timedelta
 from rest_framework.test import force_authenticate, APITestCase
@@ -23,12 +22,10 @@ class ViewTests(APITestCase):
         self.current_timestamp = math.floor(
             self.current_time.timestamp() * 1000)
         self.end_date_timestamp = math.floor(self.end_date.timestamp() * 1000)
-        self.user = CustomUser.objects.create(uid="1234")
-        self.user.save()
-        self.tag = Tag(name="test_tag")
-        self.tag.save()
-        self.client.force_authenticate(user=self.user)
 
+        self.user = CustomUser.objects.create(uid="1234")
+        self.client.force_authenticate(user=self.user)
+        self.tag = Tag.objects.create(name="test_tag")
         assignment = Assignment(
             assignment_name="assignment 1",
             tag=self.tag,
@@ -171,3 +168,45 @@ class ViewTests(APITestCase):
         # Check if the assignment has been deleted from database, (The number of datas should be 0)
         assignments_in_database = Assignment.objects.all()
         self.assertEqual(len(assignments_in_database), 0)
+
+
+def create_assignment(name, due_date):
+    return Assignment.objects.create(assignment_name=name, due_date=due_date)
+
+
+class FromPresentTest(APITestCase):
+    def setUp(self):
+        self.user = CustomUser.objects.create(uid="1234")
+        self.client.force_authenticate(user=self.user)
+
+        yesterday = datetime.now() + timedelta(days=-1)
+        today = datetime.today()
+        tomorrow = datetime.now() + timedelta(days=1)
+
+        self.assignment1 = create_assignment("assignment 1", tomorrow)
+        self.assignment2 = create_assignment("assignment 2", yesterday)
+        self.assignment3 = create_assignment("assignment 3", today)
+
+    def test_not_frompresent(self):
+        """Normal GET method"""
+        response = self.client.get("/api/v1/assignment/")
+        self.assertEqual(json.loads(response.content)["count"], 3)
+
+    def test_frompresent_is_true(self):
+        """Adding fromPresent=true"""
+        response = self.client.get("/api/v1/assignment/?fromPresent=true")
+        # fromPresent=true will exclude assignment with due date < today
+        self.assertEqual(json.loads(response.content)["count"], 2)
+        # response should only contain assignment 3 and 1
+        self.assertIn(self.assignment1.get_json_data(),
+                      json.loads(response.content)["results"])
+        self.assertIn(self.assignment3.get_json_data(),
+                      json.loads(response.content)["results"])
+
+    def test_frompresent_order(self):
+        """The assignment should be ordered by its due date"""
+        response = self.client.get("/api/v1/assignment/?fromPresent=true")
+        self.assertEqual(json.loads(response.content)[
+                         "results"][0]["name"], "assignment 3")
+        self.assertEqual(json.loads(response.content)[
+                         "results"][1]["name"], "assignment 1")
