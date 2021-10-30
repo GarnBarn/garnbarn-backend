@@ -27,7 +27,6 @@ class FromPresentTest(APITestCase):
     def test_not_frompresent(self):
         """Normal GET method"""
         response = self.client.get("/api/v1/assignment/")
-        expected = ("assignment 1", "assignment 2", "assignment 3")
         self.assertEqual(json.loads(response.content)["count"], 3)
 
     def test_frompresent_is_true(self):
@@ -35,6 +34,11 @@ class FromPresentTest(APITestCase):
         response = self.client.get("/api/v1/assignment/?fromPresent=true")
         # fromPresent=true will exclude assignment with due date < today
         self.assertEqual(json.loads(response.content)["count"], 2)
+        # response should only contain assignment 3 and 1
+        self.assertIn(self.assignment1.get_json_data(),
+                      json.loads(response.content)["results"])
+        self.assertIn(self.assignment3.get_json_data(),
+                      json.loads(response.content)["results"])
 
     def test_frompresent_order(self):
         """The assignment should be ordered by its due date"""
