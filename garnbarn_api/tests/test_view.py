@@ -1,3 +1,4 @@
+from freezegun import freeze_time
 from garnbarn_api.models import Tag, Assignment, CustomUser
 from datetime import datetime, timedelta
 from rest_framework.test import force_authenticate, APITestCase
@@ -172,18 +173,10 @@ class ViewTests(APITestCase):
         self.assertEqual(len(assignments_in_database), 0)
 
 
+@freeze_time("2012-12-12T12:00:00+07:00")
 class FromPresentTest(APITestCase):
     def setUp(self):
-        # Create fake datetime
-        self.time = datetime(2012, 12, 12, 12, 0)
-
-        class fakedatetime(datetime):
-            @classmethod
-            def now(cls):
-                return self.time
-        patcher = patch('datetime.datetime', fakedatetime)
-        self.addCleanup(patcher.stop)
-        patcher.start()
+        print(datetime.now())
 
         # Create user
         self.user = CustomUser.objects.create(uid="1234")
@@ -219,6 +212,9 @@ class FromPresentTest(APITestCase):
         """The assignment should be ordered by its due date"""
         response = self.client.get("/api/v1/assignment/?fromPresent=true")
         response_in_json = json.loads(response.content)
-        self.assertEqual(response_in_json["results"][0]["name"], "assignment 4")
-        self.assertEqual(response_in_json["results"][1]["name"], "assignment 3")
-        self.assertEqual(response_in_json["results"][2]["name"], "assignment 1")
+        self.assertEqual(
+            response_in_json["results"][0]["name"], "assignment 4")
+        self.assertEqual(
+            response_in_json["results"][1]["name"], "assignment 3")
+        self.assertEqual(
+            response_in_json["results"][2]["name"], "assignment 1")
