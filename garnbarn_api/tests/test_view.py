@@ -1,4 +1,5 @@
 from django.test import TestCase
+from rest_framework.test import APITestCase
 from garnbarn_api.models import Tag, Assignment
 from datetime import datetime, timedelta
 import json
@@ -52,7 +53,9 @@ class ViewTests(TestCase):
             "tag": {
                 "id": 1,
                 "name": "test_tag",
-                "color": None
+                "author": None,
+                "color": None,
+                "reminderTime": None
             },
             "name": "assignment 1",
             "dueDate": self.end_date_timestamp,
@@ -132,7 +135,9 @@ class ViewTests(TestCase):
             "tag": {
                 "id": 1,
                 "name": "test_tag",
-                "color": None
+                "author": None,
+                "color": None,
+                "reminderTime": None
             },
             "name": "renamed",
             "description": "test"

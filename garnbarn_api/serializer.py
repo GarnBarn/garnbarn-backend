@@ -104,10 +104,14 @@ class CreateTagApiSerializer(serializers.ModelSerializer):
         {
             "id": 1
             "name": "example_tag_name"
+            "author": "example_author"
             "color": "example_color"
+            "reminderTime": [example, example]
         }
     """
-    reminderTime = serializers.JSONField(source='reminder_time', default=None)
+    reminderTime = serializers.ListField(source='reminder_time', default=None,
+                                         child=serializers.IntegerField()
+                                         )
 
     class Meta:
         model = Tag
@@ -122,11 +126,16 @@ class CreateTagApiSerializer(serializers.ModelSerializer):
 
 class UpdateTagApiSerializer(serializers.ModelSerializer):
     """Serializer for the Update Tag API"""
+    reminderTime = serializers.ListField(source='reminder_time', default=None,
+                                         child=serializers.IntegerField()
+                                         )
+
     class Meta:
         model = Tag
         fields = ['id',
                 'name',
                 'author',
-                'color'
+                'color',
+                'reminderTime'
                 ]
         depth = 1
