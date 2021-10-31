@@ -1,9 +1,6 @@
 from django.test import TestCase
-<<<<<<< HEAD
 from rest_framework import serializers
 from rest_framework.test import APITestCase
-=======
->>>>>>> iteration2
 from garnbarn_api.models import Tag, Assignment, CustomUser
 from datetime import datetime, timedelta
 from rest_framework.test import force_authenticate, APITestCase
@@ -119,11 +116,7 @@ class ViewTests(APITestCase):
             "description": "assignment 2's detail"
         }
         response = self.client.post(
-<<<<<<< HEAD
-            "/api/v1/assignment/", data)
-=======
             "/api/v1/assignment/", json.dumps(data), content_type="application/json")
->>>>>>> iteration2
         self.assertEqual(200, response.status_code)
         new_assignment = Assignment.objects.get(assignment_name="assignment 2")
         # For dueDate, Python used second based timestamp. So converting between milisec timestamp
