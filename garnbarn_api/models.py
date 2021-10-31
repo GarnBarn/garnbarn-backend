@@ -19,7 +19,24 @@ class CustomUser(models.Model):
     uid = models.CharField(max_length=40, primary_key=True, default='Unknown')
     name = models.CharField(max_length=20)
 
-    line = models.ForeignKey(SocialObject, on_delete=models.SET_NULL, null=True)
+    line = models.ForeignKey(
+        SocialObject, on_delete=models.SET_NULL, null=True)
+
+    @property
+    def is_anonymous(self):
+        """
+        Always return False. This is a way of comparing User objects to
+        anonymous users.
+        """
+        return False
+
+    @property
+    def is_authenticated(self):
+        """
+        Always return True. This is a way to tell if the user has been
+        authenticated in templates.
+        """
+        return True
 
 
 class Tag(models.Model):
