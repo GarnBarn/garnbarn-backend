@@ -190,12 +190,16 @@ class FromPresentTest(APITestCase):
         self.client.force_authenticate(user=self.user)
 
         # Create assignment with specified due date
-        yesterday = datetime.now() + timedelta(days=-1)
-        today = datetime.now() + timedelta(hours=-3)
+        yesterday = datetime.now() - timedelta(days=1)
+        today_but_in_the_past = datetime.now() - timedelta(hours=3)
+        today = datetime.now()
         tomorrow = datetime.now() + timedelta(days=1)
         self.assignment1 = self.create_assignment("assignment 1", tomorrow)
         self.assignment2 = self.create_assignment("assignment 2", yesterday)
-        self.assignment3 = self.create_assignment("assignment 3", today)
+        self.assignment3 = self.create_assignment(
+            "assignment 3", today)
+        self.assignment4 = self.create_assignment(
+            "assignment 4", today_but_in_the_past)
 
     def create_assignment(self, name, due_date):
         return Assignment.objects.create(assignment_name=name, due_date=due_date)
@@ -203,18 +207,18 @@ class FromPresentTest(APITestCase):
     def test_not_frompresent(self):
         """Normal GET method"""
         response = self.client.get("/api/v1/assignment/")
-        self.assertEqual(json.loads(response.content)["count"], 3)
+        self.assertEqual(json.loads(response.content)["count"], 4)
 
     def test_frompresent_is_true(self):
         """Adding fromPresent=true"""
         response = self.client.get("/api/v1/assignment/?fromPresent=true")
         # fromPresent=true will exclude assignment with due date < today
-        self.assertEqual(json.loads(response.content)["count"], 2)
+        self.assertEqual(json.loads(response.content)["count"], 3)
 
     def test_frompresent_order(self):
         """The assignment should be ordered by its due date"""
         response = self.client.get("/api/v1/assignment/?fromPresent=true")
-        self.assertEqual(json.loads(response.content)[
-                         "results"][0]["name"], "assignment 3")
-        self.assertEqual(json.loads(response.content)[
-                         "results"][1]["name"], "assignment 1")
+        response_in_json = json.loads(response.content)
+        self.assertEqual(response_in_json["results"][0]["name"], "assignment 4")
+        self.assertEqual(response_in_json["results"][1]["name"], "assignment 3")
+        self.assertEqual(response_in_json["results"][2]["name"], "assignment 1")
