@@ -176,8 +176,6 @@ class ViewTests(APITestCase):
 @freeze_time("2012-12-12T12:00:00+07:00")
 class FromPresentTest(APITestCase):
     def setUp(self):
-        print(datetime.now())
-
         # Create user
         self.user = CustomUser.objects.create(uid="1234")
         self.client.force_authenticate(user=self.user)
