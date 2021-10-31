@@ -113,7 +113,8 @@ class ViewTests(APITestCase):
             "tagId": 1,
             "name": "assignment 2",
             "dueDate": self.end_date_timestamp,
-            "description": "assignment 2's detail"
+            "description": "assignment 2's detail",
+            "reminderTime": [3600, 1800]
         }
         response = self.client.post(
             "/api/v1/assignment/", json.dumps(data), content_type="application/json")
@@ -127,12 +128,16 @@ class ViewTests(APITestCase):
         self.assertAlmostEqual(math.floor(new_assignment.timestamp.timestamp() * 1000),
                                self.current_timestamp, delta=2000)
         self.assertEqual(new_assignment.description, data["description"])
+        data["reminderTime"].sort()
+        self.assertEqual(data["reminderTime"],
+                         new_assignment.reminder_time)
 
     def test_patch(self):
         """Update assignment object"""
         data = json.dumps({
             "name": "renamed",
-            "dueDate": self.end_date_timestamp + 10000
+            "dueDate": self.end_date_timestamp + 10000,
+            "reminderTime": [100, 10, 25]
         })
         # rename assignment from "assignment 1" to "renamed"
         response = self.client.patch("/api/v1/assignment/1/", data,
@@ -149,7 +154,7 @@ class ViewTests(APITestCase):
             },
             "name": "renamed",
             "description": "test",
-            "reminderTime": None
+            "reminderTime": [10, 25, 100]
         })
         timestamp_cache_from_request = converted_data["timestamp"]
         due_date_cache_from_request = converted_data["dueDate"]
