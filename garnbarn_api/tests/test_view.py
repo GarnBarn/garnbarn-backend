@@ -181,3 +181,6 @@ class ViewTests(TestCase):
         # Check if the assignment has been deleted from database, (The number of datas should be 0)
         assignments_in_database = Assignment.objects.all()
         self.assertEqual(len(assignments_in_database), 0)
+
+    class ReminderTest(APITestCase):
+        pass
