@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 
 import json
 import math
-from mock import patch
+from unittest.mock import patch
 
 
 def convert_to_json(data):
