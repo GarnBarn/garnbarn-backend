@@ -8,7 +8,6 @@ from datetime import datetime, date
 from .models import Assignment, Tag
 
 
-
 class AssignmentViewset(viewsets.ModelViewSet):
     authentication_classes = [FirebaseAuthIDTokenAuthentication]
     permission_classes = [IsAuthenticated]
@@ -17,7 +16,8 @@ class AssignmentViewset(viewsets.ModelViewSet):
     def get_queryset(self):
         if self.request.query_params.get('fromPresent') == "true":
             data = Assignment.objects.exclude(
-                due_date__lt=date.today()).order_by('due_date')
+                due_date__lt=date.today())
+            data = data.exclude(due_date=None).order_by('due_date')
         else:
             data = Assignment.objects.get_queryset().order_by('id')
         return data
