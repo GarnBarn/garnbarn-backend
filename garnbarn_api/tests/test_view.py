@@ -34,17 +34,13 @@ class ViewTests(APITestCase):
         self.user = CustomUser.objects.create(uid="1234")
         self.client.force_authenticate(user=self.user)
 
-
         self.user = CustomUser(uid="user_id",
                                name="user_name",
                                )
         self.user.save()
 
-        self.assignment = Assignment(
-
         self.tag = Tag.objects.create(name="test_tag")
-        assignment = Assignment(
-
+        self.assignment = Assignment(
             assignment_name="assignment 1",
             author=self.user,
             tag=self.tag,
