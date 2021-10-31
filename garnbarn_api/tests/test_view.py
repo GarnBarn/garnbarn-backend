@@ -26,9 +26,9 @@ class ViewTests(APITestCase):
         self.end_date_timestamp = math.floor(self.end_date.timestamp() * 1000)
         self.user = CustomUser.objects.create(uid="1234")
         self.user.save()
+        self.client.force_authenticate(user=self.user)
         self.tag = Tag(name="test_tag")
         self.tag.save()
-        self.client.force_authenticate(user=self.user)
 
         assignment = Assignment(
             assignment_name="assignment 1",
