@@ -133,3 +133,9 @@ mysql_credential.cnf
 # IDE cache
 .idea
 *.DS_Store
+
+# Firebase Admin SDK Credential
+firebase-adminsdk-credential.json
+
+# Static File
+static/
