@@ -1,5 +1,6 @@
 from django.test import TestCase
 from rest_framework import serializers
+from rest_framework.test import APITestCase
 from garnbarn_api.models import Tag, Assignment, CustomUser
 from datetime import datetime, timedelta
 import json
@@ -63,7 +64,8 @@ class ViewTests(TestCase):
             },
             "name": "assignment 1",
             "dueDate": self.end_date_timestamp,
-            "description": "test"
+            "description": "test",
+            "reminderTime": None
         })
         self.assertJSONEqual(expected_result, converted_data)
         self.assertAlmostEqual(timestamp_cache_from_request,
@@ -144,7 +146,8 @@ class ViewTests(TestCase):
                 "color": None
             },
             "name": "renamed",
-            "description": "test"
+            "description": "test",
+            "reminderTime": None
         })
         timestamp_cache_from_request = converted_data["timestamp"]
         due_date_cache_from_request = converted_data["dueDate"]
