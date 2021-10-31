@@ -28,12 +28,10 @@ class TimestampField(serializers.Field):
         return date_converted
 
 
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CustomUser
-        fields = ['uid', 'name', 'line']
-
-        read_only_fields = ['uid']
+class ReminderTimeField(serializers.ListField):
+    def to_internal_value(self, data):
+        data.sort()
+        return data
 
 
 class TagIdField(serializers.Field):
@@ -55,6 +53,14 @@ class TagIdField(serializers.Field):
         return tag_object
 
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['uid', 'name', 'line']
+
+        read_only_fields = ['uid']
+
+
 class CreateAssignmentApiSerializer(serializers.ModelSerializer):
     """Serializer for Create Assignment API
 
@@ -71,9 +77,9 @@ class CreateAssignmentApiSerializer(serializers.ModelSerializer):
     timestamp = TimestampField(default=None)
     author = serializers.PrimaryKeyRelatedField(
         source='author.uid', read_only=True)
-    reminderTime = serializers.ListField(source='reminder_time', default=None,
-                                         child=serializers.IntegerField()
-                                         )
+    reminderTime = ReminderTimeField(source='reminder_time', default=None,
+                                     child=serializers.IntegerField()
+                                     )
 
     class Meta:
         model = Assignment
@@ -97,6 +103,9 @@ class UpdateAssignmentApiSerializer(serializers.ModelSerializer):
     name = serializers.CharField(source='assignment_name', required=False)
     dueDate = TimestampField(source='due_date', default=None)
     tagId = TagIdField(source='tag')
+    reminderTime = ReminderTimeField(source='reminder_time', default=None,
+                                     child=serializers.IntegerField()
+                                     )
 
     class Meta:
         model = Assignment
@@ -104,7 +113,8 @@ class UpdateAssignmentApiSerializer(serializers.ModelSerializer):
                   'tagId',
                   'name',
                   'dueDate',
-                  'description'
+                  'description',
+                  'reminderTime'
                   ]
         depth = 1
 
