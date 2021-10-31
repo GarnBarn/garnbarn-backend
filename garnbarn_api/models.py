@@ -49,7 +49,7 @@ class Assignment(models.Model):
 
     # The assignment shouldn't get deleted when tag is deleted.
     tag = models.ForeignKey(Tag, on_delete=models.SET_NULL, null=True)
-    owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True)
+    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True)
     assignment_name = models.CharField(max_length=50)
     due_date = models.DateTimeField(null=True, blank=True, default=None)
     timestamp = models.DateTimeField(auto_now_add=True)
@@ -64,10 +64,10 @@ class Assignment(models.Model):
         due_date = math.floor(self.due_date.timestamp() *
                               1000) if self.due_date else None
         tag = self.tag.get_json_data() if self.tag else None
-        owner = self.owner.uid if self.owner else None
+        author = self.author.uid if self.author else None
         return {
             "id": self.id,
-            "owner": owner,
+            "author": author,
             "name": self.assignment_name,
             "tag": tag,
             "description": self.description,

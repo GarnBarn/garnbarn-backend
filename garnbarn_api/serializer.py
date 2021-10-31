@@ -69,8 +69,8 @@ class CreateAssignmentApiSerializer(serializers.ModelSerializer):
     name = serializers.CharField(source='assignment_name')
     dueDate = TimestampField(source='due_date', default=None)
     timestamp = TimestampField(default=None)
-    owner = serializers.PrimaryKeyRelatedField(
-        source='owner.uid', read_only=True)
+    author = serializers.PrimaryKeyRelatedField(
+        source='author.uid', read_only=True)
     reminderTime = serializers.ListField(source='reminder_time', default=None,
                                          child=serializers.IntegerField()
                                          )
@@ -78,7 +78,7 @@ class CreateAssignmentApiSerializer(serializers.ModelSerializer):
     class Meta:
         model = Assignment
         fields = ['id',
-                  'owner',
+                  'author',
                   'tag',
                   'name',
                   'dueDate',
@@ -88,7 +88,7 @@ class CreateAssignmentApiSerializer(serializers.ModelSerializer):
                   ]
         depth = 1
 
-        read_only_fields = ['timestamp', 'owner']
+        read_only_fields = ['timestamp', 'author']
 
 
 class UpdateAssignmentApiSerializer(serializers.ModelSerializer):

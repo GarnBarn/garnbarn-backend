@@ -33,7 +33,7 @@ class ViewTests(TestCase):
 
         self.assignment = Assignment(
             assignment_name="assignment 1",
-            owner=self.user,
+            author=self.user,
             tag=self.tag,
             timestamp=self.current_time,
             due_date=self.end_date,
@@ -56,7 +56,7 @@ class ViewTests(TestCase):
         del converted_data["timestamp"]
         expected_result = json.dumps({
             "id": 1,
-            "owner": "user_id",
+            "author": "user_id",
             "tag": {
                 "id": 1,
                 "name": "test_tag",
@@ -76,7 +76,7 @@ class ViewTests(TestCase):
         """Create assignment object without a name"""
 
         data = {
-            "owner": self.user,
+            "author": self.user,
             "description": "no-name"
         }
         response = self.client.post("/api/v1/assignment/", data)
@@ -139,7 +139,7 @@ class ViewTests(TestCase):
         converted_data = convert_to_json(response.content)
         expected_result = json.dumps({
             "id": 1,
-            "owner": "user_id",
+            "author": "user_id",
             "tag": {
                 "id": 1,
                 "name": "test_tag",
