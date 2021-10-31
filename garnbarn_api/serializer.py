@@ -30,6 +30,8 @@ class TimestampField(serializers.Field):
 
 class ReminderTimeField(serializers.ListField):
     def to_internal_value(self, data):
+        if data == []:
+            return None
         data = super().to_internal_value(data)
         data.sort()
         return data
