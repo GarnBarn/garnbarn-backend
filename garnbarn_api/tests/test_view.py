@@ -91,6 +91,16 @@ class ViewTests(APITestCase):
         self.assertJSONEqual(res, converted_data)
         self.assertEqual(400, response.status_code)
 
+    def test_post_with_invalid_reminder_time(self):
+        """Reminder time contain string"""
+        data = {
+            "name": "Bob",
+            "reminderTime": [1, 2, "hello"]
+        }
+        response = self.client.post("/api/v1/assignment/", data)
+        converted_data = convert_to_json(response.content)
+        self.assertEqual(400, response.status_code)
+
     def test_post_with_invalid_tag_id(self):
         """Create assignment object with non-exist tag's id"""
         data = {
@@ -188,6 +198,3 @@ class ViewTests(APITestCase):
         # Check if the assignment has been deleted from database, (The number of datas should be 0)
         assignments_in_database = Assignment.objects.all()
         self.assertEqual(len(assignments_in_database), 0)
-
-    class ReminderTest(APITestCase):
-        pass
