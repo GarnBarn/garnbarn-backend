@@ -1,26 +1,29 @@
 from typing import AbstractSet, Optional
 from django.db import models
 import datetime
-from django.db.models.deletion import SET_NULL
+from django.db.models.deletion import CASCADE, SET_NULL
 from django.utils import timezone
 import math
 import uuid
 
-
-class SocialObject(models.Model):
-    """Social and notification."""
-    social_id = models.CharField(max_length=40)
-    notification = None
+from rest_framework import serializers
 
 
 class CustomUser(models.Model):
     """Information of the User."""
-    # uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     uid = models.CharField(max_length=40, primary_key=True, default='Unknown')
     name = models.CharField(max_length=20)
+    line = models.CharField(max_length=64, null=True, blank=True)
 
-    line = models.ForeignKey(
-        SocialObject, on_delete=models.SET_NULL, null=True)
+    def get_json_data(self):
+        return {
+            "uid": self.uid,
+            "name": self.name,
+            "line": self.line
+        }
+
+    def __str__(self):
+        return self.name
 
     @property
     def is_anonymous(self):
@@ -62,12 +65,13 @@ class Assignment(models.Model):
 
     # The assignment shouldn't get deleted when tag is deleted.
     tag = models.ForeignKey(Tag, on_delete=models.SET_NULL, null=True)
-
+    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True)
     assignment_name = models.CharField(max_length=50)
     due_date = models.DateTimeField(null=True, blank=True, default=None)
     timestamp = models.DateTimeField(auto_now_add=True)
     description = models.CharField(
         max_length=1000, null=True, blank=True, default=None)
+    reminder_time = models.JSONField(blank=True, null=True, default=None)
 
     def get_json_data(self):
         # Convert timestamp from second to miliseconds base.
@@ -76,13 +80,16 @@ class Assignment(models.Model):
         due_date = math.floor(self.due_date.timestamp() *
                               1000) if self.due_date else None
         tag = self.tag.get_json_data() if self.tag else None
+        author = self.author.uid if self.author else None
         return {
             "id": self.id,
+            "author": author,
             "name": self.assignment_name,
             "tag": tag,
             "description": self.description,
             "timestamp": timestamp,
             "dueDate": due_date,
+            "reminderTime": self.reminder_time
         }
 
     def __str__(self) -> str:
