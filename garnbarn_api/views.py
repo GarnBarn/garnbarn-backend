@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import serializers, viewsets, status
 from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
-from .serializer import CreateAssignmentApiSerializer, CreateTagApiSerializer, UpdateAssignmentApiSerializer, CreateTagApiSerializer, UpdateTagApiSerializer
+import garnbarn_api.serializer as garnbarn_serializer
 from .authentication import FirebaseAuthIDTokenAuthentication
 from datetime import datetime
 
@@ -14,7 +14,7 @@ from .models import Assignment, Tag
 class AssignmentViewset(viewsets.ModelViewSet):
     authentication_classes = [FirebaseAuthIDTokenAuthentication]
     permission_classes = [IsAuthenticated]
-    serializer_class = CreateAssignmentApiSerializer
+    serializer_class = garnbarn_serializer.GetAssignmentApiSerializer
 
     def get_queryset(self):
         if self.request.query_params.get('fromPresent') == "true":
@@ -34,7 +34,8 @@ class AssignmentViewset(viewsets.ModelViewSet):
             Else, returns bad request status
         """
         data = request.data
-        serializer = CreateAssignmentApiSerializer(data=data)
+        serializer = garnbarn_serializer.CreateAssignmentApiSerializer(
+            data=data)
 
         if not serializer.is_valid():
             # Response 400 if the request body is invalid
@@ -80,7 +81,7 @@ class AssignmentViewset(viewsets.ModelViewSet):
             Assignment's object in json.
         """
         data = request.data
-        serializer = UpdateAssignmentApiSerializer(
+        serializer = garnbarn_serializer.UpdateAssignmentApiSerializer(
             instance=self.get_object(), data=data, partial=True)
         if not serializer.is_valid():
             # Response 400 if the request body is invalid
@@ -93,7 +94,7 @@ class AssignmentViewset(viewsets.ModelViewSet):
 
 
 class TagViewset(viewsets.ModelViewSet):
-    serializer_class = CreateTagApiSerializer
+    serializer_class = garnbarn_serializer.CreateTagApiSerializer
     queryset = Tag.objects.get_queryset().order_by('id')
 
     def create(self, request, *args, **kwargs):
@@ -106,7 +107,7 @@ class TagViewset(viewsets.ModelViewSet):
             Else, return bad request status
         """
         data = request.data
-        serializer = CreateTagApiSerializer(data=data)
+        serializer = garnbarn_serializer.CreateTagApiSerializer(data=data)
 
         if not serializer.is_valid():
             """Response 400 if the request body is invalid"""
@@ -136,7 +137,7 @@ class TagViewset(viewsets.ModelViewSet):
             Tag's object in json.
         """
         data = request.data
-        serializer = UpdateTagApiSerializer(
+        serializer = garnbarn_serializer.UpdateTagApiSerializer(
             instance=self.get_object(), data=data, partial=True)
 
         if not serializer.is_valid():

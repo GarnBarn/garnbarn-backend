@@ -34,7 +34,8 @@ class TagIdField(serializers.Field):
             "id": value.id,
             "name": value.name,
             "author": value.author,
-            "color": value.color
+            "color": value.color,
+            "reminderTime": value.reminder_time
         }
 
     def to_internal_value(self, value):
@@ -46,6 +47,24 @@ class TagIdField(serializers.Field):
         except ValueError:
             raise serializers.ValidationError("Tag id must be a number")
         return tag_object
+
+
+class GetAssignmentApiSerializer(serializers.ModelSerializer):
+    tag = TagIdField()
+    name = serializers.CharField(source='assignment_name')
+    dueDate = TimestampField(source='due_date', default=None)
+    timestamp = TimestampField(default=None)
+
+    class Meta:
+        model = Assignment
+        fields = [
+            "id",
+            "tag",
+            "name",
+            "dueDate",
+            "timestamp",
+            "description"
+        ]
 
 
 class CreateAssignmentApiSerializer(serializers.ModelSerializer):
@@ -104,38 +123,29 @@ class CreateTagApiSerializer(serializers.ModelSerializer):
         {
             "id": 1
             "name": "example_tag_name"
-            "author": "example_author"
             "color": "example_color"
-            "reminderTime": [example, example]
         }
     """
-    reminderTime = serializers.ListField(source='reminder_time', default=None,
-                                         child=serializers.IntegerField()
-                                         )
+    reminderTime = serializers.JSONField(source='reminder_time', default=None)
 
     class Meta:
         model = Tag
         fields = ['id',
-                'name',
-                'author',
-                'color',
-                'reminderTime'
-                ]
+                  'name',
+                  'author',
+                  'color',
+                  'reminderTime'
+                  ]
         depth = 1
 
 
 class UpdateTagApiSerializer(serializers.ModelSerializer):
     """Serializer for the Update Tag API"""
-    reminderTime = serializers.ListField(source='reminder_time', default=None,
-                                         child=serializers.IntegerField()
-                                         )
-
     class Meta:
         model = Tag
         fields = ['id',
-                'name',
-                'author',
-                'color',
-                'reminderTime'
-                ]
+                  'name',
+                  'author',
+                  'color'
+                  ]
         depth = 1
