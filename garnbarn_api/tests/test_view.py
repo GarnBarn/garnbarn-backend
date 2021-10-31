@@ -12,7 +12,6 @@ from unittest.mock import patch
 def convert_to_json(data):
     """Convert data into json format"""
     data = json.loads(data)
-    # data = json.dumps(data)
     return data
 
 
