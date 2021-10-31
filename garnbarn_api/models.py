@@ -4,7 +4,22 @@ import datetime
 from django.db.models.deletion import SET_NULL
 from django.utils import timezone
 import math
-import uuid
+from django.db.models.deletion import CASCADE
+
+
+class SocialObject(models.Model):
+    """Social and notification."""
+    social_id = models.CharField(max_length=40)
+    notification = None
+
+
+class CustomUser(models.Model):
+    """Information of the User."""
+    # uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    uid = models.CharField(max_length=40, primary_key=True, default='Unknown')
+    name = models.CharField(max_length=20)
+
+    line = models.ForeignKey(SocialObject, on_delete=models.SET_NULL, null=True)
 
 
 class Tag(models.Model):
@@ -13,12 +28,16 @@ class Tag(models.Model):
     name = models.CharField(max_length=20)
     color = models.CharField(max_length=10, null=True,
                              blank=True, default=None)
+    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True)
+    reminder_time = models.JSONField(blank=True, null=True, default=None)
 
     def get_json_data(self):
         return {
             "id": self.id,
             "name": self.name,
+            "author": self.author,
             "color": self.color,
+            "reminderTime": self.reminder_time
         }
 
     def __str__(self):
@@ -55,18 +74,3 @@ class Assignment(models.Model):
 
     def __str__(self) -> str:
         return self.assignment_name
-
-
-class SocialObject(models.Model):
-    """Social and notification."""
-    social_id = models.CharField(max_length=40)
-    notification = None
-
-
-class CustomUser(models.Model):
-    """Information of the User."""
-    # uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    uid = models.CharField(max_length=40, primary_key=True, default='Unknown')
-    name = models.CharField(max_length=20)
-
-    line = models.ForeignKey(SocialObject, on_delete=models.SET_NULL, null=True)

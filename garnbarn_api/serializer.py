@@ -5,7 +5,7 @@ from django.db import models
 from django.db.models import fields
 from rest_framework import serializers
 from rest_framework.relations import PKOnlyObject
-from .models import Assignment, Tag
+from .models import Assignment, Tag, CustomUser
 import math
 
 
@@ -33,6 +33,7 @@ class TagIdField(serializers.Field):
         return {
             "id": value.id,
             "name": value.name,
+            "author": value.author,
             "color": value.color
         }
 
@@ -106,11 +107,15 @@ class CreateTagApiSerializer(serializers.ModelSerializer):
             "color": "example_color"
         }
     """
+    reminderTime = serializers.JSONField(source='reminder_time', default=None)
+
     class Meta:
         model = Tag
         fields = ['id',
                 'name',
-                'color'
+                'author',
+                'color',
+                'reminderTime'
                 ]
         depth = 1
 
@@ -121,6 +126,7 @@ class UpdateTagApiSerializer(serializers.ModelSerializer):
         model = Tag
         fields = ['id',
                 'name',
+                'author',
                 'color'
                 ]
         depth = 1
