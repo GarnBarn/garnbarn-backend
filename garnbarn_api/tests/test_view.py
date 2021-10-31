@@ -1,4 +1,5 @@
 
+from django.http import response
 from django.test import TestCase
 from rest_framework import serializers
 from rest_framework.test import APITestCase
@@ -103,8 +104,17 @@ class ViewTests(APITestCase):
             "reminderTime": [1, 2, "hello"]
         }
         response = self.client.post("/api/v1/assignment/", data)
-        converted_data = convert_to_json(response.content)
         self.assertEqual(400, response.status_code)
+
+    def test_post_with_empty_list_reminder_time(self):
+        """Create assignment with reminder"""
+        data = {
+            "name": "Bob",
+            "reminderTime": []
+        }
+        response = self.client.post("/api/v1/assignment/", data)
+        response_in_json = json.loads(response.content)
+        self.assertIsNone(response_in_json["reminderTime"])
 
     def test_post_with_invalid_tag_id(self):
         """Create assignment object with non-exist tag's id"""
