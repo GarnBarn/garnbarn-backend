@@ -1,10 +1,8 @@
-from typing import AbstractSet, Optional
 from django.db import models
 import datetime
 from django.db.models.deletion import CASCADE, SET_NULL
 from django.utils import timezone
 import math
-import uuid
 
 from rest_framework import serializers
 
@@ -46,12 +44,18 @@ class Tag(models.Model):
     name = models.CharField(max_length=20)
     color = models.CharField(max_length=10, null=True,
                              blank=True, default=None)
+    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, default=None)
+    reminder_time = models.JSONField(blank=True, null=True, default=None)
+    subscriber = models.JSONField(blank=True, null=True, default=None)
 
     def get_json_data(self):
         return {
             "id": self.id,
             "name": self.name,
+            "author": self.author,
             "color": self.color,
+            "reminderTime": self.reminder_time,
+            "subscriber": self.subscriber
         }
 
     def __str__(self):
@@ -63,7 +67,7 @@ class Assignment(models.Model):
 
     # The assignment shouldn't get deleted when tag is deleted.
     tag = models.ForeignKey(Tag, on_delete=models.SET_NULL, null=True)
-    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True)
+    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, default=None)
     assignment_name = models.CharField(max_length=50)
     due_date = models.DateTimeField(null=True, blank=True, default=None)
     timestamp = models.DateTimeField(auto_now_add=True)
