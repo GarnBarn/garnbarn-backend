@@ -187,7 +187,8 @@ class ViewTests(APITestCase):
                 "name": "test_tag",
                 "author": None,
                 "color": '#4285F4',
-                "reminderTime": None
+                "reminderTime": None,
+                "subscriber": None
             },
             "name": "renamed",
             "description": "test",
@@ -295,7 +296,8 @@ class ViewTests(APITestCase):
             'name': "renamed",
             'author': None,
             'color': '#4285F9',
-            'reminderTime': None
+            'reminderTime': None,
+            'subscriber': None
         })
         self.assertJSONEqual(expected_result, converted_data)
         self.assertEqual(200, response.status_code)

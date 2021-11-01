@@ -56,7 +56,8 @@ class Tag(models.Model):
             "name": self.name,
             "author": self.author,
             "color": self.color,
-            "reminderTime": self.reminder_time
+            "reminderTime": self.reminder_time,
+            "subscriber": self.subscriber
         }
 
     def __str__(self):
