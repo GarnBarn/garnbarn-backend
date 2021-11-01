@@ -12,18 +12,16 @@ from rest_framework import serializers
 class CustomUser(models.Model):
     """Information of the User."""
     uid = models.CharField(max_length=40, primary_key=True, default='Unknown')
-    name = models.CharField(max_length=20)
     line = models.CharField(max_length=64, null=True, blank=True)
 
     def get_json_data(self):
         return {
             "uid": self.uid,
-            "name": self.name,
             "line": self.line
         }
 
     def __str__(self):
-        return self.name
+        return self.uid
 
     @property
     def is_anonymous(self):

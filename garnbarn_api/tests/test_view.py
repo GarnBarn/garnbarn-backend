@@ -36,7 +36,6 @@ class ViewTests(APITestCase):
         self.client.force_authenticate(user=self.user)
 
         self.user = CustomUser(uid="user_id",
-                               name="user_name",
                                )
         self.user.save()
 
