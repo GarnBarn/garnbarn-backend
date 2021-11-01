@@ -4,7 +4,6 @@ import datetime
 from django.db.models.deletion import SET_NULL
 from django.utils import timezone
 import math
-from django.db.models.deletion import CASCADE
 
 
 class SocialObject(models.Model):
