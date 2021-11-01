@@ -49,6 +49,7 @@ class Tag(models.Model):
                              blank=True, default=None)
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True)
     reminder_time = models.JSONField(blank=True, null=True, default=None)
+    subscriber = models.JSONField(blank=True, null=True, default=None)
 
     def get_json_data(self):
         return {

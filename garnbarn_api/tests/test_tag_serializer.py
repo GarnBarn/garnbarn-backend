@@ -34,7 +34,8 @@ class TagAPITest(TestCase):
             'name',
             'color',
             'author',
-            'reminderTime'
+            'reminderTime',
+            'subscriber'
         }))
 
     def test_tag_field_content(self):

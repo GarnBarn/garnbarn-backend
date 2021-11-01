@@ -163,6 +163,9 @@ class CreateTagApiSerializer(serializers.ModelSerializer):
     reminderTime = ReminderTimeField(source='reminder_time', default=None,
                                         child=serializers.IntegerField()
                                         )
+    subscriber = serializers.ListField(default=None,
+                                        child=serializers.CharField()
+                                        )
 
     class Meta:
         model = Tag
@@ -170,7 +173,8 @@ class CreateTagApiSerializer(serializers.ModelSerializer):
                   'name',
                   'author',
                   'color',
-                  'reminderTime'
+                  'reminderTime',
+                  'subscriber'
                   ]
         depth = 1
 
@@ -180,6 +184,9 @@ class UpdateTagApiSerializer(serializers.ModelSerializer):
     reminderTime = ReminderTimeField(source='reminder_time', default=None,
                                         child=serializers.IntegerField()
                                         )
+    subscriber = serializers.ListField(default=None,
+                                        child=serializers.CharField()
+                                        )
 
     class Meta:
         model = Tag
@@ -187,10 +194,11 @@ class UpdateTagApiSerializer(serializers.ModelSerializer):
                   'name',
                   'author',
                   'color',
-                  'reminderTime'
+                  'reminderTime',
+                  'subscriber'
                   ]
         depth = 1
-        
+
 class CustomUserSerializer(serializers.ModelSerializer):
     """Serializer for user object
     """
