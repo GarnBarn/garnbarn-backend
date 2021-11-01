@@ -1,10 +1,9 @@
-from typing import AbstractSet, Optional
 from django.db import models
 import datetime
 from django.db.models.deletion import SET_NULL
 from django.utils import timezone
 import math
-
+from django.db.models.deletion import CASCADE
 
 class SocialObject(models.Model):
     """Social and notification."""

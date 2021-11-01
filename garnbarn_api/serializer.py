@@ -28,6 +28,12 @@ class TimestampField(serializers.Field):
         return date_converted
 
 
+class ReminderTimeField(serializers.ListField):
+    def to_internal_value(self, data):
+        data.sort()
+        return data
+
+
 class TagIdField(serializers.Field):
     def to_representation(self, value):
         return {
@@ -126,7 +132,9 @@ class CreateTagApiSerializer(serializers.ModelSerializer):
             "color": "example_color"
         }
     """
-    reminderTime = serializers.JSONField(source='reminder_time', default=None)
+    reminderTime = ReminderTimeField(source='reminder_time', default=None,
+                                        child=serializers.IntegerField()
+                                        )
 
     class Meta:
         model = Tag
@@ -141,11 +149,16 @@ class CreateTagApiSerializer(serializers.ModelSerializer):
 
 class UpdateTagApiSerializer(serializers.ModelSerializer):
     """Serializer for the Update Tag API"""
+    reminderTime = ReminderTimeField(source='reminder_time', default=None,
+                                        child=serializers.IntegerField()
+                                        )
+
     class Meta:
         model = Tag
         fields = ['id',
                   'name',
                   'author',
-                  'color'
+                  'color',
+                  'reminderTime'
                   ]
         depth = 1
