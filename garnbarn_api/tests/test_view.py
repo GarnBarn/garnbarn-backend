@@ -1,6 +1,7 @@
 
 from django.http import response
 from django.test import TestCase
+
 from rest_framework import serializers
 from rest_framework.test import APITestCase
 
@@ -22,7 +23,7 @@ def convert_to_json(data):
     return data
 
 
-class ViewTests(APITestCase):
+class ViewTests(TestCase):
     def setUp(self):
         self.current_time = datetime.now()
         self.end_date = self.current_time + timedelta(days=1)
@@ -51,13 +52,15 @@ class ViewTests(APITestCase):
         )
         self.assignment.save()
 
-    def test_assignment_not_existed_assignment(self):
+    def test_assignment_not_found(self):
         """Raise 404 status code when assignment's object does not exist"""
+
         response = self.client.get("/api/v1/assignment/0/")
         self.assertEqual(404, response.status_code)
 
     def test_get(self):
         """Return detail of the assignment"""
+
         response = self.client.get("/api/v1/assignment/1/")
         converted_data = convert_to_json(response.content)
         timestamp_cache_from_request = converted_data["timestamp"]
@@ -142,7 +145,7 @@ class ViewTests(APITestCase):
             "reminderTime": [3600, 1800]
         }
         response = self.client.post(
-            "/api/v1/assignment/", json.dumps(data), content_type="application/json")
+            "/api/v1/assignment/", data, content_type="application/json")
         self.assertEqual(200, response.status_code)
         new_assignment = Assignment.objects.get(assignment_name="assignment 2")
         # For dueDate, Python used second based timestamp. So converting between milisec timestamp
