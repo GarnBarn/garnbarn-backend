@@ -132,7 +132,7 @@ This API return the specific Assignment Object related to the Assignment ID pass
 
 |                             | Parameters      |  type   | Description                                                                           |
 | :-------------------------: | :-------------- | :-----: | :------------------------------------------------------------------------------------ |
-| ![Optional][optional_badge] | **fromPresent** | boolean | If true, The API will return only the assignment that dueDate >= today (Focus on Day) |
+| ![Optional][optional_badge] | **fromPresent** | str     | If 'true', The API will return only the assignment that dueDate >= today (Focus on Day) |
 
 Example request:
 
