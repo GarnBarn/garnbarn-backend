@@ -40,7 +40,7 @@ class ViewTests(APITestCase):
                                )
         self.user.save()
 
-        self.tag = Tag.objects.create(name="test_tag", color='#4285F4', author=self.user)
+        self.tag = Tag.objects.create(name="test_tag")
         self.assignment = Assignment(
             assignment_name="assignment 1",
             author=self.user,
@@ -56,10 +56,10 @@ class ViewTests(APITestCase):
         response = self.client.get("/api/v1/assignment/0/")
         self.assertEqual(404, response.status_code)
 
-    def test_tag_not_existed(self):
-        """Raise 404 status code when tag's object does not exist."""
-        response = self.client.get('/api/v1/tag/0/')
-        self.assertEqual(404, response.status_code)
+    # def test_tag_not_existed(self):
+    #     """Raise 404 status code when tag's object does not exist."""
+    #     response = self.client.get('/api/v1/tag/0/')
+    #     self.assertEqual(404, response.status_code)
 
     def test_get(self):
         """Return detail of the assignment"""
