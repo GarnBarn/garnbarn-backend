@@ -276,6 +276,7 @@ class ViewTests(APITestCase):
             "reminderTime": [3600, 1800],
             'subscriber': self.user
         }
+        data['reminderTime'].sort()
         response = self.client.post("/api/v1/tag/", data)
         self.assertEqual(200, response.status_code)
 

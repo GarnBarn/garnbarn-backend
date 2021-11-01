@@ -3,7 +3,7 @@ from garnbarn_api.models import Tag
 from garnbarn_api.serializer import CreateTagApiSerializer
 
 
-class TagAPITest(TestCase):
+class TagSerializerTest(TestCase):
     """Test case for Tag API."""
 
     def setUp(self):

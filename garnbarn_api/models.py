@@ -3,7 +3,6 @@ import datetime
 from django.db.models.deletion import CASCADE, SET_NULL
 from django.utils import timezone
 import math
-import uuid
 
 from rest_framework import serializers
 
