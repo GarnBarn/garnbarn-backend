@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import AbstractSet, Optional
 from django.db import models
 import datetime
 from django.db.models.deletion import CASCADE, SET_NULL
