@@ -1,17 +1,24 @@
+
+from django.http import response
 from django.test import TestCase
+from rest_framework import serializers
 from rest_framework.test import APITestCase
+
+from freezegun import freeze_time
+
 from garnbarn_api.models import Tag, Assignment, CustomUser
 from datetime import datetime, timedelta
 from rest_framework.test import force_authenticate, APITestCase
 from django.contrib.auth.models import User
+
 import json
 import math
+from unittest.mock import patch
 
 
 def convert_to_json(data):
     """Convert data into json format"""
     data = json.loads(data)
-    # data = json.dumps(data)
     return data
 
 
@@ -24,24 +31,34 @@ class ViewTests(APITestCase):
         self.current_timestamp = math.floor(
             self.current_time.timestamp() * 1000)
         self.end_date_timestamp = math.floor(self.end_date.timestamp() * 1000)
-        self.user = CustomUser.objects.create(uid="1234")
-        self.user.save()
-        self.client.force_authenticate(user=self.user)
-        self.tag = Tag(name="test_tag")
-        self.tag.save()
 
-        assignment = Assignment(
+        self.user = CustomUser.objects.create(uid="1234")
+        self.client.force_authenticate(user=self.user)
+
+        self.user = CustomUser(uid="user_id",
+                               name="user_name",
+                               )
+        self.user.save()
+
+        self.tag = Tag.objects.create(name="test_tag", color='#4285F4', author=self.user)
+        self.assignment = Assignment(
             assignment_name="assignment 1",
+            author=self.user,
             tag=self.tag,
             timestamp=self.current_time,
             due_date=self.end_date,
             description="test"
         )
-        assignment.save()
+        self.assignment.save()
 
     def test_assignment_not_existed_assignment(self):
         """Raise 404 status code when assignment's object does not exist"""
         response = self.client.get("/api/v1/assignment/0/")
+        self.assertEqual(404, response.status_code)
+
+    def test_tag_not_existed(self):
+        """Raise 404 status code when tag's object does not exist."""
+        response = self.client.get('/api/v1/tag/0/')
         self.assertEqual(404, response.status_code)
 
     def test_get(self):
@@ -52,6 +69,7 @@ class ViewTests(APITestCase):
         del converted_data["timestamp"]
         expected_result = json.dumps({
             "id": 1,
+            "author": "user_id",
             "tag": {
                 "id": 1,
                 "name": "test_tag",
@@ -61,7 +79,8 @@ class ViewTests(APITestCase):
             },
             "name": "assignment 1",
             "dueDate": self.end_date_timestamp,
-            "description": "test"
+            "description": "test",
+            "reminderTime": None
         })
         self.assertJSONEqual(expected_result, converted_data)
         self.assertAlmostEqual(timestamp_cache_from_request,
@@ -72,6 +91,7 @@ class ViewTests(APITestCase):
         """Create assignment object without a name"""
 
         data = {
+            "author": self.user,
             "description": "no-name"
         }
         response = self.client.post("/api/v1/assignment/", data)
@@ -83,6 +103,25 @@ class ViewTests(APITestCase):
         })
         self.assertJSONEqual(res, converted_data)
         self.assertEqual(400, response.status_code)
+
+    def test_post_with_invalid_reminder_time(self):
+        """Reminder time contain string"""
+        data = {
+            "name": "Bob",
+            "reminderTime": [1, 2, "hello"]
+        }
+        response = self.client.post("/api/v1/assignment/", data)
+        self.assertEqual(400, response.status_code)
+
+    def test_post_with_empty_list_reminder_time(self):
+        """Create assignment with reminder"""
+        data = {
+            "name": "Bob",
+            "reminderTime": []
+        }
+        response = self.client.post("/api/v1/assignment/", data)
+        response_in_json = json.loads(response.content)
+        self.assertIsNone(response_in_json["reminderTime"])
 
     def test_post_with_invalid_tag_id(self):
         """Create assignment object with non-exist tag's id"""
@@ -106,7 +145,8 @@ class ViewTests(APITestCase):
             "tagId": 1,
             "name": "assignment 2",
             "dueDate": self.end_date_timestamp,
-            "description": "assignment 2's detail"
+            "description": "assignment 2's detail",
+            "reminderTime": [3600, 1800]
         }
         response = self.client.post(
             "/api/v1/assignment/", json.dumps(data), content_type="application/json")
@@ -120,12 +160,16 @@ class ViewTests(APITestCase):
         self.assertAlmostEqual(math.floor(new_assignment.timestamp.timestamp() * 1000),
                                self.current_timestamp, delta=2000)
         self.assertEqual(new_assignment.description, data["description"])
+        data["reminderTime"].sort()
+        self.assertEqual(data["reminderTime"],
+                         new_assignment.reminder_time)
 
     def test_patch(self):
         """Update assignment object"""
         data = json.dumps({
             "name": "renamed",
-            "dueDate": self.end_date_timestamp + 10000
+            "dueDate": self.end_date_timestamp + 10000,
+            "reminderTime": [100, 10, 25]
         })
         # rename assignment from "assignment 1" to "renamed"
         response = self.client.patch("/api/v1/assignment/1/", data,
@@ -134,6 +178,7 @@ class ViewTests(APITestCase):
         converted_data = convert_to_json(response.content)
         expected_result = json.dumps({
             "id": 1,
+            "author": "user_id",
             "tag": {
                 "id": 1,
                 "name": "test_tag",
@@ -142,7 +187,8 @@ class ViewTests(APITestCase):
                 "reminderTime": None
             },
             "name": "renamed",
-            "description": "test"
+            "description": "test",
+            "reminderTime": [10, 25, 100]
         })
         timestamp_cache_from_request = converted_data["timestamp"]
         due_date_cache_from_request = converted_data["dueDate"]
@@ -176,3 +222,48 @@ class ViewTests(APITestCase):
         # Check if the assignment has been deleted from database, (The number of datas should be 0)
         assignments_in_database = Assignment.objects.all()
         self.assertEqual(len(assignments_in_database), 0)
+
+
+@freeze_time("2012-12-12T12:00:00+07:00")
+class FromPresentTest(APITestCase):
+    def setUp(self):
+        # Create user
+        self.user = CustomUser.objects.create(uid="1234")
+        self.client.force_authenticate(user=self.user)
+
+        # Create assignment with specified due date
+        yesterday = datetime.now() - timedelta(days=1)
+        today_but_in_the_past = datetime.now() - timedelta(hours=3)
+        today = datetime.now()
+        tomorrow = datetime.now() + timedelta(days=1)
+        self.assignment1 = self.create_assignment("assignment 1", tomorrow)
+        self.assignment2 = self.create_assignment("assignment 2", yesterday)
+        self.assignment3 = self.create_assignment(
+            "assignment 3", today)
+        self.assignment4 = self.create_assignment(
+            "assignment 4", today_but_in_the_past)
+
+    def create_assignment(self, name, due_date):
+        return Assignment.objects.create(assignment_name=name, due_date=due_date)
+
+    def test_not_frompresent(self):
+        """Normal GET method"""
+        response = self.client.get("/api/v1/assignment/")
+        self.assertEqual(json.loads(response.content)["count"], 4)
+
+    def test_frompresent_is_true(self):
+        """Adding fromPresent=true"""
+        response = self.client.get("/api/v1/assignment/?fromPresent=true")
+        # fromPresent=true will exclude assignment with due date < today
+        self.assertEqual(json.loads(response.content)["count"], 3)
+
+    def test_frompresent_order(self):
+        """The assignment should be ordered by its due date"""
+        response = self.client.get("/api/v1/assignment/?fromPresent=true")
+        response_in_json = json.loads(response.content)
+        self.assertEqual(
+            response_in_json["results"][0]["name"], "assignment 4")
+        self.assertEqual(
+            response_in_json["results"][1]["name"], "assignment 3")
+        self.assertEqual(
+            response_in_json["results"][2]["name"], "assignment 1")
