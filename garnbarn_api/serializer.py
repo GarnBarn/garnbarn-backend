@@ -66,6 +66,24 @@ class UserSerializer(serializers.ModelSerializer):
         read_only_fields = ['uid']
 
 
+class GetAssignmentApiSerializer(serializers.ModelSerializer):
+    tag = TagIdField()
+    name = serializers.CharField(source='assignment_name')
+    dueDate = TimestampField(source='due_date', default=None)
+    timestamp = TimestampField(default=None)
+
+    class Meta:
+        model = Assignment
+        fields = [
+            "id",
+            "tag",
+            "name",
+            "dueDate",
+            "timestamp",
+            "description"
+        ]
+
+
 class CreateAssignmentApiSerializer(serializers.ModelSerializer):
     """Serializer for Create Assignment API
 
@@ -166,6 +184,7 @@ class UpdateTagApiSerializer(serializers.ModelSerializer):
                   'reminderTime'
                   ]
         depth = 1
+        
 class CustomUserSerializer(serializers.ModelSerializer):
     """Serializer for user object
     """
