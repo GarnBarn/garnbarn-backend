@@ -12,7 +12,8 @@ class TagAPITest(TestCase):
             'name': "ISP",
             'author': None,
             'color': "#4285F4",
-            'reminderTime': [3600, 1800]
+            'reminderTime': [3600, 1800],
+            'subscriber': None
         }
 
         self.tag_object1 = Tag.objects.create(
@@ -46,4 +47,4 @@ class TagAPITest(TestCase):
         self.assertEqual(data['color'], self.tag_attributes['color'])
         self.assertEqual(data['author'], self.tag_attributes['author'])
         self.assertEqual(data['reminderTime'], self.tag_attributes['reminderTime'])
-
+        self.assertEqual(data['subscriber'], self.tag_attributes['subscriber'])

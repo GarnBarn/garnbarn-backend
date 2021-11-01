@@ -1,6 +1,7 @@
 
 from django.http import response
 from django.test import TestCase
+from django.test.utils import tag
 from rest_framework import serializers
 from rest_framework.test import APITestCase
 
@@ -40,7 +41,7 @@ class ViewTests(APITestCase):
                                )
         self.user.save()
 
-        self.tag = Tag.objects.create(name="test_tag")
+        self.tag = Tag.objects.create(name="test_tag", color='#4285F4')
         self.assignment = Assignment(
             assignment_name="assignment 1",
             author=self.user,
@@ -51,15 +52,17 @@ class ViewTests(APITestCase):
         )
         self.assignment.save()
 
+        self.tag2 = Tag.objects.create(name="test_tag2", color='#4285F4', author=self.user)
+
     def test_assignment_not_existed_assignment(self):
         """Raise 404 status code when assignment's object does not exist"""
         response = self.client.get("/api/v1/assignment/0/")
         self.assertEqual(404, response.status_code)
 
-    # def test_tag_not_existed(self):
-    #     """Raise 404 status code when tag's object does not exist."""
-    #     response = self.client.get('/api/v1/tag/0/')
-    #     self.assertEqual(404, response.status_code)
+    def test_tag_not_existed(self):
+        """Raise 404 status code when tag's object does not exist."""
+        response = self.client.get('/api/v1/tag/0/')
+        self.assertEqual(404, response.status_code)
 
     def test_get(self):
         """Return detail of the assignment"""
@@ -74,8 +77,8 @@ class ViewTests(APITestCase):
                 "id": 1,
                 "name": "test_tag",
                 "author": None,
-                "color": None,
-                "reminderTime": None
+                "color": '#4285F4',
+                "reminderTime": None,
             },
             "name": "assignment 1",
             "dueDate": self.end_date_timestamp,
@@ -183,7 +186,7 @@ class ViewTests(APITestCase):
                 "id": 1,
                 "name": "test_tag",
                 "author": None,
-                "color": None,
+                "color": '#4285F4',
                 "reminderTime": None
             },
             "name": "renamed",
@@ -222,6 +225,101 @@ class ViewTests(APITestCase):
         # Check if the assignment has been deleted from database, (The number of datas should be 0)
         assignments_in_database = Assignment.objects.all()
         self.assertEqual(len(assignments_in_database), 0)
+
+    def test_get_tag(self):
+        """Return detail of the tag."""
+        response = self.client.get("/api/v1/tag/2/")
+        converted_data = convert_to_json(response.content)
+        expected_result = json.dumps({
+            "id": 2,
+            "name": "test_tag2",
+            "author": {
+                'line': None,
+                'name': 'user_name',
+                'uid': 'user_id'
+                },
+            "color": "#4285F4",
+            "reminderTime": None,
+            "subscriber": None
+        })
+        self.assertJSONEqual(expected_result, converted_data)
+        self.assertEqual(200, response.status_code)
+
+    def test_post_tag_without_name(self):
+        """Create tag object without a name."""
+
+        data = {
+            'author': self.user,
+            'color': '#4285F4',
+        }
+        response = self.client.post("/api/v1/tag/", data)
+        converted_data = convert_to_json(response.content)
+        res = json.dumps({
+            "message": {
+                "name": ["This field is required."]
+            }
+        })
+        self.assertJSONEqual(res, converted_data)
+        self.assertEqual(400, response.status_code)
+
+    def test_post_with_invalid_tag_reminder_time(self):
+        """Reminder time contain string"""
+        data = {
+            "name": "test_tag",
+            "reminderTime": [1, 2, "hello"]
+        }
+        response = self.client.post("/api/v1/tag/", data)
+        self.assertEqual(400, response.status_code)
+
+    def test_post_valid_tag(self):
+        """Create tag object with no error."""
+        data = {
+            'name': "test_tag",
+            'author': self.user,
+            'color': '#4285F4',
+            "reminderTime": [3600, 1800],
+            'subscriber': self.user
+        }
+        response = self.client.post("/api/v1/tag/", data)
+        self.assertEqual(200, response.status_code)
+
+    def test_tag_patch(self):
+        """Update tag object."""
+        data = json.dumps({
+            'name': "renamed",
+            'color': '#4285F9',
+        })
+        response = self.client.patch("/api/v1/tag/1/", data,
+                                    content_type="application/json"
+                                    )
+        converted_data = convert_to_json(response.content)
+        expected_result = json.dumps({
+            'id': 1,
+            'name': "renamed",
+            'author': None,
+            'color': '#4285F9',
+            'reminderTime': None
+        })
+        self.assertJSONEqual(expected_result, converted_data)
+        self.assertEqual(200, response.status_code)
+        all_tag_in_database = Tag.objects.all()
+        self.assertEqual(len(all_tag_in_database), 2)
+        focused_tag = all_tag_in_database[0]
+        self.assertEqual(focused_tag.name, 'renamed')
+
+    def test_tag_delete(self):
+        """Delete tag object."""
+        response = self.client.delete("/api/v1/tag/1/")
+        converted_data = convert_to_json(response.content)
+        expected_result = json.dumps({})
+        self.assertJSONEqual(expected_result, converted_data)
+        self.assertEqual(200, response.status_code)
+        all_tag_object = Tag.objects.all()
+        self.assertEqual(len(all_tag_object), 1)
+        response_after_deleted = self.client.get("/api/v1/tag/1/")
+        self.assertEqual(404, response_after_deleted.status_code)
+        tag_in_database = Tag.objects.all()
+        self.assertEqual(len(tag_in_database), 1)
 
 
 @freeze_time("2012-12-12T12:00:00+07:00")
