@@ -180,6 +180,8 @@ class CreateTagApiSerializer(serializers.ModelSerializer):
                   ]
         depth = 1
 
+        read_only_fields = ['author']
+
 
 class UpdateTagApiSerializer(serializers.ModelSerializer):
     """Serializer for the Update Tag API"""
@@ -200,6 +202,7 @@ class UpdateTagApiSerializer(serializers.ModelSerializer):
                   'subscriber'
                   ]
         depth = 1
+        read_only_fields = ['author']
 
 class CustomUserSerializer(serializers.ModelSerializer):
     """Serializer for user object
