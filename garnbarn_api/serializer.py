@@ -71,16 +71,22 @@ class GetAssignmentApiSerializer(serializers.ModelSerializer):
     name = serializers.CharField(source='assignment_name')
     dueDate = TimestampField(source='due_date', default=None)
     timestamp = TimestampField(default=None)
+    author = serializers.PrimaryKeyRelatedField(source='author.uid', read_only=True)
+    reminderTime = ReminderTimeField(source='reminder_time', default=None,
+                                     child=serializers.IntegerField()
+                                     )
 
     class Meta:
         model = Assignment
         fields = [
             "id",
             "tag",
+            "author",
             "name",
             "dueDate",
             "timestamp",
-            "description"
+            "description",
+            "reminderTime",
         ]
 
 
