@@ -87,6 +87,11 @@ Example response:
         "name": "ISP",
         "color": "#4285F4"
     },
+    "reminderTime": [
+        1,
+        2,
+        3
+    ]
 }
 ```
 
@@ -157,7 +162,12 @@ Example response:
             "name": "Test",
             "dueDate": null,
             "timestamp": 1635261404498,
-            "description": "Example!"
+            "description": "Example!",
+            "reminderTime": [
+                1,
+                2,
+                3
+            ]
         }
     ]
 }
@@ -192,6 +202,7 @@ This API will create the assignment in the Database.
 | ![Optional][optional_badge] | **description** | String | The description of assignment.                                |
 | ![Optional][optional_badge] | **dueDate**     | Number | The due date of the new assignment specifed as **Timestamp**. |
 | ![Optional][optional_badge] | **tagId**       | Number | The tag id that this assignment will be assgiened to.         |
+| ![Optional][optional_badge] | **reminderTime**| List   | The list of all reminder time.                                |
 
 Example request:
 
@@ -222,7 +233,12 @@ Example response:
         "id": 1234,
         "name": "Example Tag",
         "color": "#11111"
-    }
+    },
+    "reminderTime": [
+        1,
+        2,
+        3
+    ]
 }
 ```
 
@@ -330,6 +346,8 @@ This API will update the specifed assignment with the new detail.
 | ![Optional][optional_badge] | **description** | String | The description of assignment.                                |
 | ![Optional][optional_badge] | **dueDate**     | Number | The due date of the new assignment specifed as **Timestamp**. |
 | ![Optional][optional_badge] | **tagId**       | String | The tag id that this assignment will be assgiened to.         |
+| ![Optional][optional_badge] | **reminderTime**| List   | The list of all reminder time.                                |
+
 
 Example request:
 
@@ -360,6 +378,11 @@ Example response:
         "name": "ISP",
         "color": "#4285F4"
     },
+    "reminderTime": [
+        1,
+        2,
+        3
+    ]
 }
 ```
 
