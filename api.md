@@ -483,15 +483,39 @@ Example error response:
 
 ```JSON
 {
-    "message": "Tag id must be a number"
+    "message": "Tag not found"
 }
 ```
 
 ---
 ### Delete Tag
 
-**To be specified**
+This API will delete the specifed tag from the Database.
 
+#### HTTP Request
+
+`DELETE /api/v1/tag/{tagId}`
+
+#### Response
+Return status code `200` and [Tag Object](#tag-object)    
+Example response:
+
+```JSON
+{}
+```
+#### Error
+
+Returns a `40x` HTTP status code and an error response. For more information, see [Error responses in Common specifications](#error-responses-in-common-specifications).
+
+Example error response:
+
+```JSON
+{
+    "message": "Tag not found"
+}
+```
+
+---
 ### Update Tag
 
 **To be specified**
