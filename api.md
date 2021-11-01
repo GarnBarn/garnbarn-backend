@@ -517,8 +517,45 @@ Example error response:
 
 ---
 ### Update Tag
+This API will update the specifed assignment with the new detail.
 
-**To be specified**
+#### HTTP Request
+
+`PATCH /api/v1/tag/{tagId}`
+
+#### Response
+Return status code `200` and [Tag Object](#tag-object)    
+Example response:
+
+```JSON
+{
+    "id": 1,
+    "name": "tag",
+    "author": "0000000000000000000000000000",
+    "color": "#TTTTTT",
+    "reminderTime": [
+        1,
+        2,
+        3
+    ],
+    "subscriber": [
+        1,
+        2,
+        3
+    ]
+}
+```
+#### Error
+
+Returns a `40x` HTTP status code and an error response. For more information, see [Error responses in Common specifications](#error-responses-in-common-specifications).
+
+Example error response:
+
+```JSON
+{
+    "message": "Tag not found"
+}
+```
 
 ---
 
