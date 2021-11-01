@@ -233,11 +233,7 @@ class ViewTests(APITestCase):
         expected_result = json.dumps({
             "id": 2,
             "name": "test_tag2",
-            "author": {
-                'line': None,
-                'name': 'user_name',
-                'uid': 'user_id'
-                },
+            "author": 'user_id',
             "color": "#4285F4",
             "reminderTime": None,
             "subscriber": None

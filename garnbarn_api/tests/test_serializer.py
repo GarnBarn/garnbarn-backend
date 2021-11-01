@@ -44,6 +44,7 @@ class SerializerTests(TestCase):
             'id',
             'tag',
             'name',
+            'author',
             'dueDate',
             'timestamp',
             'description',
