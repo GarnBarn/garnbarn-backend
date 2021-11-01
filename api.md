@@ -410,6 +410,27 @@ This API return the specific Tag Object related to the Tag ID passed in te reque
 
 `GET /api/v1/tag/{tagId}`    
 
+**Request headers**
+
+|                             | Parameters        | Value               |
+| :-------------------------: | :---------------- | ------------------- |
+| ![Required][required_badge] | **Content-Type**  | application/json    |
+| ![Required][required_badge] | **Authorization** | Bearer `{ID Token}` |
+
+**Path parameters**
+
+|                             | Parameters       | Description           |
+| :-------------------------: | :--------------- | :-------------------- |
+| ![Required][required_badge] | **tagId** | The ID of tag. |
+
+Example request:
+
+```bash
+curl -v -X GET {PREFIX}/api/v1/tag/{tagId}/ \
+-H 'Content-Type: application/json' \
+-H 'Authorization: Bearer {ID Token}' \
+```
+
 #### Response
 Return status code `200` and [Tag Object](#tag-object)    
 Example response:
@@ -452,6 +473,31 @@ This API will create the tag in Database.
 #### HTTP Request
 
 `POST /api/v1/tag/`
+
+**Request headers**
+
+|                             | Parameters        | Value               |
+| :-------------------------: | :---------------- | ------------------- |
+| ![Required][required_badge] | **Content-Type**  | application/json    |
+| ![Required][required_badge] | **Authorization** | Bearer `{ID Token}` |
+
+**Path parameters**
+
+|                             | Parameters      |  Type  | Description                                                   |
+| :-------------------------: | :-------------- | :----: | :------------------------------------------------------------ |
+| ![Required][required_badge] | **name**        | String | The name of the new tag.                               |
+| ![Optional][optional_badge] | **author** | String | The uid of the user that create tag.                                |
+| ![Optional][optional_badge] | **color**     | String | The color of the tag. |
+| ![Optional][optional_badge] | **reminderTime**       | List: Int | The tag reminder time list.         |
+| ![Optional][optional_badge] | **subscriber**| List   | The list of all subscriber that subscribe the tag.       
+
+Example request:
+
+```bash
+curl -v -X POST {PREFIX}/api/v1/tag/ \
+-H 'Content-Type: application/json' \
+-H 'Authorization: Bearer {ID Token}' \
+```
 
 #### Response
 Return status code `200` and [Tag Object](#tag-object)    
@@ -496,6 +542,27 @@ This API will delete the specifed tag from the Database.
 
 `DELETE /api/v1/tag/{tagId}`
 
+**Request headers**
+
+|                             | Parameters        | Value               |
+| :-------------------------: | :---------------- | ------------------- |
+| ![Required][required_badge] | **Content-Type**  | application/json    |
+| ![Required][required_badge] | **Authorization** | Bearer `{ID Token}` |
+
+**Path parameters**
+
+|                             | Parameters       | Description           |
+| :-------------------------: | :--------------- | :-------------------- |
+| ![Required][required_badge] | **tagId** | The ID of tag user want to remove. |
+
+Example request:
+
+```bash
+curl -v -X DELETE {PREFIX}/api/v1/tag/{tagId}/ \
+-H 'Content-Type: application/json' \
+-H 'Authorization: Bearer {ID Token}' \
+```
+
 #### Response
 Return status code `200` and [Tag Object](#tag-object)    
 Example response:
@@ -523,6 +590,40 @@ This API will update the specifed assignment with the new detail.
 
 `PATCH /api/v1/tag/{tagId}`
 
+**Request headers**
+
+|                             | Parameters        | Value               |
+| :-------------------------: | :---------------- | ------------------- |
+| ![Required][required_badge] | **Content-Type**  | application/json    |
+| ![Required][required_badge] | **Authorization** | Bearer `{ID Token}` |
+
+**Path parameters**
+
+|                             | Parameters       |  Type  | Description                              |
+| :-------------------------: | :--------------- | :----: | :--------------------------------------- |
+| ![Required][required_badge] | **tagId** | String | The ID of tag you want to update. |
+
+**Request body**
+
+|                             | Parameters      |  Type  | Description                                                   |
+| :-------------------------: | :-------------- | :----: | :------------------------------------------------------------ |
+| ![Optional][optional_badge] | **name**        | String | The name of the new tag.                               |
+| ![Optional][optional_badge] | **color** | String | The color of assignment.                                |
+| ![Optional][optional_badge] | **reminderTime**     | List | The list of all reminder time. |
+| ![Optional][optional_badge] | **subscriber**       | List | The list of all subscriber.         |
+
+
+Example request:
+
+```bash
+curl -v -X PATCH {PREFIX}/api/v1/tag/{tagId} \
+-H 'Content-Type: application/json' \
+-H 'Authorization: Bearer {ID Token}' \
+-d '{
+    "name": "Renamed tag"
+}'
+```
+
 #### Response
 Return status code `200` and [Tag Object](#tag-object)    
 Example response:
@@ -530,7 +631,7 @@ Example response:
 ```JSON
 {
     "id": 1,
-    "name": "tag",
+    "name": "Renamed tag",
     "author": "0000000000000000000000000000",
     "color": "#TTTTTT",
     "reminderTime": [
