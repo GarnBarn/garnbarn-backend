@@ -7,7 +7,8 @@ class TagModelTests(TestCase):
 
     def setUp(self):
         self.tag = Tag(name='tag1')
-        self.tag2 = Tag(name='tag2', color='white', author=(CustomUser(uid='test', name='test')), reminder_time=[3600, 1800])
+        self.tag2 = Tag(name='tag2', color='white', author=(
+            CustomUser(uid='test')), reminder_time=[3600, 1800])
 
     def test_get_tag_name(self):
         """Test that tag object will return tag name in string."""
@@ -19,7 +20,6 @@ class TagModelTests(TestCase):
 
     def test_get_tag_author(self):
         """Test that tag object can get author name."""
-        print(self.tag2.author)
         self.assertIsInstance(self.tag2.author, CustomUser)
 
     def test_no_author(self):
