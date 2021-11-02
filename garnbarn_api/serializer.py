@@ -2,10 +2,10 @@ import datetime
 from enum import auto
 import time
 from django.db import models
-from django.db.models import fields
+from django.db.models import fields, query_utils
 from rest_framework import serializers
 from rest_framework.relations import PKOnlyObject
-from .models import Assignment, Tag
+from .models import Assignment, CustomUser, Tag
 import math
 
 
@@ -28,12 +28,23 @@ class TimestampField(serializers.Field):
         return date_converted
 
 
+class ReminderTimeField(serializers.ListField):
+    def to_internal_value(self, data):
+        if data == []:
+            return None
+        data = super().to_internal_value(data)
+        data.sort()
+        return data
+
+
 class TagIdField(serializers.Field):
     def to_representation(self, value):
         return {
             "id": value.id,
             "name": value.name,
-            "color": value.color
+            "author": value.author,
+            "color": value.color,
+            "reminderTime": value.reminder_time
         }
 
     def to_internal_value(self, value):
@@ -45,6 +56,38 @@ class TagIdField(serializers.Field):
         except ValueError:
             raise serializers.ValidationError("Tag id must be a number")
         return tag_object
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['uid', 'name', 'line']
+
+        read_only_fields = ['uid']
+
+
+class GetAssignmentApiSerializer(serializers.ModelSerializer):
+    tag = TagIdField()
+    name = serializers.CharField(source='assignment_name')
+    dueDate = TimestampField(source='due_date', default=None)
+    timestamp = TimestampField(default=None)
+    author = serializers.PrimaryKeyRelatedField(source='author.uid', read_only=True, default=None)
+    reminderTime = ReminderTimeField(source='reminder_time', default=None,
+                                     child=serializers.IntegerField()
+                                     )
+
+    class Meta:
+        model = Assignment
+        fields = [
+            "id",
+            "tag",
+            "author",
+            "name",
+            "dueDate",
+            "timestamp",
+            "description",
+            "reminderTime",
+        ]
 
 
 class CreateAssignmentApiSerializer(serializers.ModelSerializer):
@@ -61,19 +104,26 @@ class CreateAssignmentApiSerializer(serializers.ModelSerializer):
     name = serializers.CharField(source='assignment_name')
     dueDate = TimestampField(source='due_date', default=None)
     timestamp = TimestampField(default=None)
+    author = serializers.PrimaryKeyRelatedField(
+        source='author.uid', read_only=True, default=None)
+    reminderTime = ReminderTimeField(source='reminder_time', default=None,
+                                     child=serializers.IntegerField()
+                                     )
 
     class Meta:
         model = Assignment
         fields = ['id',
+                  'author',
                   'tag',
                   'name',
                   'dueDate',
                   'timestamp',
-                  'description'
+                  'description',
+                  'reminderTime'
                   ]
         depth = 1
 
-        read_only_fields = ['timestamp']
+        read_only_fields = ['timestamp', 'author']
 
 
 class UpdateAssignmentApiSerializer(serializers.ModelSerializer):
@@ -82,6 +132,9 @@ class UpdateAssignmentApiSerializer(serializers.ModelSerializer):
     name = serializers.CharField(source='assignment_name', required=False)
     dueDate = TimestampField(source='due_date', default=None)
     tagId = TagIdField(source='tag')
+    reminderTime = ReminderTimeField(source='reminder_time', default=None,
+                                     child=serializers.IntegerField()
+                                     )
 
     class Meta:
         model = Assignment
@@ -89,8 +142,73 @@ class UpdateAssignmentApiSerializer(serializers.ModelSerializer):
                   'tagId',
                   'name',
                   'dueDate',
-                  'description'
+                  'description',
+                  'reminderTime'
                   ]
         depth = 1
 
         read_only_fields = ['tagId', ]
+
+
+class CreateTagApiSerializer(serializers.ModelSerializer):
+    """Serializer for Create Tag API
+
+    template:
+        {
+            "id": 1
+            "name": "example_tag_name"
+            "color": "example_color"
+        }
+    """
+    reminderTime = ReminderTimeField(source='reminder_time', default=None,
+                                        child=serializers.IntegerField()
+                                        )
+    author = serializers.PrimaryKeyRelatedField(
+        source='author.uid', read_only=True, default=None)
+    subscriber = serializers.ListField(default=None,
+                                        child=serializers.CharField()
+                                        )
+
+    class Meta:
+        model = Tag
+        fields = ['id',
+                  'name',
+                  'author',
+                  'color',
+                  'reminderTime',
+                  'subscriber'
+                  ]
+        depth = 1
+
+        read_only_fields = ['author']
+
+
+class UpdateTagApiSerializer(serializers.ModelSerializer):
+    """Serializer for the Update Tag API"""
+    reminderTime = ReminderTimeField(source='reminder_time', default=None,
+                                        child=serializers.IntegerField()
+                                        )
+    subscriber = serializers.ListField(default=None,
+                                        child=serializers.CharField()
+                                        )
+
+    class Meta:
+        model = Tag
+        fields = ['id',
+                  'name',
+                  'author',
+                  'color',
+                  'reminderTime',
+                  'subscriber'
+                  ]
+        depth = 1
+        read_only_fields = ['author']
+
+class CustomUserSerializer(serializers.ModelSerializer):
+    """Serializer for user object
+    """
+    class Meta:
+        model = CustomUser
+        fields = '__all__'
+
+        read_only_fields = ['uid', ]

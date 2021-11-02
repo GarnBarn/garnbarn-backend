@@ -44,9 +44,11 @@ class SerializerTests(TestCase):
             'id',
             'tag',
             'name',
+            'author',
             'dueDate',
             'timestamp',
-            'description'
+            'description',
+            'reminderTime'
         }))
 
     def test_field_content_except_timestamp(self):
