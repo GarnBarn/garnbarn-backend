@@ -13,7 +13,7 @@ from .models import Assignment, Tag
 class AssignmentViewset(viewsets.ModelViewSet):
     authentication_classes = [FirebaseAuthIDTokenAuthentication]
     permission_classes = [IsAuthenticated]
-    serializer_class = garnbarn_serializer.GetAssignmentApiSerializer
+    serializer_class = garnbarn_serializer.CreateAssignmentApiSerializer
 
     def get_queryset(self):
         if self.request.query_params.get('fromPresent') == "true":

@@ -51,7 +51,8 @@ class ViewTests(APITestCase):
         )
         self.assignment.save()
 
-        self.tag2 = Tag.objects.create(name="test_tag2", color='#4285F4', author=self.user)
+        self.tag2 = Tag.objects.create(
+            name="test_tag2", color='#4285F4', author=self.user)
 
     def test_assignment_not_existed_assignment(self):
         """Raise 404 status code when assignment's object does not exist"""
@@ -78,6 +79,7 @@ class ViewTests(APITestCase):
                 "author": None,
                 "color": '#4285F4',
                 "reminderTime": None,
+                "subscriber": None
             },
             "name": "assignment 1",
             "dueDate": self.end_date_timestamp,
@@ -287,8 +289,8 @@ class ViewTests(APITestCase):
             'color': '#4285F9',
         })
         response = self.client.patch("/api/v1/tag/1/", data,
-                                    content_type="application/json"
-                                    )
+                                     content_type="application/json"
+                                     )
         converted_data = convert_to_json(response.content)
         expected_result = json.dumps({
             'id': 1,
