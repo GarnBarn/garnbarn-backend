@@ -50,10 +50,11 @@ class Tag(models.Model):
     subscriber = models.JSONField(blank=True, null=True, default=None)
 
     def get_json_data(self):
+        author = self.author.uid if self.author else None
         return {
             "id": self.id,
             "name": self.name,
-            "author": self.author,
+            "author": author,
             "color": self.color,
             "reminderTime": self.reminder_time,
             "subscriber": self.subscriber
