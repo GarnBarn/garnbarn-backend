@@ -94,6 +94,8 @@ class AssignmentViewset(viewsets.ModelViewSet):
 
 
 class TagViewset(viewsets.ModelViewSet):
+    authentication_classes = [FirebaseAuthIDTokenAuthentication]
+    permission_classes = [IsAuthenticated]
     serializer_class = garnbarn_serializer.CreateTagApiSerializer
     queryset = Tag.objects.get_queryset().order_by('id')
 
