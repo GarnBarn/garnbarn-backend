@@ -9,7 +9,7 @@ from rest_framework import serializers
 
 class CustomUser(models.Model):
     """Information of the User."""
-    uid = models.CharField(max_length=40, primary_key=True, default='Unknown')
+    uid = models.CharField(max_length=40, primary_key=True)
     line = models.CharField(max_length=64, null=True, blank=True)
 
     def get_json_data(self):

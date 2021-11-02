@@ -18,7 +18,3 @@ class TestCustomUserModel(TestCase):
         """Test user uid with specific uid."""
         self.assertEqual('line_id1', self.user1.line)
         self.assertEqual('line_id2', self.user2.line)
-
-    def test_user_uid_default(self):
-        """Test user default uid."""
-        self.assertEqual('Unknown', self.user3.uid)
