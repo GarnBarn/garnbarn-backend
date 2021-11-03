@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import serializers, viewsets, status
 from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
-import garnbarn_api.serializer as garnbarn_serializer
+from garnbarn_api.serializer import AssignmentSerializer, TagSerializer
 from .authentication import FirebaseAuthIDTokenAuthentication
 
 from datetime import datetime, date
@@ -13,16 +13,16 @@ from .models import Assignment, Tag
 class AssignmentViewset(viewsets.ModelViewSet):
     authentication_classes = [FirebaseAuthIDTokenAuthentication]
     permission_classes = [IsAuthenticated]
-    serializer_class = garnbarn_serializer.CreateAssignmentApiSerializer
+    serializer_class = AssignmentSerializer
 
     def get_queryset(self):
         if self.request.query_params.get('fromPresent') == "true":
-            data = Assignment.objects.exclude(
+            assignment = Assignment.objects.exclude(
                 due_date__lt=date.today())
-            data = data.exclude(due_date=None).order_by('due_date')
+            assignment = assignment.exclude(due_date=None).order_by('due_date')
         else:
-            data = Assignment.objects.get_queryset().order_by('id')
-        return data
+            assignment = Assignment.objects.get_queryset().order_by('id')
+        return assignment
 
     def create(self, request, *args, **kwargs):
         """ Create Assignment object.
@@ -33,9 +33,7 @@ class AssignmentViewset(viewsets.ModelViewSet):
             , returns assignment's object in json.
             Else, returns bad request status
         """
-        data = request.data
-        serializer = garnbarn_serializer.CreateAssignmentApiSerializer(
-            data=data)
+        serializer = AssignmentSerializer(data=request.data)
 
         if not serializer.is_valid():
             # Response 400 if the request body is invalid
@@ -43,29 +41,11 @@ class AssignmentViewset(viewsets.ModelViewSet):
                 'message': serializer.errors
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        assignment_object = Assignment(**serializer.validated_data)
+        self.perform_create(serializer)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-        tag_id_from_request = request.data.get("tagId")
-        if tag_id_from_request is not None:
-            # Check the tagId is founded in the database. If not, Response 400.
-            try:
-                tag_id_from_request = int(tag_id_from_request)
-                assignment_object.tag = Tag.objects.get(id=tag_id_from_request)
-            except Tag.DoesNotExist:
-                return Response({
-                    'message': "Tag's ID not found"
-                }, status=status.HTTP_400_BAD_REQUEST)
-            except ValueError:
-                return Response({
-                    'message': "tagId must be able to be converted to an integer"
-                }, status=status.HTTP_400_BAD_REQUEST)
-            except TypeError:
-                return Response({
-                    'message': "tagId must be able to be converted to an integer"
-                }, status=status.HTTP_400_BAD_REQUEST)
-
-        assignment_object.save()
-        return Response(assignment_object.get_json_data(), status=status.HTTP_200_OK)
+    def perform_create(self, serializer):
+        serializer.save()
 
     def destroy(self, request, *args, **kwargs):
         """ Remove assignment with specified id.
@@ -84,9 +64,8 @@ class AssignmentViewset(viewsets.ModelViewSet):
         Returns:
             Assignment's object in json.
         """
-        data = request.data
-        serializer = garnbarn_serializer.UpdateAssignmentApiSerializer(
-            instance=self.get_object(), data=data, partial=True)
+        serializer = AssignmentSerializer(
+            instance=self.get_object(), data=request.data, partial=True)
         if not serializer.is_valid():
             # Response 400 if the request body is invalid
             return Response({
@@ -100,8 +79,11 @@ class AssignmentViewset(viewsets.ModelViewSet):
 class TagViewset(viewsets.ModelViewSet):
     authentication_classes = [FirebaseAuthIDTokenAuthentication]
     permission_classes = [IsAuthenticated]
-    serializer_class = garnbarn_serializer.CreateTagApiSerializer
-    queryset = Tag.objects.get_queryset().order_by('id')
+    serializer_class = TagSerializer
+
+    def get_queryset(self):
+        tag = Tag.objects.get_queryset().order_by('id')
+        return tag
 
     def create(self, request, *args, **kwargs):
         """Create Tag object.
@@ -112,8 +94,7 @@ class TagViewset(viewsets.ModelViewSet):
             return tag's object in json.
             Else, return bad request status
         """
-        data = request.data
-        serializer = garnbarn_serializer.CreateTagApiSerializer(data=data)
+        serializer = TagSerializer(data=request.data)
 
         if not serializer.is_valid():
             """Response 400 if the request body is invalid"""
@@ -121,9 +102,11 @@ class TagViewset(viewsets.ModelViewSet):
                 'message': serializer.errors
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        tag_object = Tag(**serializer.validated_data)
-        tag_object.save()
-        return Response(tag_object.get_json_data(), status=status.HTTP_200_OK)
+        self.perform_create(serializer)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def perform_create(self, serializer):
+        serializer.save()
 
     def destroy(self, request, *args, **kwargs):
         """Remove tag with specified id.
@@ -143,7 +126,7 @@ class TagViewset(viewsets.ModelViewSet):
             Tag's object in json.
         """
         data = request.data
-        serializer = garnbarn_serializer.UpdateTagApiSerializer(
+        serializer = TagSerializer(
             instance=self.get_object(), data=data, partial=True)
 
         if not serializer.is_valid():

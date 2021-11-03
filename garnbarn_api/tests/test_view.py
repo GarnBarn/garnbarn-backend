@@ -136,7 +136,7 @@ class ViewTests(APITestCase):
         response = self.client.post("/api/v1/assignment/", data)
         converted_data = convert_to_json(response.content)
         res = json.dumps({
-            "message": "Tag's ID not found"
+            "message": {'tagId': ['Tag not found']}
         })
         self.assertJSONEqual(res, converted_data)
         self.assertEqual(400, response.status_code)

@@ -45,7 +45,7 @@ class Tag(models.Model):
     color = models.CharField(max_length=10, null=True,
                              blank=True, default=None)
     author = models.ForeignKey(
-        CustomUser, on_delete=models.CASCADE, null=True, default=None)
+        CustomUser, on_delete=models.CASCADE, blank=True, null=True, default=None)
     reminder_time = models.JSONField(blank=True, null=True, default=None)
     subscriber = models.JSONField(blank=True, null=True, default=None)
 
@@ -68,9 +68,10 @@ class Assignment(models.Model):
     """Data and detail about assignment"""
 
     # The assignment shouldn't get deleted when tag is deleted.
-    tag = models.ForeignKey(Tag, on_delete=models.SET_NULL, null=True)
+    tag = models.ForeignKey(Tag, on_delete=models.SET_NULL,
+                            null=True, blank=True, default=None)
     author = models.ForeignKey(
-        CustomUser, on_delete=models.CASCADE, null=True, default=None)
+        CustomUser, on_delete=models.CASCADE, blank=True, null=True, default=None)
     assignment_name = models.CharField(max_length=50)
     due_date = models.DateTimeField(null=True, blank=True, default=None)
     timestamp = models.DateTimeField(auto_now_add=True)

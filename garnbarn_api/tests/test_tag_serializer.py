@@ -1,6 +1,6 @@
 from django.test import TestCase
 from garnbarn_api.models import Tag
-from garnbarn_api.serializer import CreateTagApiSerializer
+from garnbarn_api.serializer import TagSerializer
 
 
 class TagSerializerTest(TestCase):
@@ -22,7 +22,7 @@ class TagSerializerTest(TestCase):
             reminder_time=[3600, 1800]
         )
 
-        self.serializer1 = CreateTagApiSerializer(
+        self.serializer1 = TagSerializer(
             instance=self.tag_object1
         )
 
@@ -45,5 +45,6 @@ class TagSerializerTest(TestCase):
         self.assertEqual(data['name'], self.tag_attributes['name'])
         self.assertEqual(data['color'], self.tag_attributes['color'])
         self.assertEqual(data['author'], self.tag_attributes['author'])
-        self.assertEqual(data['reminderTime'], self.tag_attributes['reminderTime'])
+        self.assertEqual(data['reminderTime'],
+                         self.tag_attributes['reminderTime'])
         self.assertEqual(data['subscriber'], self.tag_attributes['subscriber'])
