@@ -13,7 +13,7 @@ from .models import Assignment, Tag
 class AssignmentViewset(viewsets.ModelViewSet):
     authentication_classes = [FirebaseAuthIDTokenAuthentication]
     permission_classes = [IsAuthenticated]
-    serializer_class = garnbarn_serializer.GetAssignmentApiSerializer
+    serializer_class = garnbarn_serializer.CreateAssignmentApiSerializer
 
     def get_queryset(self):
         if self.request.query_params.get('fromPresent') == "true":
@@ -56,6 +56,10 @@ class AssignmentViewset(viewsets.ModelViewSet):
                     'message': "Tag's ID not found"
                 }, status=status.HTTP_400_BAD_REQUEST)
             except ValueError:
+                return Response({
+                    'message': "tagId must be able to be converted to an integer"
+                }, status=status.HTTP_400_BAD_REQUEST)
+            except TypeError:
                 return Response({
                     'message': "tagId must be able to be converted to an integer"
                 }, status=status.HTTP_400_BAD_REQUEST)
