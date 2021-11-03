@@ -39,12 +39,14 @@ class ReminderTimeField(serializers.ListField):
 
 class TagIdField(serializers.Field):
     def to_representation(self, value):
+        author = value.author.uid if value.author else None
         return {
             "id": value.id,
             "name": value.name,
-            "author": value.author,
+            "author": author,
             "color": value.color,
-            "reminderTime": value.reminder_time
+            "reminderTime": value.reminder_time,
+            "subscriber": value.subscriber
         }
 
     def to_internal_value(self, value):
@@ -118,7 +120,7 @@ class CreateAssignmentApiSerializer(serializers.ModelSerializer):
     reminderTime = ReminderTimeField(source='reminder_time', default=None,
                                      child=serializers.IntegerField()
                                      )
-    tag = CreateTagApiSerializer(default=None)
+    tag = TagIdField(default=None)
 
     class Meta:
         model = Assignment
