@@ -120,7 +120,7 @@ class CreateAssignmentApiSerializer(serializers.ModelSerializer):
     reminderTime = ReminderTimeField(source='reminder_time', default=None,
                                      child=serializers.IntegerField()
                                      )
-    tag = TagIdField(default=None)
+    tag = TagIdField(default=None, read_only=True)
 
     class Meta:
         model = Assignment
@@ -135,7 +135,7 @@ class CreateAssignmentApiSerializer(serializers.ModelSerializer):
                   ]
         depth = 1
 
-        read_only_fields = ['timestamp', 'author']
+        read_only_fields = ['timestamp', 'author', 'tag']
 
 
 class UpdateAssignmentApiSerializer(serializers.ModelSerializer):

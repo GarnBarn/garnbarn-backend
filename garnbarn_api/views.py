@@ -59,6 +59,10 @@ class AssignmentViewset(viewsets.ModelViewSet):
                 return Response({
                     'message': "tagId must be able to be converted to an integer"
                 }, status=status.HTTP_400_BAD_REQUEST)
+            except TypeError:
+                return Response({
+                    'message': "tagId must be able to be converted to an integer"
+                }, status=status.HTTP_400_BAD_REQUEST)
 
         assignment_object.save()
         return Response(assignment_object.get_json_data(), status=status.HTTP_200_OK)
