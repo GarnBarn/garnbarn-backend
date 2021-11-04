@@ -1,13 +1,65 @@
 from django.db.models.query import QuerySet
+from rest_framework.decorators import permission_classes
 from rest_framework.response import Response
 from rest_framework import serializers, viewsets, status
 from rest_framework import viewsets, status
-from rest_framework.permissions import IsAuthenticated
-from garnbarn_api.serializer import AssignmentSerializer, TagSerializer
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from garnbarn_api.serializer import AssignmentSerializer, CustomUserSerializer, TagSerializer
 from .authentication import FirebaseAuthIDTokenAuthentication
 
 from datetime import datetime, date
-from .models import Assignment, Tag
+from .models import Assignment, CustomUser, Tag
+
+
+class CustomUserViewset(viewsets.ModelViewSet):
+    permission_classes = [IsAdminUser]
+    serializer_class = CustomUserSerializer
+
+    def get_queryset(self):
+        user = CustomUser.objects.all()
+        return user
+
+    def create(self, request, *args, **kwargs):
+        """Create User object"""
+        serializer = CustomUserSerializer(data=request.data)
+
+        if not serializer.is_valid():
+            # Response 400 if the request body is invalid
+            return Response({
+                'message': serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
+        self.perform_create(serializer)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def destroy(self, request, *args, **kwargs):
+        """ Remove user with specified user id.
+
+        Returns:
+            {} with 200 status code.
+        """
+        user = self.get_object()
+        user.delete()
+        return Response({}, status=status.HTTP_200_OK)
+
+    def partial_update(self, request, *args, **kwargs):
+        """ Update data of a specified user
+
+        Returns:
+            User's object in json.
+        """
+        serializer = CustomUserSerializer(
+            instance=self.get_object(), data=request.data, partial=True)
+        if not serializer.is_valid():
+            # Response 400 if the request body is invalid
+            return Response({
+                'message': serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        self.perform_update(serializer)
+        return Response(self.get_object().get_json_data(), status=status.HTTP_200_OK)
+
+    def verify_line_access_token(self, access_token):
+        pass
 
 
 class AssignmentViewset(viewsets.ModelViewSet):
