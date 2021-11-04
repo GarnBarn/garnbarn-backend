@@ -154,3 +154,18 @@ class TagViewset(viewsets.ModelViewSet):
             tag.subscriber.append(request.user.uid)
         tag.save()
         return Response({"message": f"user has subscribed to {tag.name}"}, status.HTTP_200_OK)
+
+    @action(methods=['post', 'delete'], detail=True,
+            url_path="unsubscribe", url_name="unsubscribe")
+    def unsubscribe(self, request, *args, **kwargs):
+        tag = self.get_object()
+        if not tag.subscriber or request.user.uid not in tag.subscriber:
+            return Response({
+                "message": "User has not subscribe to this tag yet."
+            }, status=status.HTTP_400_BAD_REQUEST)
+        elif request.user.uid in tag.subscriber:
+            tag.subscriber.remove(request.user.uid)
+            if tag.subscriber == []:
+                tag.subscriber = None
+            tag.save()
+            return Response({"message": f"user has un-subscribed to {tag.name}"}, status.HTTP_200_OK)
