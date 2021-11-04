@@ -276,7 +276,7 @@ class ViewTests(APITestCase):
             'author': self.user,
             'color': '#4285F4',
             "reminderTime": [3600, 1800],
-            'subscriber': self.user
+            'subscriber': []
         }
         data['reminderTime'].sort()
         response = self.client.post("/api/v1/tag/", data)
