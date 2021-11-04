@@ -21,14 +21,7 @@ class CustomUserViewset(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         """Create User object"""
-        serializer = CustomUserSerializer(data=request.data)
-
-        if not serializer.is_valid():
-            # Response 400 if the request body is invalid
-            return Response({
-                'message': serializer.errors
-            }, status=status.HTTP_400_BAD_REQUEST)
-        self.perform_create(serializer)
+        pass
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def destroy(self, request, *args, **kwargs):
@@ -37,8 +30,7 @@ class CustomUserViewset(viewsets.ModelViewSet):
         Returns:
             {} with 200 status code.
         """
-        user = self.get_object()
-        user.delete()
+        pass
         return Response({}, status=status.HTTP_200_OK)
 
     def partial_update(self, request, *args, **kwargs):
@@ -47,15 +39,7 @@ class CustomUserViewset(viewsets.ModelViewSet):
         Returns:
             User's object in json.
         """
-        serializer = CustomUserSerializer(
-            instance=self.get_object(), data=request.data, partial=True)
-        if not serializer.is_valid():
-            # Response 400 if the request body is invalid
-            return Response({
-                'message': serializer.errors
-            }, status=status.HTTP_400_BAD_REQUEST)
-
-        self.perform_update(serializer)
+        pass
         return Response(self.get_object().get_json_data(), status=status.HTTP_200_OK)
 
     def verify_line_access_token(self, access_token):
