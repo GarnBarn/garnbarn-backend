@@ -140,17 +140,17 @@ class TagViewset(viewsets.ModelViewSet):
         self.perform_update(serializer)
         return Response(self.get_object().get_json_data(), status=status.HTTP_200_OK)
 
-    # @action(methods=['post'], detail=True,
-    #         url_path="subscribe", url_name="subscribe")
-    # def subscribe(self, request, *args, **kwargs):
-    #     tag = self.get_object()
-    #     print(tag.subscriber)
-
-    #     # if not tag.subscriber:
-    #     #     tag.subscriber = [request.user.uid]
-    #     # elif request.user.uid in tag.subscriber:
-    #     #     return Response({
-    #     #         "message": "User has already subscribe this tag."
-    #     #     }, status=status.HTTP_400_BAD_REQUEST)
-    #     # else:
-    #     #     tag.subscriber.add(request.user.uid)
+    @action(methods=['post'], detail=True,
+            url_path="subscribe", url_name="subscribe")
+    def subscribe(self, request, *args, **kwargs):
+        tag = self.get_object()
+        if not tag.subscriber:
+            tag.subscriber = [request.user.uid]
+        elif request.user.uid in tag.subscriber:
+            return Response({
+                "message": "User has already subscribed to this tag."
+            }, status=status.HTTP_400_BAD_REQUEST)
+        elif tag.subscriber:
+            tag.subscriber.append(request.user.uid)
+        tag.save()
+        return Response({"message": f"user has subscribed to {tag.name}"}, status.HTTP_200_OK)
