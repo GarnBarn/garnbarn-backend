@@ -1,9 +1,10 @@
+from functools import partial
 from django.db.models.query import QuerySet
-from rest_framework.decorators import permission_classes
+from rest_framework.decorators import action, authentication_classes
 from rest_framework.response import Response
 from rest_framework import serializers, viewsets, status
 from rest_framework import viewsets, status
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
 from garnbarn_api.serializer import AssignmentSerializer, CustomUserSerializer, TagSerializer
 from .authentication import FirebaseAuthIDTokenAuthentication
 
@@ -11,37 +12,91 @@ from datetime import datetime, date
 from .models import Assignment, CustomUser, Tag
 
 
+# class PermissionsPerMethodMixin(object):
+#     def get_permissions(self):
+#         """
+#         Allows overriding default permissions with @permission_classes
+#         """
+#         view = getattr(self, self.action)
+#         if hasattr(view, 'permission_classes'):
+#             print('_____________')
+#             return [permission_class() for permission_class in view.permission_classes]
+#         return super().get_permissions()
+
+
+
+
+
 class CustomUserViewset(viewsets.ModelViewSet):
-    permission_classes = [IsAdminUser]
-    serializer_class = CustomUserSerializer
+#     # permission_classes = [IsAdminUser]
+#     permission_classes = [FirebaseAuthIDTokenAuthentication]
+#     serializer_class = CustomUserSerializer
 
     def get_queryset(self):
         user = CustomUser.objects.all()
         return user
 
-    def create(self, request, *args, **kwargs):
-        """Create User object"""
+#     @action(detail=False, methods=['POST'])
+#     @permission_classes((AllowAny,))
+#     def create_user(self, request, *args, **kwargs):
+#         """Create User object"""
+#         # firebase_auth = FirebaseAuthIDTokenAuthentication()
+#         # user = firebase_auth.authenticate_credentials(request)
+#         # print(user)
+#         # print(request.data)
+#         # serializer = CustomUserSerializer(data=request.data)
+#         # decoded_token = auth.verify_id_token(key)
+#         # permission_classes = [IsAuthenticated]
+
+#         if not serializer.is_valid():
+#             # Response 400 if the request body is invalid.
+#             return Response({
+#                 'message': serializer.errors
+#             }, status=status.HTTP_400_BAD_REQUEST)
+
+#         self.perform_create(serializer)
+#         return Response(serializer.data, status=status.HTTP_200_OK)
+
+#     def destroy(self, request, *args, **kwargs):
+#         """ Remove user with specified user id.
+
+#         Returns:
+#             {} with 200 status code.
+#         """
+#         user = self.get_object()
+#         user.delete()
+#         return Response({}, status=status.HTTP_200_OK)
+
+#     def partial_update(self, request, *args, **kwargs):
+#         """ Update data of a specified user
+
+#         Returns:
+#             User's object in json.
+#         """
+#         serializer = CustomUser(
+#             isinstance=self.get_object(), data=request.data, partial=True)
+#         if not serializer.is_valid():
+#             return Response({
+#                 'message': serializer.errors
+#             }, status=status.HTTP_400_BAD_REQUEST)
+
+#         self.perform_update(serializer)
+#         return Response(self.get_object().get_json_data(), status=status.HTTP_200_OK)
+
+    @action(methods=['get'], detail=True)
+    def get_user_api(self, request, *args, **kwarg):
         pass
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def destroy(self, request, *args, **kwargs):
-        """ Remove user with specified user id.
-
-        Returns:
-            {} with 200 status code.
-        """
+    @action(methods=['get'], detail=True)
+    def get_link(self, request, *args, **kwarg):
         pass
-        return Response({}, status=status.HTTP_200_OK)
 
-    def partial_update(self, request, *args, **kwargs):
-        """ Update data of a specified user
-
-        Returns:
-            User's object in json.
-        """
+    @action(methods=['patch'], detail=True)
+    def un_link(self, access_token):
         pass
-        return Response(self.get_object().get_json_data(), status=status.HTTP_200_OK)
 
+    @action(methods=['get'], detail=True,
+        url_path='account', url_name='account')
     def verify_line_access_token(self, access_token):
         pass
 
