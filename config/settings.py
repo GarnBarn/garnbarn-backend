@@ -161,8 +161,4 @@ REST_FRAMEWORK = {
     'DATE_FORMAT': TIMESTAMP
 }
 
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:8080',
-    'https://garnbarn.web.app',
-    'https://garnbarn.app'
-]
+CORS_ALLOW_ALL_ORIGINS = True
