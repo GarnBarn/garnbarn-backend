@@ -1,15 +1,25 @@
+<<<<<<< HEAD
 from functools import partial
+=======
+from django.db.models import query
+>>>>>>> iteration3
 from django.db.models.query import QuerySet
 from rest_framework.decorators import action, authentication_classes
 from rest_framework.response import Response
 from rest_framework import serializers, viewsets, status
 from rest_framework import viewsets, status
+<<<<<<< HEAD
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
+=======
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
+>>>>>>> iteration3
 from garnbarn_api.serializer import AssignmentSerializer, CustomUserSerializer, TagSerializer
 from .authentication import FirebaseAuthIDTokenAuthentication
+from rest_framework.decorators import action, permission_classes
 
 from datetime import datetime, date
 from .models import Assignment, CustomUser, Tag
+<<<<<<< HEAD
 
 
 class CustomUserViewset(viewsets.ModelViewSet):
@@ -37,6 +47,8 @@ class CustomUserViewset(viewsets.ModelViewSet):
         url_path='line', url_name='line')
     def verify_line_access_token(self, access_token):
         pass
+=======
+>>>>>>> iteration3
 
 
 class AssignmentViewset(viewsets.ModelViewSet):
@@ -80,7 +92,7 @@ class AssignmentViewset(viewsets.ModelViewSet):
         """ Remove assignment with specified id.
 
         Returns:
-            Response message telling which assignment has been deleted.
+            {} with 200 status code.
         """
         assignment = self.get_object()
         assignment.delete()
@@ -141,7 +153,7 @@ class TagViewset(viewsets.ModelViewSet):
         """Remove tag with specified id.
 
         Returns:
-            Response message telling which tag has been deleted.
+            {} with 200 status code.
         """
         tag = self.get_object()
         tag.delete()
@@ -166,3 +178,33 @@ class TagViewset(viewsets.ModelViewSet):
 
         self.perform_update(serializer)
         return Response(self.get_object().get_json_data(), status=status.HTTP_200_OK)
+
+    @action(methods=['post'], detail=True,
+            url_path="subscribe", url_name="subscribe")
+    def subscribe(self, request, *args, **kwargs):
+        tag = self.get_object()
+        if not tag.subscriber:
+            tag.subscriber = [request.user.uid]
+        elif request.user.uid in tag.subscriber:
+            return Response({
+                "message": "User has already subscribed to this tag."
+            }, status=status.HTTP_400_BAD_REQUEST)
+        elif tag.subscriber:
+            tag.subscriber.append(request.user.uid)
+        tag.save()
+        return Response({"message": f"user has subscribed to {tag.name}"}, status.HTTP_200_OK)
+
+    @action(methods=['post', 'delete'], detail=True,
+            url_path="unsubscribe", url_name="unsubscribe")
+    def unsubscribe(self, request, *args, **kwargs):
+        tag = self.get_object()
+        if not tag.subscriber or request.user.uid not in tag.subscriber:
+            return Response({
+                "message": "User has not subscribe to this tag yet."
+            }, status=status.HTTP_400_BAD_REQUEST)
+        elif request.user.uid in tag.subscriber:
+            tag.subscriber.remove(request.user.uid)
+            if tag.subscriber == []:
+                tag.subscriber = None
+            tag.save()
+            return Response({"message": f"user has un-subscribed to {tag.name}"}, status.HTTP_200_OK)
