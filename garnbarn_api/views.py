@@ -1,10 +1,12 @@
 from django.db.models.query import QuerySet
+from django.http import request
 from rest_framework.response import Response
 from rest_framework import serializers, viewsets, status
 from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
 from garnbarn_api.serializer import AssignmentSerializer, TagSerializer
 from .authentication import FirebaseAuthIDTokenAuthentication
+from django.db.models import Q
 
 from datetime import datetime, date
 from .models import Assignment, Tag
@@ -23,7 +25,7 @@ class AssignmentViewset(viewsets.ModelViewSet):
                 due_date__lt=date.today())
             assignment = assignment.exclude(due_date=None).order_by('due_date')
         else:
-            assignment = Assignment.objects.get_queryset().filter(author=user_data).order_by('id')
+            assignment = Assignment.objects.get_queryset().filter(Q(author=user_data)).order_by('id')
         return assignment
 
     def create(self, request, *args, **kwargs):
@@ -85,7 +87,7 @@ class TagViewset(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user_data = self.request.user.get_json_data()["uid"]
-        tag = Tag.objects.get_queryset().filter(author=user_data).order_by('id')
+        tag = Tag.objects.get_queryset().filter(Q(author=user_data) | Q(subscriber__icontains=user_data)).order_by('id')
         return tag
 
     def create(self, request, *args, **kwargs):
