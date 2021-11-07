@@ -1,25 +1,17 @@
-<<<<<<< HEAD
 from functools import partial
-=======
 from django.db.models import query
->>>>>>> iteration3
 from django.db.models.query import QuerySet
 from rest_framework.decorators import action, authentication_classes
 from rest_framework.response import Response
 from rest_framework import serializers, viewsets, status
 from rest_framework import viewsets, status
-<<<<<<< HEAD
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
-=======
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
->>>>>>> iteration3
 from garnbarn_api.serializer import AssignmentSerializer, CustomUserSerializer, TagSerializer
 from .authentication import FirebaseAuthIDTokenAuthentication
 from rest_framework.decorators import action, permission_classes
 
 from datetime import datetime, date
 from .models import Assignment, CustomUser, Tag
-<<<<<<< HEAD
 
 
 class CustomUserViewset(viewsets.ModelViewSet):
@@ -34,21 +26,19 @@ class CustomUserViewset(viewsets.ModelViewSet):
         pass
 
     @action(methods=['get'], detail=True,
-        url_path='link', url_name='link')
+            url_path='link', url_name='link')
     def get_link(self, request, *args, **kwarg):
         pass
 
     @action(methods=['patch'], detail=True,
-        url_path='unlink', url_name='unlink')
+            url_path='unlink', url_name='unlink')
     def unlink(self, access_token):
         pass
 
     @action(methods=['get'], detail=True,
-        url_path='line', url_name='line')
+            url_path='line', url_name='line')
     def verify_line_access_token(self, access_token):
         pass
-=======
->>>>>>> iteration3
 
 
 class AssignmentViewset(viewsets.ModelViewSet):
