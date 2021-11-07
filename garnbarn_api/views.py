@@ -25,7 +25,7 @@ class AssignmentViewset(viewsets.ModelViewSet):
                 due_date__lt=date.today())
             assignment = assignment.exclude(due_date=None).order_by('due_date')
         else:
-            assignment = Assignment.objects.get_queryset().filter(Q(author=user_data)).order_by('id')
+            assignment = Assignment.objects.get_queryset().filter(Q(author=user_data) | Q(tag__subscriber__icontains=user_data)).order_by('id')
         return assignment
 
     def create(self, request, *args, **kwargs):
