@@ -16,12 +16,14 @@ class AssignmentViewset(viewsets.ModelViewSet):
     serializer_class = AssignmentSerializer
 
     def get_queryset(self):
+        user_data = self.request.user.get_json_data()["uid"]
+        
         if self.request.query_params.get('fromPresent') == "true":
             assignment = Assignment.objects.exclude(
                 due_date__lt=date.today())
             assignment = assignment.exclude(due_date=None).order_by('due_date')
         else:
-            assignment = Assignment.objects.get_queryset().order_by('id')
+            assignment = Assignment.objects.get_queryset().filter(author=user_data).order_by('id')
         return assignment
 
     def create(self, request, *args, **kwargs):
@@ -82,7 +84,8 @@ class TagViewset(viewsets.ModelViewSet):
     serializer_class = TagSerializer
 
     def get_queryset(self):
-        tag = Tag.objects.get_queryset().order_by('id')
+        user_data = self.request.user.get_json_data()["uid"]
+        tag = Tag.objects.get_queryset().filter(author=user_data).order_by('id')
         return tag
 
     def create(self, request, *args, **kwargs):
