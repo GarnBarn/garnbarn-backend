@@ -70,7 +70,7 @@ class ViewTests(APITestCase):
         del converted_data["timestamp"]
         expected_result = json.dumps({
             "id": 1,
-            "author": "1234",
+            "author": "user_id",
             "name": "assignment 1",
             "dueDate": self.end_date_timestamp,
             "description": "test",
@@ -78,7 +78,7 @@ class ViewTests(APITestCase):
             "tag": {
                 "id": 1,
                 "name": "test_tag",
-                "author": "1234",
+                "author": "user_id",
                 "color": '#4285F4',
                 "reminderTime": None,
                 "subscriber": None
@@ -180,11 +180,11 @@ class ViewTests(APITestCase):
         converted_data = convert_to_json(response.content)
         expected_result = json.dumps({
             "id": 1,
-            "author": "1234",
+            "author": "user_id",
             "tag": {
                 "id": 1,
                 "name": "test_tag",
-                "author": "1234",
+                "author": "user_id",
                 "color": '#4285F4',
                 "reminderTime": None,
                 "subscriber": None
@@ -233,7 +233,7 @@ class ViewTests(APITestCase):
         expected_result = json.dumps({
             "id": 2,
             "name": "test_tag2",
-            "author": "1234",
+            "author": "user_id",
             "color": "#4285F4",
             "reminderTime": None,
             "subscriber": None
@@ -295,7 +295,7 @@ class ViewTests(APITestCase):
         expected_result = json.dumps({
             'id': 1,
             'name': "renamed",
-            'author': "1234",
+            'author': "user_id",
             'color': '#4285F9',
             'reminderTime': None,
             'subscriber': None
@@ -374,7 +374,7 @@ class SubscriptionTest(APITestCase):
         """Create authenticated user and tag object."""
         self.user = CustomUser.objects.create(uid="user_id")
         self.client.force_authenticate(user=self.user)
-        self.tag = Tag.objects.create(name="test_sub")
+        self.tag = Tag.objects.create(name="test_sub", author=self.user)
 
     def test_sub(self):
         """Test for subscription"""
@@ -424,7 +424,7 @@ class SubscriptionTest(APITestCase):
         response = self.client.post("/api/v1/tag/1/unsubscribe/")
         response_in_json = json.loads(response.content)
         expected = {
-            "message": "User has not subscribe to this tag yet."
+            'message': 'User has not subscribe to this tag yet.'
         }
         self.assertEqual(expected, response_in_json)
         self.assertEqual(400, response.status_code)
