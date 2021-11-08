@@ -1,7 +1,7 @@
 
 from django.http import response
 from django.test import TestCase
-from django.test.utils import tag
+from django.test.utils import Approximate, tag
 from rest_framework import serializers
 from rest_framework.test import APITestCase
 
@@ -33,7 +33,7 @@ class ViewTests(APITestCase):
             self.current_time.timestamp() * 1000)
         self.end_date_timestamp = math.floor(self.end_date.timestamp() * 1000)
 
-        self.user = CustomUser.objects.create(uid="1234")
+        self.user = CustomUser.objects.create(uid="user_id")
         self.client.force_authenticate(user=self.user)
 
         self.user.save()
@@ -274,7 +274,7 @@ class ViewTests(APITestCase):
             'author': self.user,
             'color': '#4285F4',
             "reminderTime": [3600, 1800],
-            'subscriber': self.user
+            'subscriber': []
         }
         data['reminderTime'].sort()
         response = self.client.post("/api/v1/tag/", data)
@@ -365,3 +365,66 @@ class FromPresentTest(APITestCase):
             response_in_json["results"][1]["name"], "assignment 3")
         self.assertEqual(
             response_in_json["results"][2]["name"], "assignment 1")
+
+
+class SubscriptionTest(APITestCase):
+    """Test cases for subscription"""
+
+    def setUp(self) -> None:
+        """Create authenticated user and tag object."""
+        self.user = CustomUser.objects.create(uid="user_id")
+        self.client.force_authenticate(user=self.user)
+        self.tag = Tag.objects.create(name="test_sub")
+
+    def test_sub(self):
+        """Test for subscription"""
+        response = self.client.post("/api/v1/tag/1/subscribe/")
+        self.tag.refresh_from_db()
+        self.assertEqual(self.tag.subscriber, [self.user.uid])
+
+        response_in_json = json.loads(response.content)
+        expected = {
+            "message": "user has subscribed to test_sub"
+        }
+        self.assertEqual(expected, response_in_json)
+        self.assertEqual(200, response.status_code)
+
+    def test_already_sub(self):
+        """Test for twice subscription"""
+        self.client.post("/api/v1/tag/1/subscribe/")
+        self.tag.refresh_from_db()
+        self.assertEqual(self.tag.subscriber, [self.user.uid])
+        # subscribe again
+        response = self.client.post("/api/v1/tag/1/subscribe/")
+        response_in_json = json.loads(response.content)
+        expected = {
+            "message": "User has already subscribed to this tag."
+        }
+        self.assertEqual(expected, response_in_json)
+        self.assertEqual(400, response.status_code)
+
+    def test_unsub(self):
+        """Test for Unsubscription"""
+        self.client.post("/api/v1/tag/1/subscribe/")
+        self.tag.refresh_from_db()
+        self.assertEqual(self.tag.subscriber, [self.user.uid])
+        # unsubscribe from tag
+        response = self.client.post("/api/v1/tag/1/unsubscribe/")
+        self.tag.refresh_from_db()
+        self.assertIsNone(self.tag.subscriber)
+        response_in_json = json.loads(response.content)
+        expected = {
+            "message": "user has un-subscribed to test_sub"
+        }
+        self.assertEqual(expected, response_in_json)
+        self.assertEqual(200, response.status_code)
+
+    def test_unsub_with_no_subscription(self):
+        """Unsub but didn't sub"""
+        response = self.client.post("/api/v1/tag/1/unsubscribe/")
+        response_in_json = json.loads(response.content)
+        expected = {
+            "message": "User has not subscribe to this tag yet."
+        }
+        self.assertEqual(expected, response_in_json)
+        self.assertEqual(400, response.status_code)
