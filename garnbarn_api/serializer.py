@@ -7,6 +7,7 @@ from rest_framework import serializers
 from rest_framework.relations import PKOnlyObject
 from .models import Assignment, CustomUser, Tag
 import math
+from firebase_admin import auth
 
 
 class TimestampField(serializers.Field):
@@ -88,18 +89,20 @@ class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = '__all__'
-
         read_only_fields = ['uid']
 
     def to_representation(self, obj):
         uid = obj.uid
-        line_id = obj.line
-
-        displayName = "Bounk"
-        profileImage = "https://..."
-        platform = {
-            "line": line_id
-        }
+        line_user_id = obj.line
+        try:
+            firebase_user = auth.get_user(uid)
+        except auth.UserNotFoundError:
+            raise serializers.ValidationError("User not found")
+        displayName = firebase_user.display_name
+        profileImage = firebase_user.photo_url
+        platform = {}
+        if line_user_id:
+            platform["line"] = line_user_id
 
         primitive_repr = {}
         primitive_repr["displayName"] = displayName
