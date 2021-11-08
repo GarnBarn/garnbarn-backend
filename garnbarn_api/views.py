@@ -9,7 +9,7 @@ from .authentication import FirebaseAuthIDTokenAuthentication
 from django.db.models import Q
 
 from datetime import datetime, date
-from .models import Assignment, Tag
+from .models import Assignment, Tag, CustomUser
 
 
 class AssignmentViewset(viewsets.ModelViewSet):
@@ -49,7 +49,8 @@ class AssignmentViewset(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def perform_create(self, serializer):
-        serializer.save()
+        user_data = self.request.user.get_json_data()["uid"]
+        serializer.save(author=CustomUser(uid=user_data))
 
     def destroy(self, request, *args, **kwargs):
         """ Remove assignment with specified id.
@@ -111,7 +112,8 @@ class TagViewset(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def perform_create(self, serializer):
-        serializer.save()
+        user_data = self.request.user.get_json_data()["uid"]
+        serializer.save(author=CustomUser(uid=user_data))
 
     def destroy(self, request, *args, **kwargs):
         """Remove tag with specified id.
