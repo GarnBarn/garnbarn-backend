@@ -84,11 +84,28 @@ class TagIdField(serializers.Field):
 class CustomUserSerializer(serializers.ModelSerializer):
     """Serializer for user object
     """
+
     class Meta:
         model = CustomUser
         fields = '__all__'
 
-        read_only_fields = ['uid', ]
+        read_only_fields = ['uid']
+
+    def to_representation(self, obj):
+        uid = obj.uid
+        line_id = obj.line
+
+        displayName = "Bounk"
+        profileImage = "https://..."
+        platform = {
+            "line": line_id
+        }
+
+        primitive_repr = {}
+        primitive_repr["displayName"] = displayName
+        primitive_repr["profileImage"] = profileImage
+        primitive_repr["platform"] = platform
+        return primitive_repr
 
 
 class TagSerializer(serializers.ModelSerializer):
