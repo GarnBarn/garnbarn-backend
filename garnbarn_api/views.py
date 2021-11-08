@@ -15,16 +15,17 @@ from .models import Assignment, CustomUser, Tag
 
 
 class CustomUserViewset(viewsets.ModelViewSet):
+    serializer_class = CustomUserSerializer
 
     def get_queryset(self):
-        uid = self.request.query_parms.get('uid')
+        uid = self.request.query_params.get('uid')
         if uid:
             try:
                 user = CustomUser.objects.get(uid=uid)
-                return user
+                # return (user)
             except KeyError:
                 return Response({'message': 'User not found'}, status=status.HTTP_400_BAD_REQUEST)
-        return self.get_object()
+        # return (user)
 
     @action(methods=['post'], detail=True,
             url_path='link', url_name='link')
