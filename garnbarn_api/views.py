@@ -17,27 +17,23 @@ from .models import Assignment, CustomUser, Tag
 class CustomUserViewset(viewsets.ModelViewSet):
 
     def get_queryset(self):
-        user = CustomUser.objects.all()
-        return user
+        uid = self.request.query_parms.get('uid')
+        if uid:
+            try:
+                user = CustomUser.objects.get(uid=uid)
+                return user
+            except KeyError:
+                return Response({'message': 'User not found'}, status=status.HTTP_400_BAD_REQUEST)
+        return self.get_object()
 
-    @action(methods=['get'], detail=True,
-            url_path='user_api', url_name='user_api')
-    def get_user_api(self, request, *args, **kwarg):
-        pass
-
-    @action(methods=['get'], detail=True,
+    @action(methods=['post'], detail=True,
             url_path='link', url_name='link')
     def get_link(self, request, *args, **kwarg):
         pass
 
-    @action(methods=['patch'], detail=True,
+    @action(methods=['post'], detail=True,
             url_path='unlink', url_name='unlink')
-    def unlink(self, access_token):
-        pass
-
-    @action(methods=['get'], detail=True,
-            url_path='line', url_name='line')
-    def verify_line_access_token(self, access_token):
+    def unlink(self, request):
         pass
 
 
