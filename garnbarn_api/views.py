@@ -15,17 +15,19 @@ from .models import Assignment, CustomUser, Tag
 
 
 class CustomUserViewset(viewsets.ModelViewSet):
-    # serializer_class = CustomUserSerializer
+    authentication_classes = [FirebaseAuthIDTokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = CustomUserSerializer
 
     def get_queryset(self):
-        uid = self.request.query_params.get('uid')
-        if uid:
-            user = CustomUser.objects.get(uid=uid)
-            if user:
-                return  # here
-            return Response({'message': 'User not found'}, status=status.HTTP_400_BAD_REQUEST)
-        user = self.request.user
-        return  # here
+        # uid = self.request.query_params.get('uid', None)
+        # if uid:
+        #     user = CustomUser.objects.filter(uid=uid)
+        #     if user is None:
+        #         return Response({"message": "Not found"})
+        # else:
+        user = CustomUser.objects.filter(uid=self.request.user.uid)
+        return user
 
     @action(methods=['post'], detail=True,
             url_path='link', url_name='link')
