@@ -21,7 +21,7 @@ class AssignmentViewset(viewsets.ModelViewSet):
     serializer_class = AssignmentSerializer
 
     def get_queryset(self):
-        user_data = self.request.user.get_json_data()["uid"]
+        user_data = self.request.user.uid
         
         if self.request.query_params.get('fromPresent') == "true":
             assignment = Assignment.objects.exclude(
@@ -52,7 +52,7 @@ class AssignmentViewset(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def perform_create(self, serializer):
-        user_data = self.request.user.get_json_data()["uid"]
+        user_data = self.request.user.uid
         serializer.save(author=CustomUser(uid=user_data))
 
     def destroy(self, request, *args, **kwargs):
@@ -90,7 +90,7 @@ class TagViewset(viewsets.ModelViewSet):
     serializer_class = TagSerializer
 
     def get_queryset(self):
-        user_data = self.request.user.get_json_data()["uid"]
+        user_data = self.request.user.uid
         tag = Tag.objects.get_queryset().filter(Q(author=user_data) | Q(subscriber__icontains=user_data)).order_by('id')
         return tag
 
@@ -115,7 +115,7 @@ class TagViewset(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def perform_create(self, serializer):
-        user_data = self.request.user.get_json_data()["uid"]
+        user_data = self.request.user.uid
         serializer.save(author=CustomUser(uid=user_data))
 
     def destroy(self, request, *args, **kwargs):
