@@ -292,8 +292,6 @@ class ViewTests(APITestCase):
                                      content_type="application/json"
                                      )
         converted_data = convert_to_json(response.content)
-        # self.user = CustomUser(uid="user_id")
-        # uid = self.user
         expected_result = json.dumps({
             'id': 1,
             'name': "renamed",
