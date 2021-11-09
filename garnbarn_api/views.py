@@ -16,11 +16,10 @@ from datetime import datetime, date
 from .models import Assignment, CustomUser, Tag
 
 
-class CustomUserViewset(ListModelMixin, viewsets.GenericViewSet):
+class CustomUserViewset(viewsets.ModelViewSet):
     authentication_classes = [FirebaseAuthIDTokenAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = CustomUserSerializer
-    # pagination_class = None
 
     def get_queryset(self):
         uid = self.request.query_params.get('uid', None)
@@ -41,19 +40,25 @@ class CustomUserViewset(ListModelMixin, viewsets.GenericViewSet):
         return Response(serializer.data)
 
     @action(methods=['post'], detail=True,
-            url_path='link', url_name='link')
-    def get_link(self, request, *args, **kwarg):
-        # queryset = self.get_queryset()
-        # uid = queryset.uid
+            url_path="link", url_name="account-link")
+    def link(self, request, *args, **kwarg):
+        return Response({"message": "success"}, status=status.HTTP_200_OK)
+        # uid = request.user.uid
+        # line = request.user.line
         # context = {
-
+        #     "platform": "line",
+        #     "credential": {
+        #         "code": "",
+        #         "redirectUri": "",
+        #         "clientId": "",
+        #     }
         # }
-        pass
+        # return Response(context, status=status.HTTP_200_OK)
 
-    @action(methods=['post'], detail=True,
-            url_path='unlink', url_name='unlink')
-    def unlink(self, request):
-        pass
+    # @action(methods=['post'], detail=True,
+    #         url_path='unlink', url_name='unlink')
+    # def unlink(self, request):
+    #     pass
 
 
 class AssignmentViewset(viewsets.ModelViewSet):
