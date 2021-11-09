@@ -1,11 +1,14 @@
 from django.db.models import query
 from django.db.models.query import QuerySet
+from django.http import request
 from rest_framework.response import Response
 from rest_framework import serializers, viewsets, status
 from rest_framework import viewsets, status
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from garnbarn_api.serializer import AssignmentSerializer, CustomUserSerializer, TagSerializer
 from .authentication import FirebaseAuthIDTokenAuthentication
+from django.db.models import Q
+
 from rest_framework.decorators import action, permission_classes
 
 from datetime import datetime, date
@@ -18,12 +21,14 @@ class AssignmentViewset(viewsets.ModelViewSet):
     serializer_class = AssignmentSerializer
 
     def get_queryset(self):
+        user_data = self.request.user.uid
+        
         if self.request.query_params.get('fromPresent') == "true":
             assignment = Assignment.objects.exclude(
                 due_date__lt=date.today())
             assignment = assignment.exclude(due_date=None).order_by('due_date')
         else:
-            assignment = Assignment.objects.get_queryset().order_by('id')
+            assignment = Assignment.objects.get_queryset().filter(Q(author=user_data) | Q(tag__subscriber__icontains=user_data)).order_by('id')
         return assignment
 
     def create(self, request, *args, **kwargs):
@@ -47,7 +52,8 @@ class AssignmentViewset(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def perform_create(self, serializer):
-        serializer.save()
+        user_data = self.request.user.uid
+        serializer.save(author=CustomUser(uid=user_data))
 
     def destroy(self, request, *args, **kwargs):
         """ Remove assignment with specified id.
@@ -84,7 +90,8 @@ class TagViewset(viewsets.ModelViewSet):
     serializer_class = TagSerializer
 
     def get_queryset(self):
-        tag = Tag.objects.get_queryset().order_by('id')
+        user_data = self.request.user.uid
+        tag = Tag.objects.get_queryset().filter(Q(author=user_data) | Q(subscriber__icontains=user_data)).order_by('id')
         return tag
 
     def create(self, request, *args, **kwargs):
@@ -108,7 +115,8 @@ class TagViewset(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def perform_create(self, serializer):
-        serializer.save()
+        user_data = self.request.user.uid
+        serializer.save(author=CustomUser(uid=user_data))
 
     def destroy(self, request, *args, **kwargs):
         """Remove tag with specified id.
