@@ -1,6 +1,7 @@
 from functools import partial
 from django.db.models import query
 from django.db.models.query import QuerySet
+from requests.api import request
 from rest_framework.decorators import action, authentication_classes
 from rest_framework.mixins import ListModelMixin
 from rest_framework.response import Response
@@ -39,21 +40,21 @@ class CustomUserViewset(viewsets.ModelViewSet):
         serializer = self.get_serializer(queryset)
         return Response(serializer.data)
 
-    @action(methods=['post'], detail=True,
+    @action(methods=['post'], detail=False,
             url_path="link", url_name="account-link")
     def link(self, request, *args, **kwarg):
-        return Response({"message": "success"}, status=status.HTTP_200_OK)
-        # uid = request.user.uid
-        # line = request.user.line
-        # context = {
-        #     "platform": "line",
-        #     "credential": {
-        #         "code": "",
-        #         "redirectUri": "",
-        #         "clientId": "",
-        #     }
-        # }
-        # return Response(context, status=status.HTTP_200_OK)
+        # return Response({"message": "success"}, status=status.HTTP_200_OK)
+        uid = request.user.uid
+        line = request.user.line
+        context = {
+            "platform": "line",
+            "credential": {
+                "code": "",
+                "redirectUri": "",
+                "clientId": "",
+            }
+        }
+        return Response(context, status=status.HTTP_200_OK)
 
     # @action(methods=['post'], detail=True,
     #         url_path='unlink', url_name='unlink')
