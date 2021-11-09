@@ -14,7 +14,6 @@ from .authentication import FirebaseAuthIDTokenAuthentication
 from rest_framework.decorators import action, permission_classes, api_view
 from garnbarn_api.services.line import LineLoginPlatformHelper, LineApiError
 import json
-import requests
 
 from datetime import datetime, date
 from .models import Assignment, CustomUser, Tag
@@ -51,7 +50,7 @@ class CustomUserViewset(viewsets.ModelViewSet):
             request_payload = json.loads(request.body)
         except json.JSONDecodeError:
             return Response({
-                "message": "The body contain invalud json format."
+                "message": "The body contain invalid json format."
             }, status=status.HTTP_400_BAD_REQUEST)
         if request_payload.get("platform") != "line":
             return Response({
@@ -85,10 +84,26 @@ class CustomUserViewset(viewsets.ModelViewSet):
         request.user.save()
         return Response({}, status=status.HTTP_200_OK)
 
-    # @action(methods=['post'], detail=True,
-    #         url_path='unlink', url_name='unlink')
-    # def unlink(self, request):
-    #     pass
+    @action(methods=['POST'], detail=False,
+            url_path='unlink', url_name='unlink')
+    def unlink(self, request):
+        try:
+            request_payload = json.loads(request.body)
+        except json.JSONDecodeError:
+            return Response({
+                "message": "The body contain invalid json format."
+            }, status=status.HTTP_400_BAD_REQUEST)
+        if request_payload.get("platform") != "line":
+            return Response({
+                "message": "You didn't specify the platform or the platform you specify is not supported."
+            }, status=status.HTTP_400_BAD_REQUEST)
+        if not request.user.line:
+            return Response({
+                "message": "User is not linked the LINE account"
+            }, status=status.HTTP_400_BAD_REQUEST)
+        request.user.line = None
+        request.user.save()
+        return Response({}, status=status.HTTP_200_OK)
 
 
 class AssignmentViewset(viewsets.ModelViewSet):
