@@ -12,6 +12,9 @@ from rest_framework.views import APIView
 from garnbarn_api.serializer import AssignmentSerializer, CustomUserSerializer, TagSerializer
 from .authentication import FirebaseAuthIDTokenAuthentication
 from rest_framework.decorators import action, permission_classes, api_view
+from garnbarn_api.services.line import LineLoginPlatformHelper, LineApiError
+import json
+import requests
 
 from datetime import datetime, date
 from .models import Assignment, CustomUser, Tag
@@ -40,21 +43,47 @@ class CustomUserViewset(viewsets.ModelViewSet):
         serializer = self.get_serializer(queryset)
         return Response(serializer.data)
 
-    @action(methods=['post'], detail=False,
+    @action(methods=['POST'], detail=False,
             url_path="link", url_name="account-link")
     def link(self, request, *args, **kwarg):
-        # return Response({"message": "success"}, status=status.HTTP_200_OK)
         uid = request.user.uid
-        line = request.user.line
-        context = {
-            "platform": "line",
-            "credential": {
-                "code": "",
-                "redirectUri": "",
-                "clientId": "",
-            }
-        }
-        return Response(context, status=status.HTTP_200_OK)
+        try:
+            request_payload = json.loads(request.body)
+        except json.JSONDecodeError:
+            return Response({
+                "message": "The body contain invalud json format."
+            }, status=status.HTTP_400_BAD_REQUEST)
+        if request_payload.get("platform") != "line":
+            return Response({
+                "message": "You didn't specify the platform or the platform you specify is not supported."
+            }, status=status.HTTP_400_BAD_REQUEST)
+        if not request_payload.get("credential"):
+            return Response({
+                "message": "No credential provided"
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check if user already linked with LINE
+        if request.user.line:
+            return Response({
+                "message": "User already linked the account with LINE"
+            }, status=status.HTTP_400_BAD_REQUEST)
+        check_list = ["code", "clientId", "redirectUri"]
+        for item in check_list:
+            if not request_payload["credential"].get(item):
+                return Response({
+                    "message": f"To link account with LINE, Field {item} is required"
+                })
+        credential = request_payload["credential"]
+        line_login = LineLoginPlatformHelper()
+        try:
+            line_login.verify_login_code(
+                credential["code"], credential["redirectUri"], credential["clientId"])
+            line_profile = line_login.get_user_profile()
+        except LineApiError as e:
+            return Response(e.line_error_object, status=status.HTTP_400_BAD_REQUEST)
+        request.user.line = line_profile["userId"]
+        request.user.save()
+        return Response({}, status=status.HTTP_200_OK)
 
     # @action(methods=['post'], detail=True,
     #         url_path='unlink', url_name='unlink')
