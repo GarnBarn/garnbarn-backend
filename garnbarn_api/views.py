@@ -46,6 +46,7 @@ class CustomUserViewset(viewsets.ModelViewSet):
             url_path="link", url_name="account-link")
     def link(self, request, *args, **kwarg):
         uid = request.user.uid
+<<<<<<< HEAD
         try:
             request_payload = json.loads(request.body)
         except json.JSONDecodeError:
@@ -104,6 +105,23 @@ class CustomUserViewset(viewsets.ModelViewSet):
         request.user.line = None
         request.user.save()
         return Response({}, status=status.HTTP_200_OK)
+=======
+        line = request.user.line
+        context = {
+            "platform": "line",
+            "credential": {
+                "code": "",
+                "redirectUri": "",
+                "clientId": "",
+            }
+        }
+        return Response(context, status=status.HTTP_200_OK)
+
+    @action(methods=['post'], detail=False,
+            url_path='unlink', url_name='unlink')
+    def unlink(self, request):
+        pass
+>>>>>>> 0a42aef18952cb48102d18830d198c9aad76ba62
 
 
 class AssignmentViewset(viewsets.ModelViewSet):

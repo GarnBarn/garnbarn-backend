@@ -94,6 +94,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
         read_only_fields = ['uid']
 
     def to_representation(self, obj):
+        """Represent data from firebase."""
         uid = obj.uid
         line_user_id = obj.line
         try:
