@@ -43,7 +43,6 @@ class CustomUserViewset(viewsets.ModelViewSet):
     @action(methods=['post'], detail=False,
             url_path="link", url_name="account-link")
     def link(self, request, *args, **kwarg):
-        # return Response({"message": "success"}, status=status.HTTP_200_OK)
         uid = request.user.uid
         line = request.user.line
         context = {
@@ -56,10 +55,10 @@ class CustomUserViewset(viewsets.ModelViewSet):
         }
         return Response(context, status=status.HTTP_200_OK)
 
-    # @action(methods=['post'], detail=True,
-    #         url_path='unlink', url_name='unlink')
-    # def unlink(self, request):
-    #     pass
+    @action(methods=['post'], detail=False,
+            url_path='unlink', url_name='unlink')
+    def unlink(self, request):
+        pass
 
 
 class AssignmentViewset(viewsets.ModelViewSet):
