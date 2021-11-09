@@ -38,7 +38,8 @@ class ViewTests(APITestCase):
 
         self.user.save()
 
-        self.tag = Tag.objects.create(name="test_tag", color='#4285F4', author=self.user)
+        self.tag = Tag.objects.create(
+            name="test_tag", color='#4285F4', author=self.user)
         self.assignment = Assignment(
             assignment_name="assignment 1",
             author=self.user,
@@ -82,7 +83,7 @@ class ViewTests(APITestCase):
                 "color": '#4285F4',
                 "reminderTime": None,
                 "subscriber": None
-                }
+            }
         })
         self.assertJSONEqual(expected_result, converted_data)
         self.assertAlmostEqual(timestamp_cache_from_request,
@@ -161,6 +162,7 @@ class ViewTests(APITestCase):
         # The creation time may not equal the current timestamp, The acceptable creation time is 2s or 2000 ms
         self.assertAlmostEqual(math.floor(new_assignment.timestamp.timestamp() * 1000),
                                self.current_timestamp, delta=2000)
+        self.assertEqual(self.user.uid, new_assignment.author.uid)
         self.assertEqual(new_assignment.description, data["description"])
         data["reminderTime"].sort()
         self.assertEqual(data["reminderTime"],
@@ -334,8 +336,10 @@ class FromPresentTest(APITestCase):
         today_but_in_the_past = datetime.now() - timedelta(hours=3)
         today = datetime.now()
         tomorrow = datetime.now() + timedelta(days=1)
-        self.assignment1 = self.create_assignment("assignment 1", tomorrow, self.user)
-        self.assignment2 = self.create_assignment("assignment 2", yesterday, self.user)
+        self.assignment1 = self.create_assignment(
+            "assignment 1", tomorrow, self.user)
+        self.assignment2 = self.create_assignment(
+            "assignment 2", yesterday, self.user)
         self.assignment3 = self.create_assignment(
             "assignment 3", today, self.user)
         self.assignment4 = self.create_assignment(
