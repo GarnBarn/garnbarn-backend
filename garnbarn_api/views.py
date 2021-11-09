@@ -2,36 +2,52 @@ from functools import partial
 from django.db.models import query
 from django.db.models.query import QuerySet
 from rest_framework.decorators import action, authentication_classes
+from rest_framework.mixins import ListModelMixin
 from rest_framework.response import Response
 from rest_framework import serializers, viewsets, status
 from rest_framework import viewsets, status
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
+from rest_framework.views import APIView
 from garnbarn_api.serializer import AssignmentSerializer, CustomUserSerializer, TagSerializer
 from .authentication import FirebaseAuthIDTokenAuthentication
-from rest_framework.decorators import action, permission_classes
+from rest_framework.decorators import action, permission_classes, api_view
 
 from datetime import datetime, date
 from .models import Assignment, CustomUser, Tag
 
 
-class CustomUserViewset(viewsets.ModelViewSet):
+class CustomUserViewset(ListModelMixin, viewsets.GenericViewSet):
     authentication_classes = [FirebaseAuthIDTokenAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = CustomUserSerializer
+    # pagination_class = None
 
     def get_queryset(self):
-        # uid = self.request.query_params.get('uid', None)
-        # if uid:
-        #     user = CustomUser.objects.filter(uid=uid)
-        #     if user is None:
-        #         return Response({"message": "Not found"})
-        # else:
-        user = CustomUser.objects.filter(uid=self.request.user.uid)
+        uid = self.request.query_params.get('uid', None)
+        if uid:
+            try:
+                user = CustomUser.objects.get(uid=uid)
+            except CustomUser.DoesNotExist:
+                return None
+        else:
+            user = CustomUser.objects.get(uid=self.request.user.uid)
         return user
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        if queryset is None:
+            return Response({"message": "User not found"}, status=status.HTTP_400_BAD_REQUEST)
+        serializer = self.get_serializer(queryset)
+        return Response(serializer.data)
 
     @action(methods=['post'], detail=True,
             url_path='link', url_name='link')
     def get_link(self, request, *args, **kwarg):
+        # queryset = self.get_queryset()
+        # uid = queryset.uid
+        # context = {
+
+        # }
         pass
 
     @action(methods=['post'], detail=True,

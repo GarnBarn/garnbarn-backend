@@ -87,7 +87,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = '__all__'
+        fields = ['uid', 'line']
 
         read_only_fields = ['uid']
 
