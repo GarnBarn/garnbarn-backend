@@ -71,7 +71,7 @@ class CustomUserViewset(viewsets.ModelViewSet):
         for item in check_list:
             if not request_payload["credential"].get(item):
                 return Response({
-                    "message": f"To link account with LINE, Field {item} is required"
+                    "message": f"To link account with LINE, Field `{item}` in credential is required"
                 })
         credential = request_payload["credential"]
         line_login = LineLoginPlatformHelper()
