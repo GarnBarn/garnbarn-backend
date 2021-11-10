@@ -9,7 +9,9 @@
 
 You can follow these step in [document](https://garnbarn.github.io/garnbarn-backend/#/?id=setting-up-env)
 
-### 2. Add Firebase Admin SDK Service Account
+### 2. Config Credential Files
+
+#### 2.1 Add Firebase Admin SDK Service Account
 
 There are 2 ways to do this:
 
@@ -20,7 +22,7 @@ There are 2 ways to do this:
 
 If no credential, The API will always return 500 Internal Server Error as its response.
 
-#### 2.1 Add LINE Platform secret config
+#### 2.2 Add LINE Platform secret config
 
 This file contain credential from LINE Login and LINE Messaging API Platform. You can generate these credential from [LINE Developer Console](https://developers.line.biz/en/)
 
