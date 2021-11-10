@@ -1,6 +1,5 @@
 import datetime
 from enum import auto
-from sys import platform
 import time
 from django.db import models
 from django.db.models import fields, query_utils
