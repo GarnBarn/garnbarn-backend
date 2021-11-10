@@ -20,6 +20,24 @@ There are 2 ways to do this:
 
 If no credential, The API will always return 500 Internal Server Error as its response.
 
+#### 2.1 Add LINE Platform secret config
+
+This file contain credential from LINE Login and LINE Messaging API Platform. You can generate these credential from [LINE Developer Console](https://developers.line.biz/en/)
+
+1. Create file name `line-config.json` with this structure
+
+```json
+{
+  "login": {
+    "channel_secret": "00000",
+    "channel_id": "00000"
+  },
+  "messaging_api": {
+    "channel_access_token": "00000"
+  }
+}
+```
+
 ### 3. Serve (locally)
 
 In the top level folder of the project.
