@@ -36,7 +36,7 @@ class FirebaseAuthIDTokenAuthentication(authentication.TokenAuthentication):
         try:
             user_model = CustomUser.objects.get(uid=decoded_token.get("uid"))
         except CustomUser.DoesNotExist:
-            user_model = CustomUser.objects.get(uid=decoded_token.get("uid"))
+            user_model = CustomUser.objects.create(uid=decoded_token.get("uid"))
             user_model.save()
 
         return (user_model, None)
