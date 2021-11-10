@@ -36,7 +36,10 @@ class ViewTests(APITestCase):
         self.user = CustomUser.objects.create(uid="user_id")
         self.client.force_authenticate(user=self.user)
 
-        self.tag = Tag.objects.create(name="test_tag", color='#4285F4')
+        self.user.save()
+
+        self.tag = Tag.objects.create(
+            name="test_tag", color='#4285F4', author=self.user)
         self.assignment = Assignment(
             assignment_name="assignment 1",
             author=self.user,
@@ -69,18 +72,18 @@ class ViewTests(APITestCase):
         expected_result = json.dumps({
             "id": 1,
             "author": "user_id",
-            "tag": {
-                "id": 1,
-                "name": "test_tag",
-                "author": None,
-                "color": '#4285F4',
-                "reminderTime": None,
-                "subscriber": None
-            },
             "name": "assignment 1",
             "dueDate": self.end_date_timestamp,
             "description": "test",
-            "reminderTime": None
+            "reminderTime": None,
+            "tag": {
+                "id": 1,
+                "name": "test_tag",
+                "author": "user_id",
+                "color": '#4285F4',
+                "reminderTime": None,
+                "subscriber": None
+            }
         })
         self.assertJSONEqual(expected_result, converted_data)
         self.assertAlmostEqual(timestamp_cache_from_request,
@@ -159,6 +162,7 @@ class ViewTests(APITestCase):
         # The creation time may not equal the current timestamp, The acceptable creation time is 2s or 2000 ms
         self.assertAlmostEqual(math.floor(new_assignment.timestamp.timestamp() * 1000),
                                self.current_timestamp, delta=2000)
+        self.assertEqual(self.user.uid, new_assignment.author.uid)
         self.assertEqual(new_assignment.description, data["description"])
         data["reminderTime"].sort()
         self.assertEqual(data["reminderTime"],
@@ -182,7 +186,7 @@ class ViewTests(APITestCase):
             "tag": {
                 "id": 1,
                 "name": "test_tag",
-                "author": None,
+                "author": "user_id",
                 "color": '#4285F4',
                 "reminderTime": None,
                 "subscriber": None
@@ -231,7 +235,7 @@ class ViewTests(APITestCase):
         expected_result = json.dumps({
             "id": 2,
             "name": "test_tag2",
-            "author": 'user_id',
+            "author": "user_id",
             "color": "#4285F4",
             "reminderTime": None,
             "subscriber": None
@@ -291,7 +295,7 @@ class ViewTests(APITestCase):
         expected_result = json.dumps({
             'id': 1,
             'name': "renamed",
-            'author': None,
+            'author': "user_id",
             'color': '#4285F9',
             'reminderTime': None,
             'subscriber': None
@@ -330,15 +334,17 @@ class FromPresentTest(APITestCase):
         today_but_in_the_past = datetime.now() - timedelta(hours=3)
         today = datetime.now()
         tomorrow = datetime.now() + timedelta(days=1)
-        self.assignment1 = self.create_assignment("assignment 1", tomorrow)
-        self.assignment2 = self.create_assignment("assignment 2", yesterday)
+        self.assignment1 = self.create_assignment(
+            "assignment 1", tomorrow, self.user)
+        self.assignment2 = self.create_assignment(
+            "assignment 2", yesterday, self.user)
         self.assignment3 = self.create_assignment(
-            "assignment 3", today)
+            "assignment 3", today, self.user)
         self.assignment4 = self.create_assignment(
-            "assignment 4", today_but_in_the_past)
+            "assignment 4", today_but_in_the_past, self.user)
 
-    def create_assignment(self, name, due_date):
-        return Assignment.objects.create(assignment_name=name, due_date=due_date)
+    def create_assignment(self, name, due_date, author):
+        return Assignment.objects.create(assignment_name=name, due_date=due_date, author=author)
 
     def test_not_frompresent(self):
         """Normal GET method"""
@@ -370,7 +376,7 @@ class SubscriptionTest(APITestCase):
         """Create authenticated user and tag object."""
         self.user = CustomUser.objects.create(uid="user_id")
         self.client.force_authenticate(user=self.user)
-        self.tag = Tag.objects.create(name="test_sub")
+        self.tag = Tag.objects.create(name="test_sub", author=self.user)
 
     def test_sub(self):
         """Test for subscription"""
@@ -420,7 +426,7 @@ class SubscriptionTest(APITestCase):
         response = self.client.post("/api/v1/tag/1/unsubscribe/")
         response_in_json = json.loads(response.content)
         expected = {
-            "message": "User has not subscribe to this tag yet."
+            'message': 'User has not subscribe to this tag yet.'
         }
         self.assertEqual(expected, response_in_json)
         self.assertEqual(400, response.status_code)
