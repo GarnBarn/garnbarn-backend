@@ -45,7 +45,7 @@ class LineLoginPlatformHelper:
         """
         if client_id != self.__channel_id:
             raise AssertionError(
-                "Client id is diffriend from the client id in the server.")
+                "Client id is different from the client id in the server.")
         body = {
             "code": code,
             "redirect_uri": redirect_uri,
