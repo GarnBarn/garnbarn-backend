@@ -10,3 +10,4 @@ requests
 django-cors-headers
 firebase-admin==5.0.3
 freezegun
+requests

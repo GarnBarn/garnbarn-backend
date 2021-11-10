@@ -1,18 +1,110 @@
+from functools import partial
 from django.db.models import query
 from django.db.models.query import QuerySet
-from django.http import request
+from requests.api import request
+from rest_framework.decorators import action, authentication_classes
+from rest_framework.mixins import ListModelMixin
 from rest_framework.response import Response
 from rest_framework import serializers, viewsets, status
 from rest_framework import viewsets, status
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
+from rest_framework.views import APIView
 from garnbarn_api.serializer import AssignmentSerializer, CustomUserSerializer, TagSerializer
 from .authentication import FirebaseAuthIDTokenAuthentication
+from rest_framework.decorators import action, permission_classes, api_view
+from garnbarn_api.services.line import LineLoginPlatformHelper, LineApiError
+import json
 from django.db.models import Q
-
-from rest_framework.decorators import action, permission_classes
 
 from datetime import datetime, date
 from .models import Assignment, CustomUser, Tag
+
+
+class CustomUserViewset(viewsets.ModelViewSet):
+    authentication_classes = [FirebaseAuthIDTokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = CustomUserSerializer
+
+    def get_queryset(self):
+        uid = self.request.query_params.get('uid', None)
+        if uid:
+            try:
+                user = CustomUser.objects.get(uid=uid)
+            except CustomUser.DoesNotExist:
+                return None
+        else:
+            user = CustomUser.objects.get(uid=self.request.user.uid)
+        return user
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        if queryset is None:
+            return Response({"message": "User not found"}, status=status.HTTP_400_BAD_REQUEST)
+        serializer = self.get_serializer(queryset)
+        return Response(serializer.data)
+
+    @action(methods=['POST'], detail=False,
+            url_path="link", url_name="account-link")
+    def link(self, request, *args, **kwarg):
+        uid = request.user.uid
+        try:
+            request_payload = json.loads(request.body)
+        except json.JSONDecodeError:
+            return Response({
+                "message": "The body contain invalid json format."
+            }, status=status.HTTP_400_BAD_REQUEST)
+        if request_payload.get("platform") != "line":
+            return Response({
+                "message": "You didn't specify the platform or the platform you specify is not supported."
+            }, status=status.HTTP_400_BAD_REQUEST)
+        if not request_payload.get("credential"):
+            return Response({
+                "message": "No credential provided"
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check if user already linked with LINE
+        if request.user.line:
+            return Response({
+                "message": "User already linked the account with LINE"
+            }, status=status.HTTP_400_BAD_REQUEST)
+        check_list = ["code", "clientId", "redirectUri"]
+        for item in check_list:
+            if not request_payload["credential"].get(item):
+                return Response({
+                    "message": f"To link account with LINE, Field `{item}` in credential is required"
+                })
+        credential = request_payload["credential"]
+        line_login = LineLoginPlatformHelper()
+        try:
+            line_login.verify_login_code(
+                credential["code"], credential["redirectUri"], credential["clientId"])
+            line_profile = line_login.get_user_profile()
+        except LineApiError as e:
+            return Response(e.line_error_object, status=status.HTTP_400_BAD_REQUEST)
+        request.user.line = line_profile["userId"]
+        request.user.save()
+        return Response({}, status=status.HTTP_200_OK)
+
+    @action(methods=['POST'], detail=False,
+            url_path='unlink', url_name='unlink')
+    def unlink(self, request):
+        try:
+            request_payload = json.loads(request.body)
+        except json.JSONDecodeError:
+            return Response({
+                "message": "The body contain invalid json format."
+            }, status=status.HTTP_400_BAD_REQUEST)
+        if request_payload.get("platform") != "line":
+            return Response({
+                "message": "You didn't specify the platform or the platform you specify is not supported."
+            }, status=status.HTTP_400_BAD_REQUEST)
+        if not request.user.line:
+            return Response({
+                "message": "User is not linked the LINE account"
+            }, status=status.HTTP_400_BAD_REQUEST)
+        request.user.line = None
+        request.user.save()
+        return Response({}, status=status.HTTP_200_OK)
 
 
 class AssignmentViewset(viewsets.ModelViewSet):
@@ -22,13 +114,14 @@ class AssignmentViewset(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user_data = self.request.user.uid
-        
+
         if self.request.query_params.get('fromPresent') == "true":
             assignment = Assignment.objects.exclude(
                 due_date__lt=date.today())
             assignment = assignment.exclude(due_date=None).order_by('due_date')
         else:
-            assignment = Assignment.objects.get_queryset().filter(Q(author=user_data) | Q(tag__subscriber__icontains=user_data)).order_by('id')
+            assignment = Assignment.objects.get_queryset().filter(
+                Q(author=user_data) | Q(tag__subscriber__icontains=user_data)).order_by('id')
         return assignment
 
     def create(self, request, *args, **kwargs):
@@ -91,7 +184,8 @@ class TagViewset(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user_data = self.request.user.uid
-        tag = Tag.objects.get_queryset().filter(Q(author=user_data) | Q(subscriber__icontains=user_data)).order_by('id')
+        tag = Tag.objects.get_queryset().filter(Q(author=user_data) | Q(
+            subscriber__icontains=user_data)).order_by('id')
         return tag
 
     def create(self, request, *args, **kwargs):
