@@ -1,7 +1,7 @@
 
 from django.http import response
 from django.test import TestCase
-from django.test.utils import tag
+from django.test.utils import Approximate, tag
 from rest_framework import serializers
 from rest_framework.test import APITestCase
 
@@ -33,14 +33,13 @@ class ViewTests(APITestCase):
             self.current_time.timestamp() * 1000)
         self.end_date_timestamp = math.floor(self.end_date.timestamp() * 1000)
 
-        self.user = CustomUser.objects.create(uid="1234")
+        self.user = CustomUser.objects.create(uid="user_id")
         self.client.force_authenticate(user=self.user)
 
-        self.user = CustomUser(uid="user_id",
-                               )
         self.user.save()
 
-        self.tag = Tag.objects.create(name="test_tag", color='#4285F4')
+        self.tag = Tag.objects.create(
+            name="test_tag", color='#4285F4', author=self.user)
         self.assignment = Assignment(
             assignment_name="assignment 1",
             author=self.user,
@@ -73,18 +72,18 @@ class ViewTests(APITestCase):
         expected_result = json.dumps({
             "id": 1,
             "author": "user_id",
-            "tag": {
-                "id": 1,
-                "name": "test_tag",
-                "author": None,
-                "color": '#4285F4',
-                "reminderTime": None,
-                "subscriber": None
-            },
             "name": "assignment 1",
             "dueDate": self.end_date_timestamp,
             "description": "test",
-            "reminderTime": None
+            "reminderTime": None,
+            "tag": {
+                "id": 1,
+                "name": "test_tag",
+                "author": "user_id",
+                "color": '#4285F4',
+                "reminderTime": None,
+                "subscriber": None
+            }
         })
         self.assertJSONEqual(expected_result, converted_data)
         self.assertAlmostEqual(timestamp_cache_from_request,
@@ -136,7 +135,7 @@ class ViewTests(APITestCase):
         response = self.client.post("/api/v1/assignment/", data)
         converted_data = convert_to_json(response.content)
         res = json.dumps({
-            "message": "Tag's ID not found"
+            "message": {'tagId': ['Tag not found']}
         })
         self.assertJSONEqual(res, converted_data)
         self.assertEqual(400, response.status_code)
@@ -163,6 +162,7 @@ class ViewTests(APITestCase):
         # The creation time may not equal the current timestamp, The acceptable creation time is 2s or 2000 ms
         self.assertAlmostEqual(math.floor(new_assignment.timestamp.timestamp() * 1000),
                                self.current_timestamp, delta=2000)
+        self.assertEqual(self.user.uid, new_assignment.author.uid)
         self.assertEqual(new_assignment.description, data["description"])
         data["reminderTime"].sort()
         self.assertEqual(data["reminderTime"],
@@ -186,7 +186,7 @@ class ViewTests(APITestCase):
             "tag": {
                 "id": 1,
                 "name": "test_tag",
-                "author": None,
+                "author": "user_id",
                 "color": '#4285F4',
                 "reminderTime": None,
                 "subscriber": None
@@ -235,7 +235,7 @@ class ViewTests(APITestCase):
         expected_result = json.dumps({
             "id": 2,
             "name": "test_tag2",
-            "author": 'user_id',
+            "author": "user_id",
             "color": "#4285F4",
             "reminderTime": None,
             "subscriber": None
@@ -276,7 +276,7 @@ class ViewTests(APITestCase):
             'author': self.user,
             'color': '#4285F4',
             "reminderTime": [3600, 1800],
-            'subscriber': self.user
+            'subscriber': []
         }
         data['reminderTime'].sort()
         response = self.client.post("/api/v1/tag/", data)
@@ -295,7 +295,7 @@ class ViewTests(APITestCase):
         expected_result = json.dumps({
             'id': 1,
             'name': "renamed",
-            'author': None,
+            'author': "user_id",
             'color': '#4285F9',
             'reminderTime': None,
             'subscriber': None
@@ -334,15 +334,17 @@ class FromPresentTest(APITestCase):
         today_but_in_the_past = datetime.now() - timedelta(hours=3)
         today = datetime.now()
         tomorrow = datetime.now() + timedelta(days=1)
-        self.assignment1 = self.create_assignment("assignment 1", tomorrow)
-        self.assignment2 = self.create_assignment("assignment 2", yesterday)
+        self.assignment1 = self.create_assignment(
+            "assignment 1", tomorrow, self.user)
+        self.assignment2 = self.create_assignment(
+            "assignment 2", yesterday, self.user)
         self.assignment3 = self.create_assignment(
-            "assignment 3", today)
+            "assignment 3", today, self.user)
         self.assignment4 = self.create_assignment(
-            "assignment 4", today_but_in_the_past)
+            "assignment 4", today_but_in_the_past, self.user)
 
-    def create_assignment(self, name, due_date):
-        return Assignment.objects.create(assignment_name=name, due_date=due_date)
+    def create_assignment(self, name, due_date, author):
+        return Assignment.objects.create(assignment_name=name, due_date=due_date, author=author)
 
     def test_not_frompresent(self):
         """Normal GET method"""
@@ -365,3 +367,66 @@ class FromPresentTest(APITestCase):
             response_in_json["results"][1]["name"], "assignment 3")
         self.assertEqual(
             response_in_json["results"][2]["name"], "assignment 1")
+
+
+class SubscriptionTest(APITestCase):
+    """Test cases for subscription"""
+
+    def setUp(self) -> None:
+        """Create authenticated user and tag object."""
+        self.user = CustomUser.objects.create(uid="user_id")
+        self.client.force_authenticate(user=self.user)
+        self.tag = Tag.objects.create(name="test_sub", author=self.user)
+
+    def test_sub(self):
+        """Test for subscription"""
+        response = self.client.post("/api/v1/tag/1/subscribe/")
+        self.tag.refresh_from_db()
+        self.assertEqual(self.tag.subscriber, [self.user.uid])
+
+        response_in_json = json.loads(response.content)
+        expected = {
+            "message": "user has subscribed to test_sub"
+        }
+        self.assertEqual(expected, response_in_json)
+        self.assertEqual(200, response.status_code)
+
+    def test_already_sub(self):
+        """Test for twice subscription"""
+        self.client.post("/api/v1/tag/1/subscribe/")
+        self.tag.refresh_from_db()
+        self.assertEqual(self.tag.subscriber, [self.user.uid])
+        # subscribe again
+        response = self.client.post("/api/v1/tag/1/subscribe/")
+        response_in_json = json.loads(response.content)
+        expected = {
+            "message": "User has already subscribed to this tag."
+        }
+        self.assertEqual(expected, response_in_json)
+        self.assertEqual(400, response.status_code)
+
+    def test_unsub(self):
+        """Test for Unsubscription"""
+        self.client.post("/api/v1/tag/1/subscribe/")
+        self.tag.refresh_from_db()
+        self.assertEqual(self.tag.subscriber, [self.user.uid])
+        # unsubscribe from tag
+        response = self.client.post("/api/v1/tag/1/unsubscribe/")
+        self.tag.refresh_from_db()
+        self.assertIsNone(self.tag.subscriber)
+        response_in_json = json.loads(response.content)
+        expected = {
+            "message": "user has un-subscribed to test_sub"
+        }
+        self.assertEqual(expected, response_in_json)
+        self.assertEqual(200, response.status_code)
+
+    def test_unsub_with_no_subscription(self):
+        """Unsub but didn't sub"""
+        response = self.client.post("/api/v1/tag/1/unsubscribe/")
+        response_in_json = json.loads(response.content)
+        expected = {
+            'message': 'User has not subscribe to this tag yet.'
+        }
+        self.assertEqual(expected, response_in_json)
+        self.assertEqual(400, response.status_code)
