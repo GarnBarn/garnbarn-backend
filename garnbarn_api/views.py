@@ -186,6 +186,8 @@ class TagViewset(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user_data = self.request.user.uid
+        # user_request = self.request
+        # print(user_request)
         tag = Tag.objects.get_queryset().filter(Q(author=user_data) | Q(
             subscriber__icontains=user_data)).order_by('id')
         return tag
