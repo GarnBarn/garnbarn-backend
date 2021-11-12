@@ -257,6 +257,27 @@ class TagViewset(viewsets.ModelViewSet):
     def subscribe(self, request, *args, **kwargs):
         tag = Tag.objects.get_queryset().get(id=self.kwargs.get('pk'))
 
+        try:
+            request_json = json.loads(request.body)
+        except json.JSONDecodeError:
+            return Response({
+                "message": "The invalid json is passed in the body."
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        if not request_json.get("code"):
+            return Response({
+                "message": "The field `code` is required in the json body."
+            }, status=status.HTTP_400_BAD_REQUEST)
+        otp_code = request_json["code"]
+        if not tag.secret_key_totp or tag.secret_key_totp == "":
+            return Response({
+                "message": "This Tag doesn't contain the key that required for the verification process. Please re-create the tag."
+            }, status=status.HTTP_400_BAD_REQUEST)
+        if not pyotp.TOTP(tag.secret_key_totp).verify(otp_code):
+            return Response({
+                "message": "You enter an incorrect join code."
+            }, status=status.HTTP_400_BAD_REQUEST)
+
         if not tag.subscriber:
             tag.subscriber = [request.user.uid]
         elif request.user.uid in tag.subscriber:
@@ -266,7 +287,7 @@ class TagViewset(viewsets.ModelViewSet):
         elif tag.subscriber:
             tag.subscriber.append(request.user.uid)
         tag.save()
-        return Response({"message": f"user has subscribed to {tag.name}"}, status.HTTP_200_OK)
+        return Response({"message": f"user has subscribed to tag id {tag.id}"}, status.HTTP_200_OK)
 
     @action(methods=['post', 'delete'], detail=True,
             url_path="unsubscribe", url_name="unsubscribe")
@@ -282,4 +303,4 @@ class TagViewset(viewsets.ModelViewSet):
             if tag.subscriber == []:
                 tag.subscriber = None
             tag.save()
-            return Response({"message": f"user has un-subscribed to {tag.name}"}, status.HTTP_200_OK)
+            return Response({"message": f"user has un-subscribed from tag id {tag.id}"}, status.HTTP_200_OK)
