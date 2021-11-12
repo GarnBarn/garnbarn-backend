@@ -7,3 +7,7 @@ config/
 db.sqlite3
 garnbarn_api/
 firebase-adminsdk-credential.json
+.vscode/
+line-config.json
+static/
+venv/
