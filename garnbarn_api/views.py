@@ -191,8 +191,6 @@ class TagViewset(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user_data = self.request.user.uid
-        # user_request = self.request
-        # print(user_request)
         tag = Tag.objects.get_queryset().filter(Q(author=user_data) | Q(
             subscriber__icontains=user_data)).order_by('id')
         return tag
@@ -237,7 +235,6 @@ class TagViewset(viewsets.ModelViewSet):
                 'message': "You not the tag author."
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # return Response({}, status=status.HTTP_200_OK)
 
     def partial_update(self, request, *args, **kwargs):
         """Update data of the specified tag
@@ -261,7 +258,8 @@ class TagViewset(viewsets.ModelViewSet):
     @action(methods=['post'], detail=True,
             url_path="subscribe", url_name="subscribe")
     def subscribe(self, request, *args, **kwargs):
-        tag = self.get_object()
+        tag = Tag.objects.get_queryset().get(id=self.kwargs.get('pk'))
+
         if not tag.subscriber:
             tag.subscriber = [request.user.uid]
         elif request.user.uid in tag.subscriber:
@@ -276,7 +274,8 @@ class TagViewset(viewsets.ModelViewSet):
     @action(methods=['post', 'delete'], detail=True,
             url_path="unsubscribe", url_name="unsubscribe")
     def unsubscribe(self, request, *args, **kwargs):
-        tag = self.get_object()
+        tag = Tag.objects.get_queryset().get(id=self.kwargs.get('pk'))
+
         if not tag.subscriber or request.user.uid not in tag.subscriber:
             return Response({
                 "message": "User has not subscribe to this tag yet."
