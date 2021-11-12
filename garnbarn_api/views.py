@@ -14,6 +14,7 @@ from .authentication import FirebaseAuthIDTokenAuthentication
 from rest_framework.decorators import action, permission_classes, api_view
 from garnbarn_api.services.line import LineLoginPlatformHelper, LineApiError
 import json
+import pyotp
 from django.db.models import Q
 
 from datetime import datetime, date
@@ -205,13 +206,16 @@ class TagViewset(viewsets.ModelViewSet):
             return Response({
                 'message': serializer.errors
             }, status=status.HTTP_400_BAD_REQUEST)
+        random_secret_key = pyotp.random_base32()
+        self.perform_create(serializer, random_secret_key)
+        response_data = serializer.data
+        response_data["secretKeyTotp"] = random_secret_key
+        return Response(response_data, status=status.HTTP_200_OK)
 
-        self.perform_create(serializer)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def perform_create(self, serializer):
+    def perform_create(self, serializer, secret_key):
         user_data = self.request.user.uid
-        serializer.save(author=CustomUser(uid=user_data))
+        serializer.save(author=CustomUser(uid=user_data),
+                        secret_key_totp=secret_key)
 
     def destroy(self, request, *args, **kwargs):
         """Remove tag with specified id.
