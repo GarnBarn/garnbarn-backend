@@ -156,15 +156,9 @@ class AssignmentViewset(viewsets.ModelViewSet):
         Returns:
             {} with 200 status code.
         """
-        user_data = self.request.user.uid
         assignment = self.get_object()
-        if str(assignment.author) == str(user_data):
-            assignment.delete()
-            return Response({}, status=status.HTTP_200_OK)
-        else:
-            return Response({
-                'message': "You not the assignment author."
-            }, status=status.HTTP_400_BAD_REQUEST)
+        assignment.delete()
+        return Response({}, status=status.HTTP_200_OK)
 
     def partial_update(self, request, *args, **kwargs):
         """ Update data of a specified assignment
@@ -225,16 +219,9 @@ class TagViewset(viewsets.ModelViewSet):
         Returns:
             {} with 200 status code.
         """
-        user_data = self.request.user.uid
         tag = self.get_object()
-        if str(tag.author) == str(user_data):
-            tag.delete()
-            return Response({}, status=status.HTTP_200_OK)
-        else:
-            return Response({
-                'message': "You not the tag author."
-            }, status=status.HTTP_400_BAD_REQUEST)
-
+        tag.delete()
+        return Response({}, status=status.HTTP_200_OK)
 
     def partial_update(self, request, *args, **kwargs):
         """Update data of the specified tag
