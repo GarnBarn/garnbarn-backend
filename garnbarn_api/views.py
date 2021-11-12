@@ -219,9 +219,15 @@ class TagViewset(viewsets.ModelViewSet):
         Returns:
             {} with 200 status code.
         """
+        user_data = self.request.user.uid
         tag = self.get_object()
-        tag.delete()
-        return Response({}, status=status.HTTP_200_OK)
+        if str(tag.author) == str(user_data):
+            tag.delete()
+            return Response({}, status=status.HTTP_200_OK)
+        else:
+            return Response({
+                'message': "Only Tag's author can delete the tag"
+            }, status=status.HTTP_400_BAD_REQUEST)
 
     def partial_update(self, request, *args, **kwargs):
         """Update data of the specified tag
