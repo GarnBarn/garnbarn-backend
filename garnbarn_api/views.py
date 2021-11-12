@@ -158,7 +158,6 @@ class AssignmentViewset(viewsets.ModelViewSet):
         """
         assignment = self.get_object()
         assignment.delete()
-
         return Response({}, status=status.HTTP_200_OK)
 
     def partial_update(self, request, *args, **kwargs):
@@ -220,10 +219,15 @@ class TagViewset(viewsets.ModelViewSet):
         Returns:
             {} with 200 status code.
         """
+        user_data = self.request.user.uid
         tag = self.get_object()
-        tag.delete()
-
-        return Response({}, status=status.HTTP_200_OK)
+        if str(tag.author) == str(user_data):
+            tag.delete()
+            return Response({}, status=status.HTTP_200_OK)
+        else:
+            return Response({
+                'message': "Only Tag's author can delete the tag"
+            }, status=status.HTTP_400_BAD_REQUEST)
 
     def partial_update(self, request, *args, **kwargs):
         """Update data of the specified tag
@@ -247,7 +251,8 @@ class TagViewset(viewsets.ModelViewSet):
     @action(methods=['post'], detail=True,
             url_path="subscribe", url_name="subscribe")
     def subscribe(self, request, *args, **kwargs):
-        tag = self.get_object()
+        tag = Tag.objects.get_queryset().get(id=self.kwargs.get('pk'))
+
         if not tag.subscriber:
             tag.subscriber = [request.user.uid]
         elif request.user.uid in tag.subscriber:
@@ -262,7 +267,8 @@ class TagViewset(viewsets.ModelViewSet):
     @action(methods=['post', 'delete'], detail=True,
             url_path="unsubscribe", url_name="unsubscribe")
     def unsubscribe(self, request, *args, **kwargs):
-        tag = self.get_object()
+        tag = Tag.objects.get_queryset().get(id=self.kwargs.get('pk'))
+
         if not tag.subscriber or request.user.uid not in tag.subscriber:
             return Response({
                 "message": "User has not subscribe to this tag yet."
