@@ -163,7 +163,7 @@ class AssignmentViewset(viewsets.ModelViewSet):
             return Response({}, status=status.HTTP_200_OK)
         else:
             return Response({
-                'message': "You not the tag author."
+                'message': "You not the assignment author."
             }, status=status.HTTP_400_BAD_REQUEST)
 
     def partial_update(self, request, *args, **kwargs):
