@@ -48,6 +48,7 @@ class Tag(models.Model):
         CustomUser, on_delete=models.CASCADE, blank=True, null=True, default=None)
     reminder_time = models.JSONField(blank=True, null=True, default=None)
     subscriber = models.JSONField(blank=True, null=True, default=None)
+    secret_key_totp = models.CharField(blank=True, null=True, max_length=40)
 
     def get_json_data(self):
         author = self.author.uid if self.author else None

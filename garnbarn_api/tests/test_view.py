@@ -14,6 +14,7 @@ from django.contrib.auth.models import User
 
 import json
 import math
+import pyotp
 from unittest.mock import patch
 
 
@@ -375,29 +376,39 @@ class SubscriptionTest(APITestCase):
     def setUp(self) -> None:
         """Create authenticated user and tag object."""
         self.user = CustomUser.objects.create(uid="user_id")
-        self.client.force_authenticate(user=self.user)
-        self.tag = Tag.objects.create(name="test_sub", author=self.user)
+        self.user_2 = CustomUser.objects.create(uid="user_id_2")
+        self.client.force_authenticate(user=self.user_2)
+        self.secret_key = pyotp.random_base32()
+        self.totp = pyotp.TOTP(self.secret_key)
+        self.totp_body = {"code": self.totp.now()}
+        self.tag = Tag.objects.create(
+            name="test_sub", author=self.user, secret_key_totp=self.secret_key)
+        self.tag.save()
 
     def test_sub(self):
         """Test for subscription"""
-        response = self.client.post("/api/v1/tag/1/subscribe/")
+        response = self.client.post(
+            "/api/v1/tag/1/subscribe/", self.totp_body, format='json')
+        print(response.content)
         self.tag.refresh_from_db()
-        self.assertEqual(self.tag.subscriber, [self.user.uid])
+        self.assertEqual(self.tag.subscriber, [self.user_2.uid])
 
         response_in_json = json.loads(response.content)
         expected = {
-            "message": "user has subscribed to test_sub"
+            "message": "user has subscribed to tag id 1"
         }
         self.assertEqual(expected, response_in_json)
         self.assertEqual(200, response.status_code)
 
     def test_already_sub(self):
         """Test for twice subscription"""
-        self.client.post("/api/v1/tag/1/subscribe/")
+        self.client.post("/api/v1/tag/1/subscribe/",
+                         self.totp_body, format='json')
         self.tag.refresh_from_db()
-        self.assertEqual(self.tag.subscriber, [self.user.uid])
+        self.assertEqual(self.tag.subscriber, [self.user_2.uid])
         # subscribe again
-        response = self.client.post("/api/v1/tag/1/subscribe/")
+        response = self.client.post(
+            "/api/v1/tag/1/subscribe/", self.totp_body, format='json')
         response_in_json = json.loads(response.content)
         expected = {
             "message": "User has already subscribed to this tag."
@@ -407,16 +418,17 @@ class SubscriptionTest(APITestCase):
 
     def test_unsub(self):
         """Test for Unsubscription"""
-        self.client.post("/api/v1/tag/1/subscribe/")
+        self.client.post("/api/v1/tag/1/subscribe/",
+                         self.totp_body, format='json')
         self.tag.refresh_from_db()
-        self.assertEqual(self.tag.subscriber, [self.user.uid])
+        self.assertEqual(self.tag.subscriber, [self.user_2.uid])
         # unsubscribe from tag
         response = self.client.post("/api/v1/tag/1/unsubscribe/")
         self.tag.refresh_from_db()
         self.assertIsNone(self.tag.subscriber)
         response_in_json = json.loads(response.content)
         expected = {
-            "message": "user has un-subscribed to test_sub"
+            "message": "user has un-subscribed from tag id 1"
         }
         self.assertEqual(expected, response_in_json)
         self.assertEqual(200, response.status_code)
@@ -430,3 +442,13 @@ class SubscriptionTest(APITestCase):
         }
         self.assertEqual(expected, response_in_json)
         self.assertEqual(400, response.status_code)
+
+    def test_subscribe_my_own_tag(self):
+        self.client.force_authenticate(user=self.user)
+        response = self.client.post(
+            "/api/v1/tag/1/subscribe/", self.totp_body, format='json')
+        self.assertEqual(400, response.status_code)
+        expected_message = {
+            "message": "You can't subscribe to your own tag."
+        }
+        self.assertEqual(json.loads(response.content), expected_message)

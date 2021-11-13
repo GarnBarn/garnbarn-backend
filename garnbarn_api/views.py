@@ -14,6 +14,7 @@ from .authentication import FirebaseAuthIDTokenAuthentication
 from rest_framework.decorators import action, permission_classes, api_view
 from garnbarn_api.services.line import LineLoginPlatformHelper, LineApiError
 import json
+import pyotp
 from django.db.models import Q
 
 from datetime import datetime, date
@@ -158,7 +159,6 @@ class AssignmentViewset(viewsets.ModelViewSet):
         """
         assignment = self.get_object()
         assignment.delete()
-
         return Response({}, status=status.HTTP_200_OK)
 
     def partial_update(self, request, *args, **kwargs):
@@ -206,13 +206,16 @@ class TagViewset(viewsets.ModelViewSet):
             return Response({
                 'message': serializer.errors
             }, status=status.HTTP_400_BAD_REQUEST)
+        random_secret_key = pyotp.random_base32()
+        self.perform_create(serializer, random_secret_key)
+        response_data = serializer.data
+        response_data["secretKeyTotp"] = random_secret_key
+        return Response(response_data, status=status.HTTP_200_OK)
 
-        self.perform_create(serializer)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def perform_create(self, serializer):
+    def perform_create(self, serializer, secret_key):
         user_data = self.request.user.uid
-        serializer.save(author=CustomUser(uid=user_data))
+        serializer.save(author=CustomUser(uid=user_data),
+                        secret_key_totp=secret_key)
 
     def destroy(self, request, *args, **kwargs):
         """Remove tag with specified id.
@@ -220,10 +223,15 @@ class TagViewset(viewsets.ModelViewSet):
         Returns:
             {} with 200 status code.
         """
+        user_data = self.request.user.uid
         tag = self.get_object()
-        tag.delete()
-
-        return Response({}, status=status.HTTP_200_OK)
+        if str(tag.author) == str(user_data):
+            tag.delete()
+            return Response({}, status=status.HTTP_200_OK)
+        else:
+            return Response({
+                'message': "Only Tag's author can delete the tag"
+            }, status=status.HTTP_400_BAD_REQUEST)
 
     def partial_update(self, request, *args, **kwargs):
         """Update data of the specified tag
@@ -247,22 +255,39 @@ class TagViewset(viewsets.ModelViewSet):
     @action(methods=['post'], detail=True,
             url_path="subscribe", url_name="subscribe")
     def subscribe(self, request, *args, **kwargs):
-        tag = self.get_object()
+        tag = Tag.objects.get_queryset().get(id=self.kwargs.get('pk'))
+
+        try:
+            request_json = json.loads(request.body)
+        except json.JSONDecodeError:
+            return self.response_bad_request("The invalid json is passed in the body.")
+        if not request_json.get("code"):
+            return self.response_bad_request("The field `code` is required in the json body.")
+
+        otp_code = request_json["code"]
+        if not tag.secret_key_totp or tag.secret_key_totp == "":
+            return self.response_bad_request("This Tag doesn't contain the key that required for the verification process. Please re-create the tag.")
+        if not pyotp.TOTP(tag.secret_key_totp).verify(otp_code):
+            return self.response_bad_request("You enter an incorrect subscribe code.")
+        if not tag.author:
+            return self.response_bad_request("This Tag doesn't contain the author that required for the verification process. Please re-create the tag.")
+        if request.user.uid == tag.author.uid:
+            return self.response_bad_request("You can't subscribe to your own tag.")
+
         if not tag.subscriber:
             tag.subscriber = [request.user.uid]
         elif request.user.uid in tag.subscriber:
-            return Response({
-                "message": "User has already subscribed to this tag."
-            }, status=status.HTTP_400_BAD_REQUEST)
+            return self.response_bad_request("User has already subscribed to this tag.")
         elif tag.subscriber:
             tag.subscriber.append(request.user.uid)
         tag.save()
-        return Response({"message": f"user has subscribed to {tag.name}"}, status.HTTP_200_OK)
+        return Response({"message": f"user has subscribed to tag id {tag.id}"}, status.HTTP_200_OK)
 
     @action(methods=['post', 'delete'], detail=True,
             url_path="unsubscribe", url_name="unsubscribe")
     def unsubscribe(self, request, *args, **kwargs):
-        tag = self.get_object()
+        tag = Tag.objects.get_queryset().get(id=self.kwargs.get('pk'))
+
         if not tag.subscriber or request.user.uid not in tag.subscriber:
             return Response({
                 "message": "User has not subscribe to this tag yet."
@@ -272,4 +297,9 @@ class TagViewset(viewsets.ModelViewSet):
             if tag.subscriber == []:
                 tag.subscriber = None
             tag.save()
-            return Response({"message": f"user has un-subscribed to {tag.name}"}, status.HTTP_200_OK)
+            return Response({"message": f"user has un-subscribed from tag id {tag.id}"}, status.HTTP_200_OK)
+
+    def response_bad_request(self, message):
+        return Response({
+            "message": message
+        }, status=status.HTTP_400_BAD_REQUEST)
