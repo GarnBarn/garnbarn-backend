@@ -260,30 +260,24 @@ class TagViewset(viewsets.ModelViewSet):
         try:
             request_json = json.loads(request.body)
         except json.JSONDecodeError:
-            return Response({
-                "message": "The invalid json is passed in the body."
-            }, status=status.HTTP_400_BAD_REQUEST)
-
+            return self.response_bad_request("The invalid json is passed in the body.")
         if not request_json.get("code"):
-            return Response({
-                "message": "The field `code` is required in the json body."
-            }, status=status.HTTP_400_BAD_REQUEST)
+            return self.response_bad_request("The field `code` is required in the json body.")
+
         otp_code = request_json["code"]
         if not tag.secret_key_totp or tag.secret_key_totp == "":
-            return Response({
-                "message": "This Tag doesn't contain the key that required for the verification process. Please re-create the tag."
-            }, status=status.HTTP_400_BAD_REQUEST)
+            return self.response_bad_request("This Tag doesn't contain the key that required for the verification process. Please re-create the tag.")
         if not pyotp.TOTP(tag.secret_key_totp).verify(otp_code):
-            return Response({
-                "message": "You enter an incorrect join code."
-            }, status=status.HTTP_400_BAD_REQUEST)
+            return self.response_bad_request("You enter an incorrect subscribe code.")
+        if not tag.author:
+            return self.response_bad_request("This Tag doesn't contain the author that required for the verification process. Please re-create the tag.")
+        if request.user.uid == tag.author.uid:
+            return self.response_bad_request("You can't subscribe to your own tag.")
 
         if not tag.subscriber:
             tag.subscriber = [request.user.uid]
         elif request.user.uid in tag.subscriber:
-            return Response({
-                "message": "User has already subscribed to this tag."
-            }, status=status.HTTP_400_BAD_REQUEST)
+            return self.response_bad_request("User has already subscribed to this tag.")
         elif tag.subscriber:
             tag.subscriber.append(request.user.uid)
         tag.save()
@@ -304,3 +298,8 @@ class TagViewset(viewsets.ModelViewSet):
                 tag.subscriber = None
             tag.save()
             return Response({"message": f"user has un-subscribed from tag id {tag.id}"}, status.HTTP_200_OK)
+
+    def response_bad_request(self, message):
+        return Response({
+            "message": message
+        }, status=status.HTTP_400_BAD_REQUEST)
