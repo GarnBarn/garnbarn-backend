@@ -6,4 +6,4 @@ class GarnbarnApiConfig(AppConfig):
     name = 'garnbarn_api'
 
     def ready(self):
-        from garnbarn_api.scheduler import scheduler
+        from garnbarn_api.services.scheduler import scheduler
