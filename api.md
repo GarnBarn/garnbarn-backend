@@ -219,7 +219,7 @@ curl -v -X POST {PREFIX}/api/v1/assignment/ \
 
 #### Response
 
-Return status code `200` and the new [Assignment Object](#assignment-object)
+Return status code `201` and the new [Assignment Object](#assignment-object)
 
 Example response:
 
@@ -500,7 +500,7 @@ curl -v -X POST {PREFIX}/api/v1/tag/ \
 ```
 
 #### Response
-Return status code `200` and [Tag Object](#tag-object)    
+Return status code `201` and [Tag Object](#tag-object)    
 Example response:
 
 ```JSON
