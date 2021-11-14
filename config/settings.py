@@ -78,6 +78,35 @@ TEMPLATES = [
     },
 ]
 
+# Logging configuration
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '[({levelname}) {asctime}]: {message}',
+            'style': '{',
+            'datefmt': "%y/%b/%Y %H:%M:%S"
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+    },
+    'loggers': {
+        'scheduler': {
+            'handlers': ['console'],
+            'propagate': False,
+        }
+    },
+}
+
 WSGI_APPLICATION = 'config.wsgi.application'
 
 

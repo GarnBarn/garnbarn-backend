@@ -3,11 +3,18 @@ import datetime
 from django.db.models.deletion import CASCADE, SET_NULL
 from django.utils import timezone
 import math
-from datetime import datetime, timedelta
+from datetime import datetime
+
 from garnbarn_api.services.pubsub import pubsub
-from rest_framework import serializers
 from garnbarn_api.services.scheduler import scheduler
 from apscheduler.triggers.date import DateTrigger
+
+import logging
+
+FORMAT = "%(asctime)-15s %(message)s"
+logging.basicConfig(format=FORMAT, level=logging.INFO,
+                    datefmt='%Y-%m-%d %H:%M:%S')
+logger = logging.getLogger(__name__)
 
 
 class CustomUser(models.Model):
@@ -133,5 +140,7 @@ class Assignment(models.Model):
             schedule = self.due_date.timestamp() - item
             schedule = datetime.fromtimestamp(schedule)
             if schedule > datetime.now():
-                scheduler.add_job(pubsub, trigger=DateTrigger(run_date=schedule), id=f"Notification - {self.pk}_{index}",
-                                  max_instances=1, replace_existing=True)
+                job = scheduler.add_job(pubsub, trigger=DateTrigger(run_date=schedule), id=f"Notification - {self.pk}_{index}",
+                                        max_instances=1, replace_existing=True)
+                logger.info(
+                    f"Schedule for assignment with id:{self.pk} has been set to trigger on ({job.next_run_time})")
