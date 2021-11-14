@@ -6,7 +6,7 @@ import math
 from datetime import datetime, timedelta
 from garnbarn_api.services.pubsub import pubsub
 from rest_framework import serializers
-from garnbarn_api.management.commands.runscheduler import scheduler
+from garnbarn_api.scheduler import scheduler
 from apscheduler.triggers.date import DateTrigger
 
 
