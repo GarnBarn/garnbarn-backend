@@ -10,9 +10,9 @@ from django_apscheduler.models import DjangoJobExecution
 from django_apscheduler import util
 
 logger = logging.getLogger(__name__)
+scheduler = BackgroundScheduler(timezone=settings.TIME_ZONE)
+scheduler.add_jobstore(DjangoJobStore(), "default")
 
 
 def start():
-    scheduler = BackgroundScheduler(timezone=settings.TIME_ZONE)
-    scheduler.add_jobstore(DjangoJobStore(), "default")
     scheduler.start()
