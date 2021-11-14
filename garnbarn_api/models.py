@@ -3,8 +3,11 @@ import datetime
 from django.db.models.deletion import CASCADE, SET_NULL
 from django.utils import timezone
 import math
-
+from datetime import datetime, timedelta
+from garnbarn_api.services.pubsub import pubsub
 from rest_framework import serializers
+from garnbarn_api.management.commands.runscheduler import scheduler
+from apscheduler.triggers.date import DateTrigger
 
 
 class CustomUser(models.Model):
@@ -101,3 +104,16 @@ class Assignment(models.Model):
 
     def __str__(self) -> str:
         return self.assignment_name
+
+    def save(self, *args, **kwargs):
+        """The save method that use to update the django job scheduler and save the data into the database
+        """
+        super().save(*args, **kwargs)
+        self.refresh_from_db()
+        # TODO: For development purpose This scheduler will schedule the job for the next 10 seconds after the call time.
+        a = scheduler.add_job(pubsub, trigger=DateTrigger(run_date=datetime.now() + timedelta(seconds=10)), id=f"Notification - {self.pk}",
+                              max_instances=1,
+                              replace_existing=True)
+        # TODO: Remove these line.
+        print(a.trigger)
+        print(scheduler.get_jobs())
