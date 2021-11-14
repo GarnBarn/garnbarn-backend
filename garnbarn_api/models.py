@@ -109,7 +109,29 @@ class Assignment(models.Model):
         """The save method that use to update the django job scheduler and save the data into the database
         """
         super().save(*args, **kwargs)
+        # Stop function if there is no due_date, because schedule time
+        # is calculated by due_date - reminder_time.
+        if not self.due_date:
+            return
+
         self.refresh_from_db()
-        schedule_date = datetime.now() + timedelta(seconds=10)
-        scheduler.add_job(pubsub, trigger=DateTrigger(run_date=schedule_date), id=f"Notification - {self.pk}",
-                          max_instances=1, replace_existing=True)
+        # Default value in schedule date is 0 because we have to
+        # add a job for on-time reminder.
+        schedule_date = [0]
+        if self.reminder_time:
+            schedule_date += self.reminder_time
+        elif not self.reminder_time and self.tag.reminder_time:
+            schedule_date += self.tag.reminder_time
+
+        for i in range(4):
+            job_id = f"Notification - {self.pk}_{i}"
+            if scheduler.get_job(job_id) is None:
+                break
+            scheduler.remove_job(job_id)
+
+        for index, item in enumerate(schedule_date):
+            schedule = self.due_date.timestamp() - item
+            schedule = datetime.fromtimestamp(schedule)
+            if schedule > datetime.now():
+                scheduler.add_job(pubsub, trigger=DateTrigger(run_date=schedule), id=f"Notification - {self.pk}_{index}",
+                                  max_instances=1, replace_existing=True)
