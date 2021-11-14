@@ -111,9 +111,9 @@ class Assignment(models.Model):
         super().save(*args, **kwargs)
         self.refresh_from_db()
         # TODO: For development purpose This scheduler will schedule the job for the next 10 seconds after the call time.
-        a = scheduler.add_job(pubsub, trigger=DateTrigger(run_date=datetime.now() + timedelta(seconds=10)), id=f"Notification - {self.pk}",
-                              max_instances=1,
-                              replace_existing=True)
+        schedule_date = datetime.now() + timedelta(seconds=10)
+        scheduler.add_job(pubsub, trigger=DateTrigger(run_date=schedule_date), id=f"Notification - {self.pk}",
+                          max_instances=1, replace_existing=True)
         # TODO: Remove these line.
-        print(a.trigger)
-        print(scheduler.get_jobs())
+        # print(a.trigger)
+        # print(scheduler.get_jobs())
