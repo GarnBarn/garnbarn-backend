@@ -154,7 +154,7 @@ class ViewTests(APITestCase):
         }
         response = self.client.post(
             "/api/v1/assignment/", json.dumps(data), content_type="application/json")
-        self.assertEqual(200, response.status_code)
+        self.assertEqual(201, response.status_code)
         new_assignment = Assignment.objects.get(assignment_name="assignment 2")
         # For dueDate, Python used second based timestamp. So converting between milisec timestamp
         # Will lose 3 unit presistion. So delta=1000
@@ -281,7 +281,7 @@ class ViewTests(APITestCase):
         }
         data['reminderTime'].sort()
         response = self.client.post("/api/v1/tag/", data)
-        self.assertEqual(200, response.status_code)
+        self.assertEqual(201, response.status_code)
 
     def test_tag_patch(self):
         """Update tag object."""
