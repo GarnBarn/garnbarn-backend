@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'garnbarn_api.apps.GarnbarnApiConfig',
     'rest_framework',
-    'corsheaders'
+    'corsheaders',
+    'django_apscheduler'
 ]
 
 MIDDLEWARE = [
