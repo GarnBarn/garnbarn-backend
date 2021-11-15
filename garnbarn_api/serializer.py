@@ -136,7 +136,7 @@ class TagSerializer(serializers.ModelSerializer):
     """
     reminderTime = ReminderTimeField(source='reminder_time', default=None,
                                      child=serializers.IntegerField(),
-                                     max_length=3
+                                     max_length=3, allow_null=True
                                      )
     author = serializers.PrimaryKeyRelatedField(
         source='author.uid', read_only=True, default=None)
@@ -176,7 +176,7 @@ class AssignmentSerializer(serializers.ModelSerializer):
         source='author.uid', read_only=True, default=None)
     reminderTime = ReminderTimeField(source='reminder_time', default=None,
                                      child=serializers.IntegerField(),
-                                     max_length=3
+                                     max_length=3, allow_null=True
                                      )
     tagId = TagIdField(source="tag", default=None, allow_null=True)
 
