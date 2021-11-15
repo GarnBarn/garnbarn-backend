@@ -127,8 +127,9 @@ class Assignment(models.Model):
         schedule_date = [0]
         if self.reminder_time:
             schedule_date += self.reminder_time
-        elif not self.reminder_time and self.tag.reminder_time:
-            schedule_date += self.tag.reminder_time
+        elif not self.reminder_time and self.tag:
+            if self.tag.reminder_time:
+                schedule_date += self.tag.reminder_time
 
         for i in range(4):
             job_id = f"Notification - {self.pk}_{i}"
