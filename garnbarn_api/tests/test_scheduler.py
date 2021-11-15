@@ -8,7 +8,7 @@ from datetime import timedelta, datetime
 
 
 def create_assignment(name, due_date=None, reminder=None, tag=None):
-    """Create a assignment"""
+    """Create an assignment"""
     assignment = Assignment(assignment_name=name,
                             due_date=due_date,
                             reminder_time=reminder,
@@ -19,7 +19,7 @@ def create_assignment(name, due_date=None, reminder=None, tag=None):
 
 class TestScheduler(TestCase):
     def setUp(self):
-        """Create tag and assignments"""
+        """Create tag and assignments."""
         self.due_date = timezone.now() + timedelta(days=10)
         hour = 3600  # seconds
         day = 86400  # seconds
@@ -45,7 +45,7 @@ class TestScheduler(TestCase):
                                               )
 
     def datetime_before_due_date(self, duration):
-        """Get datetime before assignment's due date"""
+        """Get datetime before assignment's due date."""
         if duration == "week":
             return self.due_date - timedelta(days=7)
         elif duration == "day":
@@ -88,6 +88,7 @@ class TestScheduler(TestCase):
         self.assertEqual(self.assignment_1.due_date, jobs[0].next_run_time)
 
     def test_schedule_time_is_behind_current_time(self):
+        """job must skip if schedule time is behind current time."""
         past_due_date = timezone.now() - timedelta(days=1)
         assignment = create_assignment(name="Old due date",
                                        due_date=past_due_date,
