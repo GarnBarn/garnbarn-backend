@@ -47,8 +47,6 @@ class ReminderTimeField(serializers.ListField):
             A sorted list of reminder time, if incoming data
             is an empty list return None.
         """
-        if data == []:
-            return None
         data = super().to_internal_value(data)
         data.sort()
         return data
