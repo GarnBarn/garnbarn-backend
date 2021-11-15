@@ -137,8 +137,11 @@ class Assignment(models.Model):
         for index, item in enumerate(schedule_date):
             schedule = self.due_date.timestamp() - item
             schedule = datetime.fromtimestamp(schedule)
-            if schedule > datetime.now():
-                job = scheduler.add_job(pubsub, trigger=DateTrigger(run_date=schedule), id=f"Notification - {self.pk}_{index}",
-                                        max_instances=1, replace_existing=True)
-                logger.info(
-                    f"Schedule for assignment with id:{self.pk} has been set to trigger on ({job.next_run_time})")
+            if schedule < datetime.now():
+                logger.debug(
+                    f"The schedule date({schedule}) is behind current time. Job skipped")
+                continue
+            job = scheduler.add_job(pubsub, trigger=DateTrigger(run_date=schedule), id=f"Notification - {self.pk}_{index}",
+                                    max_instances=1, replace_existing=True)
+            logger.info(
+                f"Schedule for assignment with id:{self.pk} has been set to trigger on ({job.next_run_time})")

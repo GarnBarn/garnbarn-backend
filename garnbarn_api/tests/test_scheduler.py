@@ -54,7 +54,7 @@ class TestScheduler(TestCase):
             return self.due_date - timedelta(hours=1)
 
     def test_schedule_assignment_with_due_date_and_reminder_time(self):
-        """Schedule assignment with specified due date and reminder time"""
+        """Schedule assignment with specified due date and reminder time."""
         self.assignment_1.save()
         jobs = scheduler.get_jobs()
         self.assertEqual(3, len(jobs))
@@ -63,7 +63,7 @@ class TestScheduler(TestCase):
         self.assertEqual(self.assignment_1.due_date, jobs[2].next_run_time)
 
     def test_schedule_assignment_with_no_due_date(self):
-        """Schedule must not be added if due date is not specified"""
+        """Schedule must not be added if due date is not specified."""
         self.assignment_2.save()
         self.assertEqual([], scheduler.get_jobs())
 
@@ -86,3 +86,13 @@ class TestScheduler(TestCase):
         jobs = scheduler.get_jobs()
         self.assertEqual(1, len(jobs))
         self.assertEqual(self.assignment_1.due_date, jobs[0].next_run_time)
+
+    def test_schedule_time_is_behind_current_time(self):
+        past_due_date = timezone.now() - timedelta(days=1)
+        assignment = create_assignment(name="Old due date",
+                                       due_date=past_due_date,
+                                       tag=self.tag
+                                       )
+        assignment.save()
+        jobs = scheduler.get_jobs()
+        self.assertEqual(0, len(jobs))
