@@ -88,7 +88,7 @@ class ViewTests(APITestCase):
         })
         self.assertJSONEqual(expected_result, converted_data)
         self.assertAlmostEqual(timestamp_cache_from_request,
-                               self.current_timestamp, delta=2)
+                               self.current_timestamp, delta=1000)
         self.assertEqual(200, response.status_code)
 
     def test_post_without_name(self):
