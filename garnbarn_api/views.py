@@ -145,7 +145,10 @@ class AssignmentViewset(viewsets.ModelViewSet):
             }, status=status.HTTP_400_BAD_REQUEST)
 
         self.perform_create(serializer)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        response = Response(serializer.data, status=status.HTTP_201_CREATED)
+        location_id = serializer.data.get('id')
+        response['Location'] = f"{request.path}" + f"{location_id}"
+        return response
 
     def perform_create(self, serializer):
         user_data = self.request.user.uid
@@ -210,7 +213,10 @@ class TagViewset(viewsets.ModelViewSet):
         self.perform_create(serializer, random_secret_key)
         response_data = serializer.data
         response_data["secretKeyTotp"] = random_secret_key
-        return Response(response_data, status=status.HTTP_201_CREATED)
+        response = Response(response_data, status=status.HTTP_201_CREATED)
+        location_id = serializer.data.get('id')
+        response['Location'] = f"{request.path}" + f"{location_id}"
+        return response
 
     def perform_create(self, serializer, secret_key):
         user_data = self.request.user.uid
