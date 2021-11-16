@@ -47,8 +47,6 @@ class ReminderTimeField(serializers.ListField):
             A sorted list of reminder time, if incoming data
             is an empty list return None.
         """
-        if data == []:
-            return None
         data = super().to_internal_value(data)
         data.sort()
         return data
@@ -135,7 +133,8 @@ class TagSerializer(serializers.ModelSerializer):
         }
     """
     reminderTime = ReminderTimeField(source='reminder_time', default=None,
-                                     child=serializers.IntegerField()
+                                     child=serializers.IntegerField(),
+                                     max_length=3, allow_null=True
                                      )
     author = serializers.PrimaryKeyRelatedField(
         source='author.uid', read_only=True, default=None)
@@ -174,7 +173,8 @@ class AssignmentSerializer(serializers.ModelSerializer):
     author = serializers.PrimaryKeyRelatedField(
         source='author.uid', read_only=True, default=None)
     reminderTime = ReminderTimeField(source='reminder_time', default=None,
-                                     child=serializers.IntegerField()
+                                     child=serializers.IntegerField(),
+                                     max_length=3, allow_null=True
                                      )
     tagId = TagIdField(source="tag", default=None, allow_null=True)
 
