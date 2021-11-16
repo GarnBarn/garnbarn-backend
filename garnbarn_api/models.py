@@ -1,17 +1,5 @@
 from django.db import models
-import datetime
-from django.db.models.deletion import CASCADE, SET_NULL
-from django.utils import timezone
 import math
-from datetime import datetime
-
-from garnbarn_api.services.pubsub import pubsub
-from garnbarn_api.services.scheduler import scheduler
-from apscheduler.triggers.date import DateTrigger
-
-import logging
-
-logger = logging.getLogger(__name__)
 
 
 class CustomUser(models.Model):
@@ -108,40 +96,3 @@ class Assignment(models.Model):
 
     def __str__(self) -> str:
         return self.assignment_name
-
-    def save(self, *args, **kwargs):
-        """The save method that use to update the django job scheduler and save the data into the database
-        """
-        super().save(*args, **kwargs)
-        # Stop function if there is no due_date, because schedule time
-        # is calculated by due_date - reminder_time.
-        if not self.due_date:
-            return
-
-        self.refresh_from_db()
-        # Default value in schedule date is 0 because we have to
-        # add a job for on-time reminder.
-        schedule_date = [0]
-        if self.reminder_time:
-            schedule_date += self.reminder_time
-        elif not self.reminder_time and self.tag:
-            if self.tag.reminder_time:
-                schedule_date += self.tag.reminder_time
-
-        for i in range(4):
-            job_id = f"Notification - {self.pk}_{i}"
-            if scheduler.get_job(job_id) is None:
-                break
-            scheduler.remove_job(job_id)
-
-        for index, item in enumerate(schedule_date):
-            schedule = self.due_date.timestamp() - item
-            schedule = datetime.fromtimestamp(schedule)
-            if schedule < datetime.now():
-                logger.debug(
-                    f"The schedule date({schedule}) is behind current time. Job skipped")
-                continue
-            job = scheduler.add_job(pubsub, trigger=DateTrigger(run_date=schedule), id=f"Notification - {self.pk}_{index}",
-                                    max_instances=1, replace_existing=True)
-            logger.info(
-                f"Schedule for assignment with id:{self.pk} has been set to trigger on ({job.next_run_time})")

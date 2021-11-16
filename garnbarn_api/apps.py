@@ -8,3 +8,4 @@ class GarnbarnApiConfig(AppConfig):
     def ready(self):
         from garnbarn_api.services.scheduler import scheduler
         scheduler.start()
+        import garnbarn_api.signals
