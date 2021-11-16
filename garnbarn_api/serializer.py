@@ -168,7 +168,7 @@ class AssignmentSerializer(serializers.ModelSerializer):
             }
     """
     name = serializers.CharField(source='assignment_name')
-    dueDate = TimestampField(source='due_date', default=None)
+    dueDate = TimestampField(source='due_date', default=None, allow_null=True)
     timestamp = TimestampField(default=None)
     author = serializers.PrimaryKeyRelatedField(
         source='author.uid', read_only=True, default=None)
