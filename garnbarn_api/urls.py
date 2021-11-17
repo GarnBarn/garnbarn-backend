@@ -2,7 +2,7 @@ from django.conf.urls import url
 from django.urls import path
 from django.urls.conf import include
 from rest_framework.routers import DefaultRouter
-from .views import AssignmentViewset, CustomUserViewset, TagViewset
+from garnbarn_api.views import AssignmentViewset, CustomUserViewset, TagViewset
 
 router = DefaultRouter()
 router.register('assignment', AssignmentViewset, basename='assignment')
