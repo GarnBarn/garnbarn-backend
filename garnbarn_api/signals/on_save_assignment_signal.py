@@ -66,8 +66,8 @@ def add_jobs(instance, schedule_time, func):
             f"Schedule for assignment with id:{instance.pk} has been set to trigger on ({job.next_run_time})")
 
     # test by un-commenting this
-    job = scheduler.add_job(func, trigger=DateTrigger(run_date=datetime.now() + timedelta(seconds=3)), id=f"Notification - {instance.pk}_{10}",
-                            max_instances=1, replace_existing=True, args=[instance])
+    # job = scheduler.add_job(func, trigger=DateTrigger(run_date=datetime.now() + timedelta(seconds=3)), id=f"Notification - {instance.pk}_{10}",
+    #                         max_instances=1, replace_existing=True, args=[instance])
 
 
 def clear_jobs(instance):
