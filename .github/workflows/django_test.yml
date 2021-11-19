@@ -12,6 +12,12 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
+      - name: "Mount LINE Secret File"
+        run: |
+          echo "$LINE_CONFIG" > line-config.json
+        shell: bash
+        env:
+          LINE_CONFIG: ${{secrets.LINE_CONFIG}}
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
@@ -28,6 +34,12 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
+      - name: "Mount LINE Secret File"
+        run: |
+          echo "$LINE_CONFIG" > line-config.json
+        shell: bash
+        env:
+          LINE_CONFIG: ${{secrets.LINE_CONFIG}}
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
