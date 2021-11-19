@@ -8,7 +8,7 @@ class NotificationPlatform():
     def notify(self, assignment_obj):
         """Invoke notification_handler."""
         receiver = {assignment_obj.author}
-        if assignment_obj.tag:
+        if assignment_obj.tag and assignment_obj.tag.subscriber:
             tag_subscriber = assignment_obj.tag.subscriber
             subscriber = self._convert_subscriber_to_obj(tag_subscriber)
             receiver = receiver.union(subscriber)
