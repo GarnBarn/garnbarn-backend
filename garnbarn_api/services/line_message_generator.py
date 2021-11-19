@@ -3,6 +3,7 @@ from garnbarn_api.models import Assignment
 
 
 class GarnBarnMessagingApiFlexMessageGenerator:
+    FRONTEND_URI_PREFIX = "https://garnbarn.web.app"
 
     @staticmethod
     def get_text_color(background_color):
@@ -200,7 +201,7 @@ class GarnBarnMessagingApiFlexMessageGenerator:
                     "action": {
                         "type": "uri",
                         "label": "View assignment on Garnban",
-                        "uri": f"https://garnbarn.web.app/assignment/{assignment_id}"
+                        "uri": f"{self.FRONTEND_URI_PREFIX}/assignment/{assignment_id}"
                     },
                     "style": "primary"
                 }
