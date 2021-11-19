@@ -104,7 +104,7 @@ class LineMessagingApiHelper:
         ]
         return self.push_message(user_id, messages)
 
-    def push_message(self, user_id: str, messages: list[dict]):
+    def push_message(self, user_id: str, messages: list):
         """Send the Push message to the specified user_id on LINE Platform.
 
         Args:
