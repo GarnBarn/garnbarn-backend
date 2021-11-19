@@ -1,9 +1,12 @@
 from abc import abstractmethod
-
 from garnbarn_api.models import CustomUser
+import logging
+
+logger = logging.getLogger("notification")
 
 
 class NotificationPlatform():
+    PLATFORM_NAME = "Default Platform"
 
     def notify(self, assignment_obj):
         """Invoke notification_handler."""
@@ -14,7 +17,14 @@ class NotificationPlatform():
             receiver = receiver.union(subscriber)
 
         for user in receiver:
-            self.notification_handler(assignment_obj, user)
+            try:
+                self.notification_handler(assignment_obj, user)
+            except Exception as e:
+                logger.warn(
+                    f"Notification can't be sent to {user.uid} on platform {self.PLATFORM_NAME} with error {e}")
+            else:
+                logger.info(
+                    f"Successfully to send the notification for assignment `{assignment_obj.id}` to user {user.uid} on platform {self.PLATFORM_NAME}")
 
     @abstractmethod
     def notification_handler(self, assignment_obj, user_obj):
@@ -31,7 +41,8 @@ class NotificationPlatform():
             (set): List of subscriber objects.
         """
         subscriber_obj_list = {}
-        for user_id in subscriber:
-            user = CustomUser.objects.get(uid=user_id)
-            subscriber_obj_list.add(user)
+        if subscriber:
+            for user_id in subscriber:
+                user = CustomUser.objects.get(uid=user_id)
+                subscriber_obj_list.add(user)
         return subscriber_obj_list
