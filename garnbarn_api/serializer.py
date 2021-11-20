@@ -48,6 +48,8 @@ class ReminderTimeField(serializers.ListField):
             is an empty list return None.
         """
         data = super().to_internal_value(data)
+        if len(set(data)) != len(data):
+            raise serializers.ValidationError("Reminder time can't be having duplicated time.")
         data.sort()
         return data
 
