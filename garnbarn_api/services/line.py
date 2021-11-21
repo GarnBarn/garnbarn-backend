@@ -12,7 +12,7 @@ class LineApiError(Exception):
         }
 
     def __str__(self):
-        return json.dumps(self.__line_error_object)
+        return json.dumps(self.line_error_object)
 
 
 class LineLoginPlatformHelper:
