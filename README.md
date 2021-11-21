@@ -10,7 +10,7 @@
 
 ```bash
 $ git clone git@github.com:GarnBarn/garnbarn-backend.git
-$ pip install -r requirement.txt
+$ pip install -r requirements.txt
 $ python manage.py migrate
 ```
 
