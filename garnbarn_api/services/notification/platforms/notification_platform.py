@@ -28,6 +28,7 @@ class NotificationPlatform():
 
     @abstractmethod
     def notification_handler(self, assignment_obj, user_obj):
+        """Send notification."""
         pass
 
     @staticmethod

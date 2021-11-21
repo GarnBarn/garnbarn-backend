@@ -9,6 +9,9 @@ notifier = NotificationPlatform.__subclasses__()
 
 @receiver(notification_signal)
 def send_notification(sender, assignment_obj, **kwargs):
+    """Receive signals when an assignment is created or updated,
+    then invoke all platform notifier methods.
+    """
     for platform in notifier:
         temp = platform()
         temp.notify(assignment_obj)
