@@ -228,14 +228,16 @@ class GarnBarnMessagingApiFlexMessageGenerator:
         if assignment.tag:
             contents.append(self.generate_tag_box(
                 text=assignment.tag.name, color=assignment.tag.color))
-        contents.append(self.generate_due_date(date=assignment.due_date))
-        contents.append(self.generate_detail_header())
-        contents.append(self.generate_detail_section(
-            text=assignment.description))
-        contents.append({
-            "type": "separator",
-            "margin": "xxl"
-        })
+        if assignment.due_date:
+            contents.append(self.generate_due_date(date=assignment.due_date))
+        if assignment.description:
+            contents.append(self.generate_detail_header())
+            contents.append(self.generate_detail_section(
+                text=assignment.description))
+            contents.append({
+                "type": "separator",
+                "margin": "xxl"
+            })
         contents.append(self.generate_action_button(
             assignment_id=assignment.id))
         return {
