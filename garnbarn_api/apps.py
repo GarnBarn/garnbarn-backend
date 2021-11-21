@@ -8,5 +8,5 @@ class GarnbarnApiConfig(AppConfig):
     def ready(self):
         from garnbarn_api.services.scheduler import scheduler
         scheduler.start()
-        import garnbarn_api.signals.on_save_assignment_signal
-        from garnbarn_api.services.notification import send_notification
+        from garnbarn_api.signals.on_save_assignment_signal import on_save_assignment
+        from garnbarn_api.services.notification.send_notification import send_notification
