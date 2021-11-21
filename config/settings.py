@@ -103,6 +103,10 @@ LOGGING = {
         'scheduler': {
             'handlers': ['console'],
             'propagate': False,
+        },
+        'notification': {
+            'handlers': ['console'],
+            'propagate': False,
         }
     },
 }
