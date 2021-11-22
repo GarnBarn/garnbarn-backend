@@ -41,7 +41,7 @@ class NotificationPlatform():
         Returns:
             (set): List of subscriber objects.
         """
-        subscriber_obj_list = {}
+        subscriber_obj_list = set()
         if subscriber:
             for user_id in subscriber:
                 user = CustomUser.objects.get(uid=user_id)
