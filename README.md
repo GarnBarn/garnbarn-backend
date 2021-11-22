@@ -3,7 +3,16 @@
 [![Django Test](https://github.com/GarnBarn/garnbarn-backend/actions/workflows/django_test.yml/badge.svg)](https://github.com/GarnBarn/garnbarn-backend/actions/workflows/django_test.yml)
 [![codecov](https://codecov.io/gh/GarnBarn/garnbarn-backend/branch/master/graph/badge.svg?token=HG7J0R5C2J)](https://codecov.io/gh/GarnBarn/garnbarn-backend)
 
+
 ## 📦 Build Steps
+
+### 0. Setting up
+
+```bash
+$ git clone git@github.com:GarnBarn/garnbarn-backend.git
+$ pip install -r requirements.txt
+$ python manage.py migrate
+```
 
 ### 1. Config the env file
 

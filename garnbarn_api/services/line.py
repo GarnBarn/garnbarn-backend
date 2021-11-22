@@ -1,5 +1,8 @@
 import requests
 import json
+from datetime import datetime
+from garnbarn_api.models import Assignment
+from garnbarn_api.services.line_message_generator import GarnBarnMessagingApiFlexMessageGenerator
 
 
 class LineApiError(Exception):
@@ -9,7 +12,7 @@ class LineApiError(Exception):
         }
 
     def __str__(self):
-        return json.dumps(self.__line_error_object)
+        return json.dumps(self.line_error_object)
 
 
 class LineLoginPlatformHelper:
@@ -21,7 +24,7 @@ class LineLoginPlatformHelper:
 
         Args:
             user_access_token (string, optional): The user's access token for LINE Login API. Defaults to None.
-            credential_file (str, optional): 
+            credential_file (str, optional):
                 The credential file containing the credential for LINE Login Channel. Defaults to "line-config.json".
         """
         # Automatic load credential from file
@@ -41,7 +44,7 @@ class LineLoginPlatformHelper:
 
         Raises:
             AssertionError: When the client id and the channel id is not the same
-            LineApiError: If LINE API not response 200 status_code 
+            LineApiError: If LINE API not response 200 status_code
         """
         if client_id != self.__channel_id:
             raise AssertionError(
@@ -63,7 +66,7 @@ class LineLoginPlatformHelper:
 
         Raises:
             TypeError: If the user_access_token is not set or type of user_access_token is not string
-            LineApiError: If LINE API not response 200 status_code 
+            LineApiError: If LINE API not response 200 status_code
 
         Returns:
             Dict: The LINE User profile object
@@ -76,6 +79,48 @@ class LineLoginPlatformHelper:
             "Authorization": f"Bearer {self.__user_access_token}"
         }
         response = requests.get(self.GET_USER_PROFILE_API, headers=headers)
+        if response.status_code != 200:
+            raise LineApiError(response.json())
+        return response.json()
+
+
+class LineMessagingApiHelper:
+    MESSAGING_API = {
+        "PUSH": "https://api.line.me/v2/bot/message/push",
+    }
+    messaging_api_flex_generator = GarnBarnMessagingApiFlexMessageGenerator()
+
+    def __init__(self, credential_file="line-config.json"):
+        credential_file_io = open(credential_file)
+        credential = json.load(credential_file_io)
+        self.__channel_access_token = credential["messaging_api"]["channel_access_token"]
+
+    def send_assignment_notification(self, user_id: str, assignment: Assignment):
+        """Send the message to LINE
+        """
+        messages = [
+            self.messaging_api_flex_generator.get_assignment_flex_message(
+                assignment)
+        ]
+        return self.push_message(user_id, messages)
+
+    def push_message(self, user_id: str, messages: list):
+        """Send the Push message to the specified user_id on LINE Platform.
+
+        Args:
+            user_id (string): The user id to send the message to
+            message (dict): The message to send to the user
+        """
+        headers = {
+            "Authorization": f"Bearer {self.__channel_access_token}",
+            "Content-Type": "application/json",
+        }
+        body = {
+            "to": user_id,
+            "messages": messages
+        }
+        response = requests.post(
+            self.MESSAGING_API["PUSH"], headers=headers, json=body)
         if response.status_code != 200:
             raise LineApiError(response.json())
         return response.json()

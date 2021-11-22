@@ -1,12 +1,9 @@
-import datetime
-from enum import auto
-import time
-from django.db import models
-from django.db.models import fields, query_utils
 from rest_framework import serializers
-from rest_framework.relations import PKOnlyObject
-from .models import Assignment, CustomUser, Tag
+from garnbarn_api.models import Assignment, CustomUser, Tag
+
 import math
+import datetime
+
 from firebase_admin import auth
 
 
@@ -48,6 +45,8 @@ class ReminderTimeField(serializers.ListField):
             is an empty list return None.
         """
         data = super().to_internal_value(data)
+        if len(set(data)) != len(data):
+            raise serializers.ValidationError("Reminder time can't be having duplicated time.")
         data.sort()
         return data
 
@@ -168,7 +167,7 @@ class AssignmentSerializer(serializers.ModelSerializer):
             }
     """
     name = serializers.CharField(source='assignment_name')
-    dueDate = TimestampField(source='due_date', default=None)
+    dueDate = TimestampField(source='due_date', default=None, allow_null=True)
     timestamp = TimestampField(default=None)
     author = serializers.PrimaryKeyRelatedField(
         source='author.uid', read_only=True, default=None)

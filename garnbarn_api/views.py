@@ -10,7 +10,7 @@ from rest_framework import viewsets, status
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from garnbarn_api.serializer import AssignmentSerializer, CustomUserSerializer, TagSerializer
-from .authentication import FirebaseAuthIDTokenAuthentication
+from garnbarn_api.authentication import FirebaseAuthIDTokenAuthentication
 from rest_framework.decorators import action, permission_classes, api_view
 from garnbarn_api.services.line import LineLoginPlatformHelper, LineApiError
 import json
