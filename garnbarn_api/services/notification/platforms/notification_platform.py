@@ -20,7 +20,7 @@ class NotificationPlatform():
             try:
                 self.notification_handler(assignment_obj, user)
             except Exception as e:
-                logger.warn(
+                logger.error(
                     f"Notification can't be sent to {user.uid} on platform {self.PLATFORM_NAME} with error {e}")
             else:
                 logger.info(
