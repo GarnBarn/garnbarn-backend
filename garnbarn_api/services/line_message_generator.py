@@ -110,7 +110,7 @@ class GarnBarnMessagingApiFlexMessageGenerator:
                     "type": "text",
                     "text": date.astimezone(
                         timezone.get_current_timezone()).strftime(
-                        "%m %b %Y\n%-I:%M %p"),
+                        "%d %b %Y\n%-I:%M %p"),
                     "wrap": True,
                     "align": "end"
                 }
