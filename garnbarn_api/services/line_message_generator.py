@@ -1,4 +1,5 @@
 from datetime import datetime
+from django.utils import timezone
 from garnbarn_api.models import Assignment
 
 
@@ -107,7 +108,9 @@ class GarnBarnMessagingApiFlexMessageGenerator:
                 },
                 {
                     "type": "text",
-                    "text": date.strftime("%m %b %Y\n%-I:%M %p"),
+                    "text": date.astimezone(
+                        timezone.get_current_timezone()).strftime(
+                        "%m %b %Y\n%-I:%M %p"),
                     "wrap": True,
                     "align": "end"
                 }
