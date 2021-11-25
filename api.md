@@ -486,7 +486,7 @@ This API will create the tag in Database.
 |                             | Parameters      |  Type  | Description                                                   |
 | :-------------------------: | :-------------- | :----: | :------------------------------------------------------------ |
 | ![Required][required_badge] | **name**        | String | The name of the new tag.                               |
-| ![Optional][optional_badge] | **author** | String | The uid of the user that create tag.                                |
+| ![Required][required_badge] | **author** | String | The uid of the user that create tag.                                |
 | ![Optional][optional_badge] | **color**     | String | The color of the tag. |
 | ![Optional][optional_badge] | **reminderTime**       | List: Int | The tag reminder time list.         |
 | ![Optional][optional_badge] | **subscriber**| List   | The list of all subscriber that subscribe the tag.       
@@ -536,7 +536,7 @@ Example error response:
 ---
 ### Delete Tag
 
-This API will delete the specifed tag from the Database.
+This API will delete the specifed tag that user was author from the Database.
 
 #### HTTP Request
 
@@ -548,12 +548,14 @@ This API will delete the specifed tag from the Database.
 | :-------------------------: | :---------------- | ------------------- |
 | ![Required][required_badge] | **Content-Type**  | application/json    |
 | ![Required][required_badge] | **Authorization** | Bearer `{ID Token}` |
+| ![Required][required_badge] | **author** | String | The uid of the user that create tag.                                |
 
 **Path parameters**
 
 |                             | Parameters       | Description           |
 | :-------------------------: | :--------------- | :-------------------- |
 | ![Required][required_badge] | **tagId** | The ID of tag user want to remove. |
+
 
 Example request:
 
@@ -584,7 +586,8 @@ Example error response:
 
 ---
 ### Update Tag
-This API will update the specifed assignment with the new detail.
+This API will update the specifed tag that user was the author or was subscribe to that tag 
+with the new detail.
 
 #### HTTP Request
 
@@ -596,6 +599,8 @@ This API will update the specifed assignment with the new detail.
 | :-------------------------: | :---------------- | ------------------- |
 | ![Required][required_badge] | **Content-Type**  | application/json    |
 | ![Required][required_badge] | **Authorization** | Bearer `{ID Token}` |
+| ![Required][required_badge] | **author** | String | The uid of the user that create tag.                                |
+| ![Required][required_badge] | **subscriber**| List   | User must be in subscribe list. | 
 
 **Path parameters**
 
@@ -679,7 +684,10 @@ Example error response:
 | :-------------------------: | :--------- | :----: | :------------------------- |
 | ![Required][required_badge] | **id**     | Number | The ID of the Tag.         |
 | ![Required][required_badge] | **name**   | String | The name of the Tag.       |
+| ![Required][required_badge] | **author** | String | The uid of the user that create tag.                                |
 | ![Optional][optional_badge] | **color**  | String | Hex color code of the tag. |
+| ![Optional][optional_badge] | **reminderTime**       | List: Int | The tag reminder time list.         |
+| ![Optional][optional_badge] | **subscriber**| List   | The list of all subscriber that subscribe the tag.      
 
 ## Error responses in Common specifications
 
