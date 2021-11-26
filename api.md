@@ -199,6 +199,7 @@ This API will create the assignment in the Database.
 |                             | Parameters      |  Type  | Description                                                   |
 | :-------------------------: | :-------------- | :----: | :------------------------------------------------------------ |
 | ![Required][required_badge] | **name**        | String | The name of the new assignment.                               |
+| ![Required][required_badge] | **author** | String | The uid of the user that create assignment.                                |
 | ![Optional][optional_badge] | **description** | String | The description of assignment.                                |
 | ![Optional][optional_badge] | **dueDate**     | Number | The due date of the new assignment specifed as **Timestamp**. |
 | ![Optional][optional_badge] | **tagId**       | Number | The tag id that this assignment will be assgiened to.         |
@@ -230,9 +231,20 @@ Example response:
     "author": "0000000000000000000000000000",
     "dueDate": 1634745493,
     "tag": {
-        "id": 1234,
-        "name": "Example Tag",
-        "color": "#11111"
+        "id": 1,
+        "name": "tag",
+        "author": "0000000000000000000000000000",
+        "color": "#TTTTTT",
+        "reminderTime": [
+            1,
+            2,
+            3
+        ],
+        "subscriber": [
+            1,
+            2,
+            3
+        ]
     },
     "reminderTime": [
         1,
@@ -279,6 +291,7 @@ This API will delete the specifed assignment from the Database.
 |                             | Parameters       | Description                              |
 | :-------------------------: | :--------------- | :--------------------------------------- |
 | ![Required][required_badge] | **assignmentId** | The ID of assignment you want to remove. |
+| ![Required][required_badge] | **author** | String | The uid of the user that create tag.                                |
 
 Example request:
 
@@ -314,7 +327,7 @@ Example error response:
 
 ### Update Assignment
 
-This API will update the specifed assignment with the new detail.
+This API will update the specifed assignment that user was the author with the new detail.
 
 #### Permission
 
@@ -337,6 +350,7 @@ This API will update the specifed assignment with the new detail.
 |                             | Parameters       |  Type  | Description                              |
 | :-------------------------: | :--------------- | :----: | :--------------------------------------- |
 | ![Required][required_badge] | **assignmentId** | String | The ID of assignment you want to update. |
+| ![Required][required_badge] | **author** | String | The uid of the user that create tag.                                |
 
 **Request body**
 
@@ -376,7 +390,18 @@ Example response:
     "tag": {
         "id": 1,
         "name": "ISP",
-        "color": "#4285F4"
+        "author": "0000000000000000000000000000",
+        "color": "#4285F4",
+        "reminderTime": [
+            1,
+            2,
+            3
+        ],
+        "subscriber": [
+            1,
+            2,
+            3
+        ]
     },
     "reminderTime": [
         1,
@@ -663,6 +688,132 @@ Example error response:
 }
 ```
 
+### Subscribe Tag
+This API will subscribe the specifed tag that user want to subscribe.
+
+#### HTTP Request
+`POST /api/v1/tag/{tagId}/subscribe`
+
+**Request headers**
+
+|                             | Parameters        | Value               |
+| :-------------------------: | :---------------- | ------------------- |
+| ![Required][required_badge] | **Content-Type**  | application/json    |
+| ![Required][required_badge] | **Authorization** | Bearer `{ID Token}` |
+
+**Path parameters**
+
+|                             | Parameters       |  Type  | Description                              |
+| :-------------------------: | :--------------- | :----: | :--------------------------------------- |
+| ![Required][required_badge] | **tagId** | String | The ID of tag you want to subscribe. |
+| ![Required][required_badge] | **TOTP** | String | The TOTP code of tag you want to subscribe. |
+
+Example request:
+
+```bash
+curl -v -X POST {PREFIX}/api/v1/tag/{tagId}/subscribe \
+-H 'Content-Type: application/json' \
+-H 'Authorization: Bearer {ID Token}' \
+-d '{
+    "subscriber": "1111111111111111111111111111"
+}'
+```
+
+#### Response
+Return status code `200` and [Tag Object](#tag-object)    
+Example response:
+
+```JSON
+{
+    "id": 1,
+    "name": "ISP",
+    "author": "0000000000000000000000000000",
+    "color": "#TTTTTT",
+    "reminderTime": [
+        1,
+        2,
+        3
+    ],
+    "subscriber": [
+        11111111111111111111111111111
+    ]
+}
+```
+
+#### Error
+
+Returns a `40x` HTTP status code and an error response. For more information, see [Error responses in Common specifications](#error-responses-in-common-specifications).
+
+Example error response:
+
+```JSON
+{
+    "message": "Tag not found"
+}
+```
+
+### Unsubscribe Tag
+This API will unsubscribe the specifed tag that user want to unsubscribe.
+
+#### HTTP Request
+`POST /api/v1/tag/{tagId}/unsubscribe`
+
+**Request headers**
+
+|                             | Parameters        | Value               |
+| :-------------------------: | :---------------- | ------------------- |
+| ![Required][required_badge] | **Content-Type**  | application/json    |
+| ![Required][required_badge] | **Authorization** | Bearer `{ID Token}` |
+
+**Path parameters**
+
+|                             | Parameters       |  Type  | Description                              |
+| :-------------------------: | :--------------- | :----: | :--------------------------------------- |
+| ![Required][required_badge] | **tagId** | String | The ID of tag you want to subscribe. |
+
+Example request:
+
+```bash
+curl -v -X POST {PREFIX}/api/v1/tag/{tagId}/subscribe \
+-H 'Content-Type: application/json' \
+-H 'Authorization: Bearer {ID Token}' \
+-d '{
+    "subscriber": []
+}'
+```
+
+#### Response
+Return status code `200` and [Tag Object](#tag-object)    
+Example response:
+
+```JSON
+{
+    "id": 1,
+    "name": "ISP",
+    "author": "0000000000000000000000000000",
+    "color": "#TTTTTT",
+    "reminderTime": [
+        1,
+        2,
+        3
+    ],
+    "subscriber": [
+    ]
+}
+```
+
+#### Error
+
+Returns a `40x` HTTP status code and an error response. For more information, see [Error responses in Common specifications](#error-responses-in-common-specifications).
+
+Example error response:
+
+```JSON
+{
+    "message": "Tag not found"
+}
+```
+
 ---
 
 ## Object Structure
@@ -687,7 +838,7 @@ Example error response:
 | ![Required][required_badge] | **author** | String | The uid of the user that create tag.                                |
 | ![Optional][optional_badge] | **color**  | String | Hex color code of the tag. |
 | ![Optional][optional_badge] | **reminderTime**       | List: Int | The tag reminder time list.         |
-| ![Optional][optional_badge] | **subscriber**| List   | The list of all subscriber that subscribe the tag.      
+| ![Optional][optional_badge] | **subscriber**| List   | The list of all subscriber that subscribe the tag.      |
 
 ## Error responses in Common specifications
 
