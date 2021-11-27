@@ -1,12 +1,12 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from garnbarn_api.models import Assignment
+from garnbarn_api.models import Assignment, Tag
 from garnbarn_api.services.scheduler import scheduler
 from garnbarn_api.signals.publish_notification_signal import publish_notification_signal
 from apscheduler.triggers.date import DateTrigger
 
-from datetime import datetime, timedelta
+from datetime import datetime
 import logging
 
 logger = logging.getLogger(__name__)
@@ -20,15 +20,25 @@ def on_save_assignment(sender, instance: Assignment, created, **kwargs):
     if not instance.due_date:
         return
     instance.refresh_from_db()
-    # Default value in schedule date is 0 because we have to
-    # add a job for on-time reminder.
-    schedule_time = [0]
-    adjust_schedule_date(instance, schedule_time)
+    schedule_time = adjust_schedule_date(instance)
     clear_jobs(instance)
     add_jobs(instance, schedule_time, publish_notification_signal)
 
 
-def adjust_schedule_date(instance, schedule_time):
+@receiver(post_save, sender=Tag)
+def on_save_tag(sender, instance: Tag, created, **kwargs):
+    assignments = Assignment.objects.filter(tag=instance)
+    if not assignments or not instance.reminder_time:
+        return
+    instance.refresh_from_db()
+    for assignment in assignments:
+        if not assignment.reminder_time:
+            schedule = adjust_schedule_date(assignment)
+            clear_jobs(assignment)
+            add_jobs(assignment, schedule, publish_notification_signal)
+
+
+def adjust_schedule_date(instance):
     """If assignment object did not provide any reminder time,
     tag's reminder time will be used.
 
@@ -36,6 +46,9 @@ def adjust_schedule_date(instance, schedule_time):
         instance (Assignment): Assignment object.
         schedule_date (list): List of reminder times.
     """
+    # Default value in schedule date is 0 because we have to
+    # add a job for on-time reminder.
+    schedule_time = [0]
     if instance.reminder_time:
         schedule_time += instance.reminder_time
     elif not instance.reminder_time and instance.tag:
