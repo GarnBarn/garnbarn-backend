@@ -46,7 +46,8 @@ class ReminderTimeField(serializers.ListField):
         """
         data = super().to_internal_value(data)
         if len(set(data)) != len(data):
-            raise serializers.ValidationError("Reminder time can't be having duplicated time.")
+            raise serializers.ValidationError(
+                "Reminder time can't be having duplicated time.")
         data.sort()
         return data
 
@@ -166,7 +167,7 @@ class AssignmentSerializer(serializers.ModelSerializer):
             "tagId": 1
             }
     """
-    name = serializers.CharField(source='assignment_name')
+    name = serializers.CharField(source='assignment_name', max_length=100)
     dueDate = TimestampField(source='due_date', default=None, allow_null=True)
     timestamp = TimestampField(default=None)
     author = serializers.PrimaryKeyRelatedField(
